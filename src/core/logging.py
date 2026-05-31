@@ -1,48 +1,24 @@
-"""
-Structured Logging Setup.
-Configures structlog for JSON logs in production and readable formatting in development.
-"""
-
 import logging
-import sys
 import structlog
 
-from src.config import settings
-
-
-def setup_logging() -> None:
-    """Configures structured logging for the entire platform."""
-    shared_processors = [
-        structlog.contextvars.merge_contextvars,
-        structlog.processors.add_log_level,
-        structlog.processors.format_exc_info,
-        structlog.processors.TimeStamper(fmt="iso"),
-    ]
-
-    if settings.environment == "local":
-        # Interactive colored output for local CLI console
-        processors = shared_processors + [
-            structlog.dev.ConsoleRenderer()
-        ]
-    else:
-        # Standard structural JSON logs for log shippers (ELK / Grafana Loki)
-        processors = shared_processors + [
-            structlog.processors.dict_tracebacks,
-            structlog.processors.JSONRenderer(),
-        ]
-
+def setup_logging(log_level: int = logging.INFO) -> None:
+    """Configure structlog with basic settings."""
     structlog.configure(
-        processors=processors,
-        logger_factory=structlog.PrintLoggerFactory(),
-        wrapper_class=structlog.make_filtering_bound_logger(
-            logging.DEBUG if settings.debug else logging.INFO
-        ),
+        processors=[
+            structlog.stdlib.add_log_level,
+            structlog.stdlib.PositionalArgumentsFormatter(),
+            structlog.processors.TimeStamper(fmt="iso"),
+            structlog.processors.StackInfoRenderer(),
+            structlog.processors.format_exc_info,
+            structlog.dev.ConsoleRenderer()
+        ],
+        context_class=dict,
+        logger_factory=structlog.stdlib.LoggerFactory(),
+        wrapper_class=structlog.stdlib.BoundLogger,
         cache_logger_on_first_use=True,
     )
+    logging.basicConfig(level=log_level)
 
-    # Route standard Python stdlib logging through structlog
-    logging.basicConfig(
-        format="%(message)s",
-        stream=sys.stdout,
-        level=logging.INFO,
-    )
+def get_logger(name: str | None = None) -> structlog.BoundLogger:
+    """Get a bound structlog logger."""
+    return structlog.get_logger(name)
