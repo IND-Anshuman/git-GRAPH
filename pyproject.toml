@@ -1,0 +1,54 @@
+[tool.poetry]
+name = "git-graph"
+version = "0.1.0"
+description = "AI-Powered Temporal Code Knowledge Graph Platform"
+authors = ["Your Name <you@example.com>"]
+readme = "README.md"
+packages = [{include = "src"}]
+
+[tool.poetry.dependencies]
+python = "^3.12"
+fastapi = "^0.111.0"
+uvicorn = {extras = ["standard"], version = "^0.30.0"}
+pydantic = "^2.7.0"
+pydantic-settings = "^2.2.0"
+sqlalchemy = {extras = ["asyncio"], version = "^2.0.30"}
+asyncpg = "^0.29.0"
+pgvector = "^0.3.0"
+gitpython = "^3.1.43"
+tree-sitter = "^0.21.3"
+structlog = "^24.2.0"
+opentelemetry-api = "^1.25.0"
+opentelemetry-sdk = "^1.25.0"
+opentelemetry-instrumentation-fastapi = "^0.46b0"
+redis = "^5.0.4"
+celery = "^5.4.0"
+langgraph = "^0.0.60"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.2.0"
+pytest-asyncio = "^0.23.0"
+black = "^24.4.0"
+ruff = "^0.4.4"
+mypy = "^1.10.0"
+alembic = "^1.13.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+line-length = 88
+target-version = ['py312']
+
+[tool.ruff]
+line-length = 88
+target-version = "py312"
+select = ["E", "F", "I", "N", "UP", "B", "C4", "RUF"]
+ignore = []
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+ignore_missing_imports = true
+exclude = ["migrations"]
