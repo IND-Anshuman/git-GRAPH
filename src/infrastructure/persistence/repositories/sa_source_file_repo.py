@@ -1,0 +1,57 @@
+"""SQLAlchemy implementation of ISourceFileRepository."""
+
+from typing import List, Optional
+from sqlalchemy.orm import Session
+from sqlalchemy import select
+
+from src.domain.entities.source_file import SourceFile
+from src.domain.repositories.source_file_repo import ISourceFileRepository
+from src.domain.value_objects.file_id import FileId
+from src.domain.value_objects.repository_id import RepositoryId
+from src.infrastructure.persistence.models.source_file_model import SourceFileModel
+from src.infrastructure.persistence.mappers.domain_mapper import DomainMapper
+
+
+class SASourceFileRepository(ISourceFileRepository):
+    """SQLAlchemy repository for SourceFile entities."""
+
+    def __init__(self, session: Session) -> None:
+        self.session = session
+
+    def get_by_id(self, id: FileId) -> Optional[SourceFile]:
+        model = self.session.get(SourceFileModel, id.value)
+        if model:
+            return DomainMapper.to_source_file_entity(model)
+        return None
+        
+    def get_by_path(self, repository_id: RepositoryId, file_path: str) -> Optional[SourceFile]:
+        stmt = select(SourceFileModel).where(
+            SourceFileModel.repository_id == repository_id.value,
+            SourceFileModel.file_path == file_path
+        )
+        model = self.session.execute(stmt).scalar_one_or_none()
+        if model:
+            return DomainMapper.to_source_file_entity(model)
+        return None
+
+    def get_all_by_repository(self, repository_id: RepositoryId) -> List[SourceFile]:
+        stmt = select(SourceFileModel).where(SourceFileModel.repository_id == repository_id.value)
+        models = self.session.execute(stmt).scalars().all()
+        return [DomainMapper.to_source_file_entity(m) for m in models]
+
+    def add(self, entity: SourceFile) -> None:
+        model = DomainMapper.to_source_file_model(entity)
+        self.session.add(model)
+        
+    def add_many(self, entities: List[SourceFile]) -> None:
+        models = [DomainMapper.to_source_file_model(e) for e in entities]
+        self.session.add_all(models)
+
+    def update(self, entity: SourceFile) -> None:
+        model = DomainMapper.to_source_file_model(entity)
+        self.session.merge(model)
+
+    def delete(self, id: FileId) -> None:
+        model = self.session.get(SourceFileModel, id.value)
+        if model:
+            self.session.delete(model)
