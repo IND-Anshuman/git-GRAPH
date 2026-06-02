@@ -4,7 +4,12 @@ from src.domain.repositories import (
     IRepositoryRepository,
     ISourceFileRepository,
     ICodeEntityRepository,
-    IRelationshipRepository
+    IRelationshipRepository,
+    ICommitRepository,
+    IEntityVersionRepository,
+    IRelationshipVersionRepository,
+    IChangeEventRepository,
+    IRepositorySnapshotRepository
 )
 
 class IUnitOfWork(ABC):
@@ -42,4 +47,29 @@ class IUnitOfWork(ABC):
     @property
     @abstractmethod
     def relationships(self) -> IRelationshipRepository:
+        pass
+
+    @property
+    @abstractmethod
+    def commits(self) -> ICommitRepository:
+        pass
+
+    @property
+    @abstractmethod
+    def entity_versions(self) -> IEntityVersionRepository:
+        pass
+
+    @property
+    @abstractmethod
+    def relationship_versions(self) -> IRelationshipVersionRepository:
+        pass
+
+    @property
+    @abstractmethod
+    def change_events(self) -> IChangeEventRepository:
+        pass
+
+    @property
+    @abstractmethod
+    def snapshots(self) -> IRepositorySnapshotRepository:
         pass
