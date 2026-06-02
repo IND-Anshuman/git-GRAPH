@@ -1,1 +1,21 @@
-"""Repositories module initialization."""
+from src.infrastructure.persistence.repositories.sa_repository_repo import SARepositoryRepository
+from src.infrastructure.persistence.repositories.sa_source_file_repo import SASourceFileRepository
+from src.infrastructure.persistence.repositories.sa_code_entity_repo import SACodeEntityRepository
+from src.infrastructure.persistence.repositories.sa_relationship_repo import SARelationshipRepository
+from src.infrastructure.persistence.repositories.sa_commit_repo import SACommitRepository
+from src.infrastructure.persistence.repositories.sa_entity_version_repo import SAEntityVersionRepository
+from src.infrastructure.persistence.repositories.sa_relationship_version_repo import SARelationshipVersionRepository
+from src.infrastructure.persistence.repositories.sa_change_event_repo import SAChangeEventRepository
+from src.infrastructure.persistence.repositories.sa_snapshot_repo import SARepositorySnapshotRepository
+
+__all__ = [
+    "SARepositoryRepository",
+    "SASourceFileRepository",
+    "SACodeEntityRepository",
+    "SARelationshipRepository",
+    "SACommitRepository",
+    "SAEntityVersionRepository",
+    "SARelationshipVersionRepository",
+    "SAChangeEventRepository",
+    "SARepositorySnapshotRepository",
+]

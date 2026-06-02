@@ -34,24 +34,22 @@ class SASourceFileRepository(ISourceFileRepository):
             return DomainMapper.to_source_file_entity(model)
         return None
 
-    def get_all_by_repository(self, repository_id: RepositoryId) -> List[SourceFile]:
-        stmt = select(SourceFileModel).where(SourceFileModel.repository_id == repository_id.value)
+    def get_by_repository(self, repo_id: RepositoryId) -> List[SourceFile]:
+        stmt = select(SourceFileModel).where(SourceFileModel.repository_id == repo_id.value)
         models = self.session.execute(stmt).scalars().all()
         return [DomainMapper.to_source_file_entity(m) for m in models]
 
-    def add(self, entity: SourceFile) -> None:
-        model = DomainMapper.to_source_file_model(entity)
-        self.session.add(model)
-        
-    def add_many(self, entities: List[SourceFile]) -> None:
-        models = [DomainMapper.to_source_file_model(e) for e in entities]
-        self.session.add_all(models)
-
-    def update(self, entity: SourceFile) -> None:
-        model = DomainMapper.to_source_file_model(entity)
+    def save(self, file: SourceFile) -> None:
+        model = DomainMapper.to_source_file_model(file)
         self.session.merge(model)
+        
+    def save_batch(self, files: List[SourceFile]) -> None:
+        models = [DomainMapper.to_source_file_model(f) for f in files]
+        for model in models:
+            self.session.merge(model)
 
-    def delete(self, id: FileId) -> None:
-        model = self.session.get(SourceFileModel, id.value)
-        if model:
-            self.session.delete(model)
+    def delete_by_repository(self, repo_id: RepositoryId) -> None:
+        stmt = select(SourceFileModel).where(SourceFileModel.repository_id == repo_id.value)
+        models = self.session.execute(stmt).scalars().all()
+        for m in models:
+            self.session.delete(m)

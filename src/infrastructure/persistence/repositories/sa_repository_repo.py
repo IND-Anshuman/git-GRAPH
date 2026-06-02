@@ -23,16 +23,19 @@ class SARepositoryRepository(IRepositoryRepository):
             return DomainMapper.to_repository_entity(model)
         return None
 
-    def get_all(self) -> List[RepositoryEntity]:
+    def get_by_url(self, url: str) -> Optional[RepositoryEntity]:
+        stmt = select(RepositoryModel).where(RepositoryModel.url == url)
+        model = self.session.execute(stmt).scalar_one_or_none()
+        if model:
+            return DomainMapper.to_repository_entity(model)
+        return None
+
+    def list_all(self) -> List[RepositoryEntity]:
         stmt = select(RepositoryModel)
         models = self.session.execute(stmt).scalars().all()
         return [DomainMapper.to_repository_entity(m) for m in models]
 
-    def add(self, entity: RepositoryEntity) -> None:
-        model = DomainMapper.to_repository_model(entity)
-        self.session.add(model)
-
-    def update(self, entity: RepositoryEntity) -> None:
+    def save(self, entity: RepositoryEntity) -> None:
         model = DomainMapper.to_repository_model(entity)
         self.session.merge(model)
 
