@@ -4,7 +4,15 @@ from unittest.mock import Mock
 @pytest.fixture
 def db_engine():
     from sqlalchemy import create_engine
-    return create_engine("sqlite:///:memory:")
+    from sqlalchemy.pool import StaticPool
+    from src.infrastructure.persistence.models import Base
+    engine = create_engine(
+        "sqlite:///:memory:",
+        connect_args={"check_same_thread": False},
+        poolclass=StaticPool
+    )
+    Base.metadata.create_all(engine)
+    return engine
 
 @pytest.fixture
 def db_session(db_engine):
