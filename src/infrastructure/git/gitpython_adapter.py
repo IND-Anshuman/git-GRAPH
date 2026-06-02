@@ -49,3 +49,11 @@ class GitPythonAdapter(IGitAdapter):
             raise DomainException(f"Not a valid git repository: {repo_path}") from e
         except Exception as e:
             raise DomainException(f"Failed to get commit hash: {str(e)}") from e
+
+    def checkout_commit(self, repo_path: str, commit_hash: str) -> None:
+        """Checks out a specific commit in the repository."""
+        try:
+            repo = Repo(repo_path)
+            repo.git.checkout(commit_hash)
+        except Exception as e:
+            raise DomainException(f"Failed to checkout commit {commit_hash}: {str(e)}") from e
