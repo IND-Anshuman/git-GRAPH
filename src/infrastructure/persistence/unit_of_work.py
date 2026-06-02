@@ -4,15 +4,27 @@ from typing import Any
 from sqlalchemy.orm import Session
 
 from src.application.ports.unit_of_work import IUnitOfWork
-from src.domain.repositories.repository_repo import IRepositoryRepository
-from src.domain.repositories.source_file_repo import ISourceFileRepository
-from src.domain.repositories.code_entity_repo import ICodeEntityRepository
-from src.domain.repositories.relationship_repo import IRelationshipRepository
+from src.domain.repositories import (
+    IRepositoryRepository,
+    ISourceFileRepository,
+    ICodeEntityRepository,
+    IRelationshipRepository,
+    ICommitRepository,
+    IEntityVersionRepository,
+    IRelationshipVersionRepository,
+    IChangeEventRepository,
+    IRepositorySnapshotRepository
+)
 
 from src.infrastructure.persistence.repositories.sa_repository_repo import SARepositoryRepository
 from src.infrastructure.persistence.repositories.sa_source_file_repo import SASourceFileRepository
 from src.infrastructure.persistence.repositories.sa_code_entity_repo import SACodeEntityRepository
 from src.infrastructure.persistence.repositories.sa_relationship_repo import SARelationshipRepository
+from src.infrastructure.persistence.repositories.sa_commit_repo import SACommitRepository
+from src.infrastructure.persistence.repositories.sa_entity_version_repo import SAEntityVersionRepository
+from src.infrastructure.persistence.repositories.sa_relationship_version_repo import SARelationshipVersionRepository
+from src.infrastructure.persistence.repositories.sa_change_event_repo import SAChangeEventRepository
+from src.infrastructure.persistence.repositories.sa_snapshot_repo import SARepositorySnapshotRepository
 from src.infrastructure.persistence.database import DatabaseEngine
 
 
@@ -25,10 +37,15 @@ class SQLAlchemyUnitOfWork(IUnitOfWork):
         
     def __enter__(self) -> "SQLAlchemyUnitOfWork":
         self._session = self._db_engine.session_factory()
-        self.repositories = SARepositoryRepository(self._session)
-        self.source_files = SASourceFileRepository(self._session)
-        self.code_entities = SACodeEntityRepository(self._session)
-        self.relationships = SARelationshipRepository(self._session)
+        self._repositories = SARepositoryRepository(self._session)
+        self._source_files = SASourceFileRepository(self._session)
+        self._code_entities = SACodeEntityRepository(self._session)
+        self._relationships = SARelationshipRepository(self._session)
+        self._commits = SACommitRepository(self._session)
+        self._entity_versions = SAEntityVersionRepository(self._session)
+        self._relationship_versions = SARelationshipVersionRepository(self._session)
+        self._change_events = SAChangeEventRepository(self._session)
+        self._snapshots = SARepositorySnapshotRepository(self._session)
         return self
 
     def __exit__(self, exc_type: Any, exc_val: Any, exc_tb: Any) -> None:
@@ -43,3 +60,39 @@ class SQLAlchemyUnitOfWork(IUnitOfWork):
 
     def rollback(self) -> None:
         self._session.rollback()
+
+    @property
+    def repositories(self) -> IRepositoryRepository:
+        return self._repositories
+
+    @property
+    def source_files(self) -> ISourceFileRepository:
+        return self._source_files
+
+    @property
+    def code_entities(self) -> ICodeEntityRepository:
+        return self._code_entities
+
+    @property
+    def relationships(self) -> IRelationshipRepository:
+        return self._relationships
+
+    @property
+    def commits(self) -> ICommitRepository:
+        return self._commits
+
+    @property
+    def entity_versions(self) -> IEntityVersionRepository:
+        return self._entity_versions
+
+    @property
+    def relationship_versions(self) -> IRelationshipVersionRepository:
+        return self._relationship_versions
+
+    @property
+    def change_events(self) -> IChangeEventRepository:
+        return self._change_events
+
+    @property
+    def snapshots(self) -> IRepositorySnapshotRepository:
+        return self._snapshots
