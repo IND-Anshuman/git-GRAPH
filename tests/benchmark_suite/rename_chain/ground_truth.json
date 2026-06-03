@@ -1,0 +1,29 @@
+{
+  "repository_name": "rename_chain_repo",
+  "expected_timeline": [
+    {
+      "commit_hash": "hash1",
+      "changes": [
+        {
+          "seid": "entity-1",
+          "change_type": "CREATED",
+          "canonical_name": "calculate_tax",
+          "file_path": "src/tax.py"
+        }
+      ]
+    },
+    {
+      "commit_hash": "hash2",
+      "changes": [
+        {
+          "seid": "entity-1",
+          "change_type": "RENAMED",
+          "canonical_name": "compute_tax",
+          "file_path": "src/tax.py",
+          "previous_name": "calculate_tax",
+          "previous_path": "src/tax.py"
+        }
+      ]
+    }
+  ]
+}

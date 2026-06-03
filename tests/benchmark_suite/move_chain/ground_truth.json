@@ -1,0 +1,29 @@
+{
+  "repository_name": "move_chain_repo",
+  "expected_timeline": [
+    {
+      "commit_hash": "hash1",
+      "changes": [
+        {
+          "seid": "entity-2",
+          "change_type": "CREATED",
+          "canonical_name": "Worker",
+          "file_path": "src/old_path.py"
+        }
+      ]
+    },
+    {
+      "commit_hash": "hash2",
+      "changes": [
+        {
+          "seid": "entity-2",
+          "change_type": "MOVED",
+          "canonical_name": "Worker",
+          "file_path": "src/new_path.py",
+          "previous_name": "Worker",
+          "previous_path": "src/old_path.py"
+        }
+      ]
+    }
+  ]
+}

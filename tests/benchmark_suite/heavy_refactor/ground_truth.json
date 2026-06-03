@@ -1,0 +1,27 @@
+{
+  "repository_name": "heavy_refactor_repo",
+  "expected_timeline": [
+    {
+      "commit_hash": "hash1",
+      "changes": [
+        {
+          "seid": "entity-3",
+          "change_type": "CREATED",
+          "canonical_name": "CoreClass",
+          "file_path": "src/core.py"
+        }
+      ]
+    },
+    {
+      "commit_hash": "hash2",
+      "changes": [
+        {
+          "seid": "entity-3",
+          "change_type": "MODIFIED",
+          "canonical_name": "CoreClass",
+          "file_path": "src/core.py"
+        }
+      ]
+    }
+  ]
+}

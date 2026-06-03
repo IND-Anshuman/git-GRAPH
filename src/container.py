@@ -25,6 +25,13 @@ from src.infrastructure.persistence.unit_of_work import SQLAlchemyUnitOfWork
 from src.infrastructure.extraction.entity_extractor import EntityExtractorService
 from src.infrastructure.extraction.relationship_extractor import RelationshipExtractorService
 from src.application.services.historical_reconstruction import HistoricalReconstructionService
+from src.application.services.temporal_integrity_service import TemporalIntegrityService
+from src.application.services.reconstruction_validation_engine import ReconstructionValidationEngine
+from src.application.services.accuracy_engine import AccuracyEngine
+from src.application.services.seid_validation_engine import SEIDValidationEngine
+from src.application.services.health_score_engine import HealthScoreEngine
+from src.application.services.temporal_explorer import TemporalExplorer
+from src.application.services.temporal_replay_service import TemporalReplayService
 from src.domain.services.identity_service import EntityIdentityService
 
 class Container:
@@ -64,6 +71,21 @@ class Container:
         self.move_detector = MoveDetector()
         self.diff_engine = TemporalDiffEngine(self.rename_detector, self.move_detector)
         self.reconstruction_service = HistoricalReconstructionService()
+        self.temporal_integrity_service = TemporalIntegrityService()
+        self.reconstruction_validation_engine = ReconstructionValidationEngine(
+            reconstruction_service=self.reconstruction_service,
+            git_adapter=self.git_adapter,
+            file_scanner=self.file_scanner,
+            parser=self.parser,
+            entity_extractor=self.entity_extractor,
+            relationship_extractor=self.relationship_extractor,
+            identity_service=self.identity_service
+        )
+        self.accuracy_engine = AccuracyEngine(self.reconstruction_validation_engine)
+        self.seid_validation_engine = SEIDValidationEngine()
+        self.health_score_engine = HealthScoreEngine(self.seid_validation_engine)
+        self.temporal_explorer = TemporalExplorer()
+        self.temporal_replay_service = TemporalReplayService(self.reconstruction_service)
 
     def get_uow_factory(self) -> Callable:
         # Resolve class using lambda and create database connection wrapper
