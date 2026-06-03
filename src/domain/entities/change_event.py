@@ -14,4 +14,5 @@ class ChangeEvent:
     commit_hash: str
     seid: SEID
     change_type: MutationType
+    confidence: float = 1.0
     metadata: dict[str, Any] = field(default_factory=dict)

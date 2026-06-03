@@ -19,5 +19,6 @@ class EntityVersion:
     end_line: int
     content_hash: str
     structural_fingerprint: str
+    confidence: float = 1.0
     source_text: str | None = None
     metadata: dict[str, Any] = field(default_factory=dict)

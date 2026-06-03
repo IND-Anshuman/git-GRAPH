@@ -8,6 +8,8 @@ from .relationship_version import RelationshipVersion
 from .change_event import ChangeEvent
 from .repository_snapshot import RepositorySnapshot
 from .temporal_graph import TemporalGraph
+from .integrity import IntegrityViolation, RepairAudit
+from .metrics import AccuracyReport, BenchmarkReport
 
 __all__ = [
     "RepositoryEntity",
@@ -20,4 +22,8 @@ __all__ = [
     "ChangeEvent",
     "RepositorySnapshot",
     "TemporalGraph",
+    "IntegrityViolation",
+    "RepairAudit",
+    "AccuracyReport",
+    "BenchmarkReport",
 ]

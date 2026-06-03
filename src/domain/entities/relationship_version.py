@@ -12,4 +12,5 @@ class RelationshipVersion:
     commit_hash: str
     mutation_type: MutationType
     version_ordinal: int
+    confidence: float = 1.0
     metadata: dict[str, Any] = field(default_factory=dict)
