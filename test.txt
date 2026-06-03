@@ -4,4 +4,19 @@
        "name": "Depression-Detector"
 }
 
+{
+       "url": "https://github.com/IND-Anshuman/Indie-VOICE.git",
+       "branch": "main",
+       "name": "Indie-VOICE"
+}
+
 uvicorn src.main:app --reload --port 8000
+
+# Tear down the database and its volume
+docker-compose down -v
+
+# Spin up a fresh database
+docker-compose up -d
+
+# Run migrations again
+.venv\Scripts\alembic upgrade head

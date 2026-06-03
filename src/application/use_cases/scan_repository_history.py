@@ -99,12 +99,18 @@ class ScanRepositoryHistoryUseCase:
                         parse_result = self.parser.parse_file(scanned.absolute_path, content, scanned.language)
                         
                         file_entities = self.entity_extractor.extract(
-                            parse_result.tree, source_file, content
+                            parsed_tree=parse_result.tree,
+                            source_code=content,
+                            source_file=source_file,
+                            repository_id=repo_id
                         )
                         current_entities.extend(file_entities)
                         
                         file_relationships = self.relationship_extractor.extract(
-                            parse_result.tree, file_entities, source_file, content
+                            parsed_tree=parse_result.tree,
+                            source_code=content,
+                            entities=file_entities,
+                            source_file=source_file
                         )
                         current_relationships.extend(file_relationships)
 

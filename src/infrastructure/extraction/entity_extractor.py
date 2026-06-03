@@ -60,9 +60,10 @@ class EntityExtractorService:
             )
             
             seid = self._identity_service.generate_seid(
-                repository_id=repository_id,
                 entity_type=raw.entity_type,
-                qualified_name=q_name
+                qualified_name=q_name,
+                file_path=source_file.file_path,
+                repo_id=repository_id
             )
             
             name_to_seid[raw.name] = seid

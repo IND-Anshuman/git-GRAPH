@@ -50,6 +50,7 @@ class RelationshipExtractorService:
         name_to_seid: Dict[str, SEID] = {e.name: e.seid for e in entities}
         
         domain_rels = []
+        seen_rels = set()
         for raw in raw_rels:
             source_seid = name_to_seid.get(raw.source_name)
             target_seid = name_to_seid.get(raw.target_name)
@@ -57,6 +58,11 @@ class RelationshipExtractorService:
             # If we couldn't resolve locally, skip or handle external references (for Phase 2)
             # For Phase 1, we map what we can
             if source_seid and target_seid:
+                rel_key = (source_seid, target_seid, raw.relationship_type)
+                if rel_key in seen_rels:
+                    continue
+                seen_rels.add(rel_key)
+                
                 rel = Relationship(
                     id=uuid.uuid4(),
                     repository_id=source_file.repository_id,
