@@ -7,6 +7,8 @@ from .entity_version_repo import IEntityVersionRepository
 from .relationship_version_repo import IRelationshipVersionRepository
 from .change_event_repo import IChangeEventRepository
 from .snapshot_repo import IRepositorySnapshotRepository
+from .metrics_repo import IMetricsRepository
+from .integrity_repo import IIntegrityRepository
 
 __all__ = [
     "IRepositoryRepository",
@@ -18,4 +20,6 @@ __all__ = [
     "IRelationshipVersionRepository",
     "IChangeEventRepository",
     "IRepositorySnapshotRepository",
+    "IMetricsRepository",
+    "IIntegrityRepository",
 ]

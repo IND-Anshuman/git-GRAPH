@@ -11,6 +11,8 @@ from src.domain.entities.entity_version import EntityVersion
 from src.domain.entities.relationship_version import RelationshipVersion
 from src.domain.entities.change_event import ChangeEvent
 from src.domain.entities.repository_snapshot import RepositorySnapshot
+from src.domain.entities.integrity import IntegrityViolation, RepairAudit
+from src.domain.entities.metrics import AccuracyReport, BenchmarkReport
 from src.domain.value_objects.repository_id import RepositoryId
 from src.domain.value_objects.file_id import FileId
 from src.domain.value_objects.entity_id import SEID
@@ -31,6 +33,8 @@ from src.infrastructure.persistence.models.entity_version_model import EntityVer
 from src.infrastructure.persistence.models.relationship_version_model import RelationshipVersionModel
 from src.infrastructure.persistence.models.change_event_model import ChangeEventModel
 from src.infrastructure.persistence.models.snapshot_model import RepositorySnapshotModel
+from src.infrastructure.persistence.models.metrics_model import BenchmarkReportModel, AccuracyReportModel
+from src.infrastructure.persistence.models.integrity_model import IntegrityViolationModel, RepairAuditModel
 
 
 class DomainMapper:
@@ -218,6 +222,7 @@ class DomainMapper:
             end_line=entity.end_line,
             content_hash=entity.content_hash,
             structural_fingerprint=entity.structural_fingerprint,
+            confidence=entity.confidence,
             source_text=entity.source_text,
             metadata_=entity.metadata
         )
@@ -236,6 +241,7 @@ class DomainMapper:
             end_line=model.end_line,
             content_hash=model.content_hash,
             structural_fingerprint=model.structural_fingerprint,
+            confidence=float(model.confidence) if model.confidence is not None else 1.0,
             source_text=model.source_text,
             metadata=model.metadata_
         )
@@ -248,6 +254,7 @@ class DomainMapper:
             commit_hash=entity.commit_hash,
             mutation_type=entity.mutation_type.value,
             version_ordinal=entity.version_ordinal,
+            confidence=entity.confidence,
             metadata_=entity.metadata
         )
 
@@ -259,6 +266,7 @@ class DomainMapper:
             commit_hash=model.commit_hash,
             mutation_type=DomainMapper._parse_enum(MutationType, model.mutation_type),
             version_ordinal=model.version_ordinal,
+            confidence=float(model.confidence) if model.confidence is not None else 1.0,
             metadata=model.metadata_
         )
 
@@ -270,6 +278,7 @@ class DomainMapper:
             commit_hash=entity.commit_hash,
             seid=entity.seid.value,
             change_type=entity.change_type.value,
+            confidence=entity.confidence,
             metadata_=entity.metadata
         )
 
@@ -281,6 +290,7 @@ class DomainMapper:
             commit_hash=model.commit_hash,
             seid=SEID(model.seid),
             change_type=DomainMapper._parse_enum(MutationType, model.change_type),
+            confidence=float(model.confidence) if model.confidence is not None else 1.0,
             metadata=model.metadata_
         )
 
@@ -304,4 +314,112 @@ class DomainMapper:
             entity_seids=[SEID.from_string(val) for val in model.entity_seids],
             snapshot_data=model.snapshot_data,
             created_at=model.created_at
+        )
+
+    @staticmethod
+    def to_benchmark_report_model(entity: BenchmarkReport) -> BenchmarkReportModel:
+        return BenchmarkReportModel(
+            id=entity.id,
+            repository_id=entity.repository_id.value,
+            commit_hash=entity.commit_hash,
+            scan_duration_ms=entity.scan_duration_ms,
+            diff_throughput_nodes_sec=entity.diff_throughput_nodes_sec,
+            reconstruction_latency_ms=entity.reconstruction_latency_ms,
+            db_size_bytes=entity.db_size_bytes,
+            memory_rss_bytes=entity.memory_rss_bytes,
+            measured_at=entity.measured_at
+        )
+
+    @staticmethod
+    def to_benchmark_report_entity(model: BenchmarkReportModel) -> BenchmarkReport:
+        return BenchmarkReport(
+            id=model.id,
+            repository_id=RepositoryId(model.repository_id),
+            commit_hash=model.commit_hash,
+            scan_duration_ms=model.scan_duration_ms,
+            diff_throughput_nodes_sec=float(model.diff_throughput_nodes_sec),
+            reconstruction_latency_ms=model.reconstruction_latency_ms,
+            db_size_bytes=model.db_size_bytes,
+            memory_rss_bytes=model.memory_rss_bytes,
+            measured_at=model.measured_at
+        )
+
+    @staticmethod
+    def to_accuracy_report_model(entity: AccuracyReport) -> AccuracyReportModel:
+        return AccuracyReportModel(
+            id=entity.id,
+            repository_id=entity.repository_id.value,
+            commit_hash=entity.commit_hash,
+            rename_precision=entity.rename_precision,
+            rename_recall=entity.rename_recall,
+            move_precision=entity.move_precision,
+            move_recall=entity.move_recall,
+            event_accuracy=entity.event_accuracy,
+            reconstruction_accuracy=entity.reconstruction_accuracy,
+            measured_at=entity.measured_at
+        )
+
+    @staticmethod
+    def to_accuracy_report_entity(model: AccuracyReportModel) -> AccuracyReport:
+        return AccuracyReport(
+            id=model.id,
+            repository_id=RepositoryId(model.repository_id),
+            commit_hash=model.commit_hash,
+            rename_precision=float(model.rename_precision),
+            rename_recall=float(model.rename_recall),
+            move_precision=float(model.move_precision),
+            move_recall=float(model.move_recall),
+            event_accuracy=float(model.event_accuracy),
+            reconstruction_accuracy=float(model.reconstruction_accuracy),
+            measured_at=model.measured_at
+        )
+
+    @staticmethod
+    def to_integrity_violation_model(entity: IntegrityViolation) -> IntegrityViolationModel:
+        return IntegrityViolationModel(
+            id=entity.id,
+            repository_id=entity.repository_id.value,
+            violation_type=entity.violation_type,
+            severity=entity.severity,
+            target_seid=entity.target_seid,
+            description=entity.description,
+            recommended_repair=entity.recommended_repair,
+            is_resolved=entity.is_resolved,
+            detected_at=entity.detected_at
+        )
+
+    @staticmethod
+    def to_integrity_violation_entity(model: IntegrityViolationModel) -> IntegrityViolation:
+        return IntegrityViolation(
+            id=model.id,
+            repository_id=RepositoryId(model.repository_id),
+            violation_type=model.violation_type,
+            severity=model.severity,
+            target_seid=model.target_seid,
+            description=model.description,
+            recommended_repair=model.recommended_repair,
+            is_resolved=model.is_resolved,
+            detected_at=model.detected_at
+        )
+
+    @staticmethod
+    def to_repair_audit_model(entity: RepairAudit) -> RepairAuditModel:
+        return RepairAuditModel(
+            id=entity.id,
+            repository_id=entity.repository_id.value,
+            operator=entity.operator,
+            issue_ids=[str(i) for i in entity.issue_ids],
+            repair_actions=entity.repair_actions,
+            executed_at=entity.executed_at
+        )
+
+    @staticmethod
+    def to_repair_audit_entity(model: RepairAuditModel) -> RepairAudit:
+        return RepairAudit(
+            id=model.id,
+            repository_id=RepositoryId(model.repository_id),
+            operator=model.operator,
+            issue_ids=[uuid.UUID(i) for i in model.issue_ids],
+            repair_actions=model.repair_actions,
+            executed_at=model.executed_at
         )
