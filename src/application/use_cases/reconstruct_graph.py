@@ -30,11 +30,11 @@ class ReconstructGraphUseCase:
             entities_dto = [
                 EntityResponse(
                     seid=str(e.seid),
-                    entity_type=e.entity_type.value,
+                    entity_type=e.entity_type.name,
                     name=e.name,
                     qualified_name=e.qualified_name,
                     file_path=e.location.file_path,
-                    language=e.language.value,
+                    language=e.language.name,
                     start_line=e.location.start_line,
                     end_line=e.location.end_line,
                     parent_seid=str(e.parent_seid) if e.parent_seid else None,
@@ -46,7 +46,7 @@ class ReconstructGraphUseCase:
             relationships_dto = [
                 RelationshipResponse(
                     id=str(r.id),
-                    relationship_type=r.relationship_type.value,
+                    relationship_type=r.relationship_type.name,
                     source_seid=str(r.source_seid),
                     target_seid=str(r.target_seid),
                     source_name=None, # we don't resolve names eagerly here

@@ -45,14 +45,15 @@ class IngestRepositoryUseCase:
             if existing:
                 return IngestionResultResponse(
                     repository_id=str(existing.id),
-                    status=existing.status.value,
+                    status=existing.status.name,
                     files_scanned=0,
                     entities_extracted=0,
                     relationships_extracted=0,
                     errors=["Repository already exists."]
                 )
 
-            repository_id = uuid.uuid4()
+            from src.domain.value_objects.repository_id import RepositoryId
+            repository_id = RepositoryId.generate()
             name = command.name or url_str.split("/")[-1].replace(".git", "")
             now = datetime.now(timezone.utc)
             repository = RepositoryEntity(
@@ -93,7 +94,7 @@ class IngestRepositoryUseCase:
 
             return IngestionResultResponse(
                 repository_id=str(repository_id),
-                status=AnalysisStatus.COMPLETED.value,
+                status=AnalysisStatus.COMPLETED.name,
                 files_scanned=len(result.files),
                 entities_extracted=len(result.entities),
                 relationships_extracted=len(result.relationships),
@@ -113,7 +114,7 @@ class IngestRepositoryUseCase:
 
             return IngestionResultResponse(
                 repository_id=str(repository_id),
-                status=AnalysisStatus.FAILED.value,
+                status=AnalysisStatus.FAILED.name,
                 files_scanned=0,
                 entities_extracted=0,
                 relationships_extracted=0,

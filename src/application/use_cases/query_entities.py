@@ -34,11 +34,11 @@ class QueryEntitiesUseCase:
                 
                 responses.append(EntityResponse(
                     seid=str(e.seid.value),
-                    entity_type=e.entity_type.value,
+                    entity_type=e.entity_type.name,
                     name=e.name,
                     qualified_name=str(e.qualified_name),
                     file_path=file_path,
-                    language=e.language.value,
+                    language=e.language.name,
                     start_line=e.location.start_point.line,
                     end_line=e.location.end_point.line,
                     parent_seid=str(e.parent_seid.value) if e.parent_seid else None,

@@ -24,7 +24,7 @@ class GetRepositoryUseCase:
                 name=repo.name,
                 url=repo.url,
                 default_branch=repo.default_branch,
-                status=repo.status.value,
+                status=repo.status.name,
                 entity_count=repo.metadata.get("entities_count"),
                 file_count=repo.metadata.get("files_count"),
                 created_at=repo.created_at,
