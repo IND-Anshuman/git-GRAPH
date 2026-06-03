@@ -9,7 +9,9 @@ from src.domain.repositories import (
     IEntityVersionRepository,
     IRelationshipVersionRepository,
     IChangeEventRepository,
-    IRepositorySnapshotRepository
+    IRepositorySnapshotRepository,
+    IMetricsRepository,
+    IIntegrityRepository
 )
 
 class IUnitOfWork(ABC):
@@ -72,4 +74,14 @@ class IUnitOfWork(ABC):
     @property
     @abstractmethod
     def snapshots(self) -> IRepositorySnapshotRepository:
+        pass
+
+    @property
+    @abstractmethod
+    def metrics(self) -> IMetricsRepository:
+        pass
+
+    @property
+    @abstractmethod
+    def integrity(self) -> IIntegrityRepository:
         pass

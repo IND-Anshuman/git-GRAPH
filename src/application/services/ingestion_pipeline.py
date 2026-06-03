@@ -56,8 +56,9 @@ class IngestionPipeline:
                         
                     content_hash = self.identity_service.compute_content_hash(content)
                     
+                    from src.domain.value_objects.file_id import FileId
                     source_file = SourceFile(
-                        id=uuid.uuid4(),
+                        id=FileId(uuid.uuid4()),
                         repository_id=repository.id,
                         file_path=scanned.path,
                         language=scanned.language,
