@@ -54,9 +54,9 @@ class EntityExtractorService:
             
             # Simple fully qualified name computation
             q_name = self._identity_service.compute_qualified_name(
-                entity_name=raw.name,
-                parent_qname=raw.parent_name, # Approximation
-                module_path=source_file.file_path
+                name=raw.name,
+                parent_name=raw.parent_name,
+                module_name=module_name
             )
             
             seid = self._identity_service.generate_seid(
