@@ -7,6 +7,8 @@ from src.infrastructure.persistence.repositories.sa_entity_version_repo import S
 from src.infrastructure.persistence.repositories.sa_relationship_version_repo import SARelationshipVersionRepository
 from src.infrastructure.persistence.repositories.sa_change_event_repo import SAChangeEventRepository
 from src.infrastructure.persistence.repositories.sa_snapshot_repo import SARepositorySnapshotRepository
+from src.infrastructure.persistence.repositories.sa_metrics_repo import SAMetricsRepository
+from src.infrastructure.persistence.repositories.sa_integrity_repo import SAIntegrityRepository
 
 __all__ = [
     "SARepositoryRepository",
@@ -18,4 +20,6 @@ __all__ = [
     "SARelationshipVersionRepository",
     "SAChangeEventRepository",
     "SARepositorySnapshotRepository",
+    "SAMetricsRepository",
+    "SAIntegrityRepository",
 ]
