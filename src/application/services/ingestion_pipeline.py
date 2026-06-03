@@ -73,12 +73,18 @@ class IngestionPipeline:
                         result.errors.extend(parse_result.errors)
                         
                     file_entities = self.entity_extractor.extract(
-                        parse_result.tree, source_file, content
+                        parsed_tree=parse_result.tree,
+                        source_code=content,
+                        source_file=source_file,
+                        repository_id=repository.id
                     )
                     result.entities.extend(file_entities)
                     
                     file_relationships = self.relationship_extractor.extract(
-                        parse_result.tree, file_entities, source_file, content
+                        parsed_tree=parse_result.tree,
+                        source_code=content,
+                        entities=file_entities,
+                        source_file=source_file
                     )
                     result.relationships.extend(file_relationships)
                     
