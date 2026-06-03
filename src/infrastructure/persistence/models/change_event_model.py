@@ -2,7 +2,7 @@
 
 from typing import Any, Dict
 import uuid
-from sqlalchemy import String, JSON, ForeignKey, Index
+from sqlalchemy import String, JSON, ForeignKey, Index, Numeric
 from sqlalchemy.orm import Mapped, mapped_column
 
 from src.infrastructure.persistence.models.base import Base
@@ -23,6 +23,7 @@ class ChangeEventModel(Base):
         ForeignKey("code_entities.seid", ondelete="CASCADE"), nullable=False
     )
     change_type: Mapped[str] = mapped_column(String(20))
+    confidence: Mapped[float] = mapped_column(Numeric(3, 2), default=1.0)
     metadata_: Mapped[Dict[str, Any]] = mapped_column("metadata", JSON, default=dict)
 
     __table_args__ = (

@@ -8,6 +8,8 @@ from src.infrastructure.persistence.models.entity_version_model import EntityVer
 from src.infrastructure.persistence.models.relationship_version_model import RelationshipVersionModel
 from src.infrastructure.persistence.models.change_event_model import ChangeEventModel
 from src.infrastructure.persistence.models.snapshot_model import RepositorySnapshotModel
+from src.infrastructure.persistence.models.metrics_model import BenchmarkReportModel, AccuracyReportModel
+from src.infrastructure.persistence.models.integrity_model import IntegrityViolationModel, RepairAuditModel
 
 __all__ = [
     "Base",
@@ -20,4 +22,8 @@ __all__ = [
     "RelationshipVersionModel",
     "ChangeEventModel",
     "RepositorySnapshotModel",
+    "BenchmarkReportModel",
+    "AccuracyReportModel",
+    "IntegrityViolationModel",
+    "RepairAuditModel",
 ]
