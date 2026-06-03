@@ -36,8 +36,9 @@ class FileSystemScanner(IFileScanner):
                         size_bytes = os.path.getsize(file_path)
                         results.append(ScannedFile(
                             path=rel_path,
+                            absolute_path=file_path,
                             language=language,
-                            size=size_bytes
+                            size_bytes=size_bytes
                         ))
                     except OSError:
                         # Skip files that can't be stat'd (e.g. broken symlinks)

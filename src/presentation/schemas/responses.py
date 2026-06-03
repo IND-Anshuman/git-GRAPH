@@ -97,3 +97,41 @@ class TimelineSchema(BaseModel):
     timestamp: datetime
     message: str
     changes: list[ChangeEventSchema]
+
+class HealthScoreSchema(BaseModel):
+    health_score: float
+    reconstruction_score: float
+    integrity_score: float
+    confidence_score: float
+    seid_stability_score: float
+    status: str
+
+class IntegrityViolationSchema(BaseModel):
+    id: str
+    repository_id: str
+    violation_type: str
+    severity: str
+    target_seid: str | None
+    description: str
+    recommended_repair: str
+    is_resolved: bool
+    detected_at: datetime
+
+class RepairAuditSchema(BaseModel):
+    id: str
+    repository_id: str
+    operator: str
+    issue_ids: list[str]
+    repair_actions: list[dict]
+    executed_at: datetime
+
+class BenchmarkReportSchema(BaseModel):
+    id: str
+    repository_id: str
+    commit_hash: str
+    scan_duration_ms: int
+    diff_throughput_nodes_sec: float
+    reconstruction_latency_ms: int
+    db_size_bytes: int
+    memory_rss_bytes: int
+    measured_at: datetime

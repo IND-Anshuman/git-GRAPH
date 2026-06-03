@@ -46,3 +46,15 @@ def get_repository_timeline_use_case(request: Request) -> GetRepositoryTimelineU
 
 def get_reconstruct_graph_use_case(request: Request) -> ReconstructGraphUseCase:
     return request.app.state.container.get_reconstruct_graph_use_case()
+
+def get_health_score_engine(request: Request) -> Any:
+    return request.app.state.container.health_score_engine
+
+def get_temporal_integrity_service(request: Request) -> Any:
+    return request.app.state.container.temporal_integrity_service
+
+def get_temporal_explorer(request: Request) -> Any:
+    return request.app.state.container.temporal_explorer
+
+def get_temporal_replay_service(request: Request) -> Any:
+    return request.app.state.container.temporal_replay_service

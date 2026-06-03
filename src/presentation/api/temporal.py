@@ -24,7 +24,9 @@ from src.presentation.dependencies import (
     get_commit_changes_use_case,
     get_repository_timeline_use_case,
     get_reconstruct_graph_use_case,
-    get_uow_factory
+    get_uow_factory,
+    get_temporal_explorer,
+    get_temporal_replay_service
 )
 
 temporal_router = APIRouter(tags=["temporal"])
@@ -105,3 +107,53 @@ def get_commit_graph(
         return use_case.execute(repository_id, commit_hash)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+@temporal_router.get("/repositories/{repository_id}/explorer/entity/{entity_id}/evolution")
+def get_entity_evolution(
+    repository_id: str,
+    entity_id: str,
+    uow_factory = Depends(get_uow_factory),
+    explorer = Depends(get_temporal_explorer)
+):
+    """Retrieves the chronological lifecycle version sequence of a specific entity."""
+    from src.domain.value_objects.entity_id import SEID
+    try:
+        seid = SEID.from_string(entity_id)
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid SEID format.")
+
+    with uow_factory() as uow:
+        return explorer.get_entity_evolution_timeline(uow, seid)
+
+@temporal_router.get("/repositories/{repository_id}/explorer/relationship/{relationship_id}/evolution")
+def get_relationship_evolution(
+    repository_id: str,
+    relationship_id: str,
+    uow_factory = Depends(get_uow_factory),
+    explorer = Depends(get_temporal_explorer)
+):
+    """Retrieves changes and version updates for a specific relationship."""
+    with uow_factory() as uow:
+        return explorer.get_relationship_evolution_timeline(uow, relationship_id)
+
+@temporal_router.get("/repositories/{repository_id}/replay")
+def get_repository_replay(
+    repository_id: str,
+    start_commit: str,
+    end_commit: str,
+    uow_factory = Depends(get_uow_factory),
+    replay_service = Depends(get_temporal_replay_service)
+):
+    """Streams commit-by-commit delta changes and exports visualizer-compliant graphs."""
+    from src.domain.value_objects.repository_id import RepositoryId
+    import uuid as py_uuid
+    try:
+        repo_id = RepositoryId(py_uuid.UUID(repository_id))
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid repository ID format.")
+
+    with uow_factory() as uow:
+        try:
+            return replay_service.get_timeline_replay(uow, repo_id, start_commit, end_commit)
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=str(e))
