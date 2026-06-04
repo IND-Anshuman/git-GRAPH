@@ -46,7 +46,7 @@ class ScanRepositoryHistoryUseCase:
         """Walks the commit history and ingests the repository temporally."""
         repo_id = RepositoryId(repository_id)
         
-        # 1. Retrieve the repository and existing source files
+        # 1. Retrieve the repository
         with self.uow_factory() as uow:
             repo = uow.repositories.get_by_id(repo_id)
             if not repo:
@@ -55,7 +55,18 @@ class ScanRepositoryHistoryUseCase:
             if not local_path:
                 raise ValueError("Repository local path is missing. Ingestion must clone the repository first.")
             start_commit = repo.metadata.get("last_analyzed_commit")
-            
+
+        # 2. Clear existing static data if starting chronological walk from scratch
+        if not start_commit:
+            logger.info(f"Clearing existing static data for repository {repo_id} to perform chronological walk...")
+            with self.uow_factory() as uow:
+                uow.relationships.delete_by_repository(repo_id)
+                uow.code_entities.delete_by_repository(repo_id)
+                uow.source_files.delete_by_repository(repo_id)
+                uow.commit()
+
+        # 3. Load existing source files (will be empty if cleared)
+        with self.uow_factory() as uow:
             existing_files = uow.source_files.get_by_repository(repo_id)
             file_cache = {f.file_path: f for f in existing_files}
 
