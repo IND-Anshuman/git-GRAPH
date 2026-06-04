@@ -56,6 +56,23 @@ class ScanRepositoryHistoryUseCase:
                 raise ValueError("Repository local path is missing. Ingestion must clone the repository first.")
             start_commit = repo.metadata.get("last_analyzed_commit")
 
+            # Self-healing: if start_commit is set but we have 0 versions in the DB,
+            # force a complete rebuild of the chronological graph by resetting start_commit to None.
+            if start_commit:
+                from src.infrastructure.persistence.models.entity_version_model import EntityVersionModel
+                from src.infrastructure.persistence.models.commit_model import CommitModel
+                from sqlalchemy import exists
+                has_versions = uow._session.query(
+                    exists().where(
+                        EntityVersionModel.commit_hash == CommitModel.hash
+                    ).where(
+                        CommitModel.repository_id == repo_id.value
+                    )
+                ).scalar()
+                if not has_versions:
+                    logger.info("Detected last_analyzed_commit but 0 versions in DB. Resetting walk to start from scratch.")
+                    start_commit = None
+
         # 2. Clear existing static data if starting chronological walk from scratch
         if not start_commit:
             logger.info(f"Clearing existing static data for repository {repo_id} to perform chronological walk...")
