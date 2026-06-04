@@ -247,7 +247,9 @@ class TemporalDiffEngine:
         # 6. Process newly CREATED entities
         for curr_e in unmatched_curr:
             # Generate new SEID
+            orig_temp_seid = temp_seids[id(curr_e)]
             curr_e.seid = SEID.generate()
+            resolved_seids[orig_temp_seid] = curr_e.seid
             curr_e.metadata["version_count"] = 1
             
             diff_result.entities_to_save.append(curr_e)
