@@ -1,9 +1,10 @@
 """Git history commit walker."""
 
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from typing import Generator, List, Optional
 import os
+import logging
 from git import Repo
 
 from src.domain.entities.commit import Commit
@@ -37,6 +38,19 @@ class CommitWalker:
 
         repo = Repo(self.repo_path)
         
+        # Self-healing: check if repository is a shallow clone, and unshallow it if so
+        logger = logging.getLogger(__name__)
+        shallow_file = os.path.join(self.repo_path, ".git", "shallow")
+        if not os.path.exists(shallow_file):
+            shallow_file = os.path.join(self.repo_path, "shallow")
+        
+        if os.path.exists(shallow_file):
+            logger.info("Shallow clone detected. Unshallowing repository to enable history scan...")
+            try:
+                repo.git.fetch("--unshallow")
+            except Exception as e:
+                logger.warning(f"Failed to unshallow repository: {e}. History traversal might fail.")
+
         # 1. Determine commit range
         if start_commit_hash:
             # Check if start_commit_hash exists in the repo
@@ -56,7 +70,7 @@ class CommitWalker:
         result = []
         for c in commit_objs:
             # Convert timezone
-            tz = timezone(c.author_tz_offset) if c.author_tz_offset else timezone.utc
+            tz = timezone(timedelta(seconds=-c.author_tz_offset)) if c.author_tz_offset is not None else timezone.utc
             authored_dt = datetime.fromtimestamp(c.authored_date, tz)
             
             commit_entity = Commit(

@@ -23,7 +23,7 @@ class GitPythonAdapter(IGitAdapter):
             DomainException: If cloning fails
         """
         try:
-            repo = Repo.clone_from(url, target_dir, branch=branch, depth=1)
+            repo = Repo.clone_from(url, target_dir, branch=branch)
             return os.path.abspath(repo.working_dir)
         except exc.GitCommandError as e:
             raise DomainException(f"Failed to clone repository: {str(e)}") from e

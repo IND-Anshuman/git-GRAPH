@@ -83,6 +83,7 @@ class IngestRepositoryUseCase:
                     if result.relationships:
                         uow.relationships.save_batch(result.relationships)
                     
+                    repo_in_db.local_path = repository.local_path
                     repo_in_db.status = AnalysisStatus.COMPLETED
                     repo_in_db.updated_at = datetime.now(timezone.utc)
                     repo_in_db.metadata["files_count"] = len(result.files)
