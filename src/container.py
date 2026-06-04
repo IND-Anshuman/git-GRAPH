@@ -116,7 +116,8 @@ class Container:
             relationship_extractor=self.relationship_extractor,
             uow_factory=self.get_uow_factory(),
             storage_root=self.config.storage_root,
-            identity_service=self.identity_service
+            identity_service=self.identity_service,
+            reconstruction_service=self.reconstruction_service
         )
 
     def get_get_repository_use_case(self) -> GetRepositoryUseCase:
@@ -137,7 +138,8 @@ class Container:
             relationship_extractor=self.relationship_extractor,
             diff_engine=self.diff_engine,
             uow_factory=self.get_uow_factory(),
-            identity_service=self.identity_service
+            identity_service=self.identity_service,
+            reconstruction_service=self.reconstruction_service
         )
 
     def get_get_commits_use_case(self) -> GetCommitsUseCase:

@@ -3,7 +3,10 @@
 import datetime
 import logging
 import uuid
+import time
+import sys
 from typing import Any, Callable, List
+from sqlalchemy import text
 
 from src.application.ports.git_port import IGitAdapter
 from src.application.ports.file_scanner_port import IFileScanner
@@ -14,10 +17,67 @@ from src.domain.enums.analysis_status import AnalysisStatus
 from src.domain.value_objects.repository_id import RepositoryId
 from src.domain.value_objects.file_id import FileId
 from src.domain.entities.source_file import SourceFile
+from src.domain.entities.metrics import BenchmarkReport
 from src.infrastructure.git.commit_walker import CommitWalker
 from src.infrastructure.git.temporal_diff_engine import TemporalDiffEngine
 
 logger = logging.getLogger(__name__)
+
+
+def get_memory_rss_bytes() -> int:
+    try:
+        if sys.platform == "win32":
+            import ctypes
+            from ctypes import wintypes
+
+            class PROCESS_MEMORY_COUNTERS(ctypes.Structure):
+                _fields_ = [
+                    ("cb", wintypes.DWORD),
+                    ("PageFaultCount", wintypes.DWORD),
+                    ("PeakWorkingSetSize", ctypes.c_size_t),
+                    ("WorkingSetSize", ctypes.c_size_t),
+                    ("QuotaPeakPagedPoolUsage", ctypes.c_size_t),
+                    ("QuotaPagedPoolUsage", ctypes.c_size_t),
+                    ("QuotaPeakNonPagedPoolUsage", ctypes.c_size_t),
+                    ("QuotaNonPagedPoolUsage", ctypes.c_size_t),
+                    ("PagefileUsage", ctypes.c_size_t),
+                    ("PeakPagefileUsage", ctypes.c_size_t),
+                ]
+
+            GetProcessMemoryInfo = ctypes.windll.psapi.GetProcessMemoryInfo
+            GetCurrentProcess = ctypes.windll.kernel32.GetCurrentProcess
+
+            process_handle = GetCurrentProcess()
+            counters = PROCESS_MEMORY_COUNTERS()
+            counters.cb = ctypes.sizeof(PROCESS_MEMORY_COUNTERS)
+
+            if GetProcessMemoryInfo(process_handle, ctypes.byref(counters), counters.cb):
+                return counters.WorkingSetSize
+        else:
+            import resource
+            return resource.getrusage(resource.RUSAGE_SELF).ru_maxrss * 1024
+    except Exception:
+        pass
+    return 0
+
+
+def get_db_size_bytes(session) -> int:
+    try:
+        bind_url = str(session.bind.url)
+        if "postgresql" in bind_url:
+            res = session.execute(text("SELECT pg_database_size(current_database())"))
+            row = res.fetchone()
+            if row:
+                return int(row[0])
+        elif "sqlite" in bind_url:
+            res = session.execute(text("SELECT page_count * page_size FROM pragma_page_count(), pragma_page_size()"))
+            row = res.fetchone()
+            if row:
+                return int(row[0])
+    except Exception as e:
+        logger.warning(f"Could not calculate database size: {e}")
+    return 0
+
 
 class ScanRepositoryHistoryUseCase:
     """Orchestrates Git history walking, AST parsing per commit, and temporal diff persistence."""
@@ -31,7 +91,8 @@ class ScanRepositoryHistoryUseCase:
         relationship_extractor: Any,
         diff_engine: TemporalDiffEngine,
         uow_factory: Callable[[], IUnitOfWork],
-        identity_service: Any
+        identity_service: Any,
+        reconstruction_service: Any = None
     ) -> None:
         self.git_adapter = git_adapter
         self.file_scanner = file_scanner
@@ -41,6 +102,7 @@ class ScanRepositoryHistoryUseCase:
         self.diff_engine = diff_engine
         self.uow_factory = uow_factory
         self.identity_service = identity_service
+        self.reconstruction_service = reconstruction_service
 
     def execute(self, repository_id: uuid.UUID, branch: str = "main", snapshot_interval: int = 100) -> dict:
         """Walks the commit history and ingests the repository temporally."""
@@ -55,23 +117,6 @@ class ScanRepositoryHistoryUseCase:
             if not local_path:
                 raise ValueError("Repository local path is missing. Ingestion must clone the repository first.")
             start_commit = repo.metadata.get("last_analyzed_commit")
-
-            # Self-healing: if start_commit is set but we have 0 versions in the DB,
-            # force a complete rebuild of the chronological graph by resetting start_commit to None.
-            if start_commit:
-                from src.infrastructure.persistence.models.entity_version_model import EntityVersionModel
-                from src.infrastructure.persistence.models.commit_model import CommitModel
-                from sqlalchemy import exists
-                has_versions = uow._session.query(
-                    exists().where(
-                        EntityVersionModel.commit_hash == CommitModel.hash
-                    ).where(
-                        CommitModel.repository_id == repo_id.value
-                    )
-                ).scalar()
-                if not has_versions:
-                    logger.info("Detected last_analyzed_commit but 0 versions in DB. Resetting walk to start from scratch.")
-                    start_commit = None
 
         # 2. Clear existing static data if starting chronological walk from scratch
         if not start_commit:
@@ -101,6 +146,9 @@ class ScanRepositoryHistoryUseCase:
             for commit_idx, (commit_entity, file_changes) in enumerate(commits_and_changes):
                 commit_hash = commit_entity.hash
                 logger.info(f"Processing commit {commit_hash} ({commit_idx + 1}/{len(commits_and_changes)})")
+
+                t_commit_start = time.perf_counter()
+                mem_start = get_memory_rss_bytes()
 
                 # Checkout the commit
                 self.git_adapter.checkout_commit(local_path, commit_hash)
@@ -175,6 +223,7 @@ class ScanRepositoryHistoryUseCase:
                     previous_relationships = uow.relationships.get_by_repository(repo_id)
 
                 # Compute temporal diff
+                t_diff_start = time.perf_counter()
                 diff_result = self.diff_engine.compute_diff(
                     repo_id,
                     commit_hash,
@@ -184,6 +233,7 @@ class ScanRepositoryHistoryUseCase:
                     current_relationships,
                     file_changes
                 )
+                t_diff_duration = time.perf_counter() - t_diff_start
 
                 # Persist the diff results in a single transaction
                 with self.uow_factory() as uow:
@@ -233,6 +283,48 @@ class ScanRepositoryHistoryUseCase:
                         uow.repositories.save(repo_db)
 
                     uow.commit()
+
+                # Post-commit benchmark telemetry collection
+                try:
+                    total_nodes = len(current_entities)
+                    diff_throughput = 0.0
+                    if t_diff_duration > 0:
+                        diff_throughput = total_nodes / t_diff_duration
+
+                    recon_latency_ms = 0
+                    if self.reconstruction_service:
+                        recon_start = time.perf_counter()
+                        with self.uow_factory() as uow_recon:
+                            self.reconstruction_service.reconstruct_graph_at_commit(
+                                uow_recon, repo_id, commit_hash
+                            )
+                        recon_latency_ms = int((time.perf_counter() - recon_start) * 1000)
+
+                    db_size = 0
+                    with self.uow_factory() as uow_db:
+                        db_size = get_db_size_bytes(uow_db._session)
+
+                    mem_end = get_memory_rss_bytes()
+                    max_mem_rss = max(mem_start, mem_end)
+
+                    scan_duration_ms = int((time.perf_counter() - t_commit_start) * 1000)
+
+                    benchmark = BenchmarkReport(
+                        id=uuid.uuid4(),
+                        repository_id=repo_id,
+                        commit_hash=commit_hash,
+                        scan_duration_ms=scan_duration_ms,
+                        diff_throughput_nodes_sec=diff_throughput,
+                        reconstruction_latency_ms=recon_latency_ms,
+                        db_size_bytes=db_size,
+                        memory_rss_bytes=max_mem_rss,
+                        measured_at=datetime.datetime.now(datetime.timezone.utc)
+                    )
+                    with self.uow_factory() as uow_bench:
+                        uow_bench.metrics.save_benchmark_report(benchmark)
+                        uow_bench.commit()
+                except Exception as telemetry_error:
+                    logger.warning(f"Error collecting benchmark metrics: {telemetry_error}", exc_info=True)
                 
                 processed_count += 0.5 # use float to accumulate or int
                 processed_count = int(processed_count + 0.5)
