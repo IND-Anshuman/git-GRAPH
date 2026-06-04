@@ -48,7 +48,31 @@ class SACodeEntityRepository(ICodeEntityRepository):
 
     def save_batch(self, entities: List[CodeEntity]) -> None:
         models = [DomainMapper.to_code_entity_model(e) for e in entities]
-        for model in models:
+        
+        # Sort topologically to insert parents before children,
+        # preventing ForeignKeyViolation on parent_seid.
+        by_seid = {m.seid: m for m in models}
+        visited = set()
+        visiting = set()
+        sorted_models = []
+
+        def visit(m):
+            if m.seid in visited:
+                return
+            if m.seid in visiting:
+                # Cycle guard
+                return
+            visiting.add(m.seid)
+            if m.parent_seid and m.parent_seid in by_seid:
+                visit(by_seid[m.parent_seid])
+            visiting.remove(m.seid)
+            visited.add(m.seid)
+            sorted_models.append(m)
+
+        for m in models:
+            visit(m)
+
+        for model in sorted_models:
             self.session.merge(model)
 
     def delete_by_repository(self, repo_id: RepositoryId) -> None:

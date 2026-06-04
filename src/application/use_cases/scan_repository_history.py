@@ -46,7 +46,7 @@ class ScanRepositoryHistoryUseCase:
         """Walks the commit history and ingests the repository temporally."""
         repo_id = RepositoryId(repository_id)
         
-        # 1. Retrieve the repository
+        # 1. Retrieve the repository and existing source files
         with self.uow_factory() as uow:
             repo = uow.repositories.get_by_id(repo_id)
             if not repo:
@@ -55,6 +55,9 @@ class ScanRepositoryHistoryUseCase:
             if not local_path:
                 raise ValueError("Repository local path is missing. Ingestion must clone the repository first.")
             start_commit = repo.metadata.get("last_analyzed_commit")
+            
+            existing_files = uow.source_files.get_by_repository(repo_id)
+            file_cache = {f.file_path: f for f in existing_files}
 
         logger.info(f"Starting history scan for repository {repo.name} starting from commit {start_commit}")
 
@@ -78,6 +81,7 @@ class ScanRepositoryHistoryUseCase:
                 current_files = self.file_scanner.scan_repository(local_path)
                 current_entities = []
                 current_relationships = []
+                files_to_save = []
 
                 # Parse files and extract entities/relationships
                 for scanned in current_files:
@@ -86,15 +90,33 @@ class ScanRepositoryHistoryUseCase:
                             content = f.read()
 
                         content_hash = self.identity_service.compute_content_hash(content)
-                        source_file = SourceFile(
-                            id=FileId(uuid.uuid4()),
-                            repository_id=repo_id,
-                            file_path=scanned.path,
-                            language=scanned.language,
-                            content_hash=content_hash,
-                            line_count=len(content.splitlines()),
-                            size_bytes=scanned.size_bytes
-                        )
+                        
+                        existing_file = file_cache.get(scanned.path)
+                        if existing_file:
+                            source_file = SourceFile(
+                                id=existing_file.id,
+                                repository_id=repo_id,
+                                file_path=scanned.path,
+                                language=scanned.language,
+                                content_hash=content_hash,
+                                line_count=len(content.splitlines()),
+                                size_bytes=scanned.size_bytes
+                            )
+                            if existing_file.content_hash != content_hash or existing_file.size_bytes != scanned.size_bytes:
+                                files_to_save.append(source_file)
+                                file_cache[scanned.path] = source_file
+                        else:
+                            source_file = SourceFile(
+                                id=FileId(uuid.uuid4()),
+                                repository_id=repo_id,
+                                file_path=scanned.path,
+                                language=scanned.language,
+                                content_hash=content_hash,
+                                line_count=len(content.splitlines()),
+                                size_bytes=scanned.size_bytes
+                            )
+                            files_to_save.append(source_file)
+                            file_cache[scanned.path] = source_file
 
                         parse_result = self.parser.parse_file(scanned.absolute_path, content, scanned.language)
                         
@@ -139,6 +161,10 @@ class ScanRepositoryHistoryUseCase:
                 with self.uow_factory() as uow:
                     # Save commit
                     uow.commits.save(commit_entity)
+
+                    # Save source files
+                    if files_to_save:
+                        uow.source_files.save_batch(files_to_save)
 
                     # Save entities and versions
                     uow.code_entities.save_batch(diff_result.entities_to_save)
