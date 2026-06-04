@@ -54,6 +54,9 @@ class TemporalDiffEngine:
         """
         diff_result = DiffResult()
 
+        # Map python object id to its original temporary SEID
+        temp_seids = {id(e): e.seid for e in current_entities}
+
         # 1. Separate previous active entities
         prev_active_entities = [e for e in previous_entities if not e.metadata.get("is_deleted", False)]
         prev_active_map = {e.seid: e for e in prev_active_entities}
@@ -89,8 +92,9 @@ class TemporalDiffEngine:
         
         resolved_seids: Dict[SEID, SEID] = {}  # temporary_seid -> old_resolved_seid
         for prev_e, curr_e in moved_associations:
+            orig_temp_seid = temp_seids[id(curr_e)]
             curr_e.seid = prev_e.seid
-            resolved_seids[curr_e.seid] = prev_e.seid
+            resolved_seids[orig_temp_seid] = prev_e.seid
             
             # Remove from unmatched lists
             unmatched_prev.remove(prev_e)
@@ -141,8 +145,9 @@ class TemporalDiffEngine:
             prev_e = prev_active_map[prev_seid]
             
             # Bind old SEID to current entity
+            orig_temp_seid = temp_seids[id(curr_e)]
             curr_e.seid = prev_seid
-            resolved_seids[curr_e.seid] = prev_seid
+            resolved_seids[orig_temp_seid] = prev_seid
             
             # Remove from unmatched lists
             unmatched_prev.remove(prev_e)
@@ -190,7 +195,9 @@ class TemporalDiffEngine:
 
             prev_e = prev_exact_matches.get(key)
             if prev_e:
+                orig_temp_seid = temp_seids[id(curr_e)]
                 curr_e.seid = prev_e.seid
+                resolved_seids[orig_temp_seid] = prev_e.seid
                 prev_version_count = prev_e.metadata.get("version_count", 1)
                 
                 # Check if content has modified
@@ -309,6 +316,11 @@ class TemporalDiffEngine:
                     metadata={}
                 )
             )
+
+        # Update parent_seid of all current entities using resolved_seids
+        for e in current_entities:
+            if e.parent_seid and e.parent_seid in resolved_seids:
+                e.parent_seid = resolved_seids[e.parent_seid]
 
         # 8. Diff Relationships
         # Build maps for current resolved relationships

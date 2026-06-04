@@ -48,32 +48,39 @@ class SACodeEntityRepository(ICodeEntityRepository):
 
     def save_batch(self, entities: List[CodeEntity]) -> None:
         models = [DomainMapper.to_code_entity_model(e) for e in entities]
+        if not models:
+            return
         
-        # Sort topologically to insert parents before children,
-        # preventing ForeignKeyViolation on parent_seid.
+        # Sort and merge/flush by hierarchy depth to ensure parents are physically
+        # inserted/updated in the database before their children.
         by_seid = {m.seid: m for m in models}
-        visited = set()
-        visiting = set()
-        sorted_models = []
+        memo = {}
 
-        def visit(m):
-            if m.seid in visited:
-                return
-            if m.seid in visiting:
-                # Cycle guard
-                return
-            visiting.add(m.seid)
-            if m.parent_seid and m.parent_seid in by_seid:
-                visit(by_seid[m.parent_seid])
-            visiting.remove(m.seid)
-            visited.add(m.seid)
-            sorted_models.append(m)
+        def get_depth(m):
+            if m.seid in memo:
+                return memo[m.seid]
+            if not m.parent_seid or m.parent_seid not in by_seid:
+                memo[m.seid] = 0
+                return 0
+            
+            # Guard against circular references
+            memo[m.seid] = 999
+            parent_m = by_seid[m.parent_seid]
+            depth = get_depth(parent_m) + 1
+            memo[m.seid] = depth
+            return depth
 
+        from collections import defaultdict
+        depth_groups = defaultdict(list)
         for m in models:
-            visit(m)
+            d = get_depth(m)
+            depth_groups[d].append(m)
 
-        for model in sorted_models:
-            self.session.merge(model)
+        for d in sorted(depth_groups.keys()):
+            for model in depth_groups[d]:
+                self.session.merge(model)
+            # Flush this level to the database before processing children
+            self.session.flush()
 
     def delete_by_repository(self, repo_id: RepositoryId) -> None:
         stmt = select(CodeEntityModel).where(CodeEntityModel.repository_id == repo_id.value)
