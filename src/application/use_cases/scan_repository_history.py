@@ -47,6 +47,9 @@ def get_memory_rss_bytes() -> int:
             GetProcessMemoryInfo = ctypes.windll.psapi.GetProcessMemoryInfo
             GetCurrentProcess = ctypes.windll.kernel32.GetCurrentProcess
 
+            GetProcessMemoryInfo.argtypes = [wintypes.HANDLE, ctypes.c_void_p, wintypes.DWORD]
+            GetProcessMemoryInfo.restype = wintypes.BOOL
+
             process_handle = GetCurrentProcess()
             counters = PROCESS_MEMORY_COUNTERS()
             counters.cb = ctypes.sizeof(PROCESS_MEMORY_COUNTERS)
@@ -122,10 +125,35 @@ class ScanRepositoryHistoryUseCase:
         if not start_commit:
             logger.info(f"Clearing existing static data for repository {repo_id} to perform chronological walk...")
             with self.uow_factory() as uow:
+                uow._session.execute(
+                    text("DELETE FROM repository_snapshots WHERE repository_id = :repo_id"),
+                    {"repo_id": str(repo_id.value)}
+                )
+                uow._session.execute(
+                    text("DELETE FROM commits WHERE repository_id = :repo_id"),
+                    {"repo_id": str(repo_id.value)}
+                )
+                uow._session.execute(
+                    text("DELETE FROM temporal_benchmarks WHERE repository_id = :repo_id"),
+                    {"repo_id": str(repo_id.value)}
+                )
+                uow._session.execute(
+                    text("DELETE FROM change_events WHERE repository_id = :repo_id"),
+                    {"repo_id": str(repo_id.value)}
+                )
+                uow._session.execute(
+                    text("DELETE FROM relationship_versions WHERE ID IN (SELECT rv.id FROM relationship_versions rv JOIN relationships r ON rv.relationship_id = r.id WHERE r.repository_id = :repo_id)"),
+                    {"repo_id": str(repo_id.value)}
+                )
+                uow._session.execute(
+                    text("DELETE FROM entity_versions WHERE seid IN (SELECT e.seid FROM code_entities e WHERE e.repository_id = :repo_id)"),
+                    {"repo_id": str(repo_id.value)}
+                )
                 uow.relationships.delete_by_repository(repo_id)
                 uow.code_entities.delete_by_repository(repo_id)
                 uow.source_files.delete_by_repository(repo_id)
                 uow.commit()
+
 
         # 3. Load existing source files (will be empty if cleared)
         with self.uow_factory() as uow:
