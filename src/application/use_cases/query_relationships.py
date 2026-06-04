@@ -15,11 +15,12 @@ class QueryRelationshipsUseCase:
         offset: int = 0, 
         limit: int = 50
     ) -> tuple[list[RelationshipResponse], int]:
-        repo_uuid = uuid.UUID(repository_id)
+        from src.domain.value_objects.repository_id import RepositoryId
+        repo_id = RepositoryId(uuid.UUID(repository_id))
         parsed_type = RelationshipType(relationship_type) if relationship_type else None
         
         with self.uow_factory() as uow:
-            relationships = uow.relationships.get_by_repository(repo_uuid)
+            relationships = uow.relationships.get_by_repository(repo_id)
             
             if parsed_type:
                 relationships = [r for r in relationships if r.relationship_type == parsed_type]
@@ -34,7 +35,7 @@ class QueryRelationshipsUseCase:
                 
                 responses.append(RelationshipResponse(
                     id=str(r.id),
-                    relationship_type=r.relationship_type.value,
+                    relationship_type=r.relationship_type.name,
                     source_seid=str(r.source_seid.value),
                     target_seid=str(r.target_seid.value),
                     source_name=source_entity.name if source_entity else None,

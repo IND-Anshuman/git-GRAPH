@@ -15,11 +15,12 @@ class QueryEntitiesUseCase:
         offset: int = 0, 
         limit: int = 50
     ) -> tuple[list[EntityResponse], int]:
-        repo_uuid = uuid.UUID(repository_id)
+        from src.domain.value_objects.repository_id import RepositoryId
+        repo_id = RepositoryId(uuid.UUID(repository_id))
         parsed_type = EntityType(entity_type) if entity_type else None
         
         with self.uow_factory() as uow:
-            entities = uow.code_entities.get_by_repository(repo_uuid)
+            entities = uow.code_entities.get_by_repository(repo_id)
             
             if parsed_type:
                 entities = [e for e in entities if e.entity_type == parsed_type]
@@ -39,8 +40,8 @@ class QueryEntitiesUseCase:
                     qualified_name=str(e.qualified_name),
                     file_path=file_path,
                     language=e.language.name,
-                    start_line=e.location.start_point.line,
-                    end_line=e.location.end_point.line,
+                    start_line=e.location.start_line,
+                    end_line=e.location.end_line,
                     parent_seid=str(e.parent_seid.value) if e.parent_seid else None,
                     metadata=e.metadata
                 ))
