@@ -3,6 +3,9 @@ from .relationship_type import RelationshipType
 from .language import SupportedLanguage
 from .analysis_status import AnalysisStatus
 from .mutation_type import MutationType
+from .evidence_type import EvidenceType
+from .transition_type import TransitionType
+from .drift_category import DriftCategory
 
 __all__ = [
     "EntityType",
@@ -10,4 +13,7 @@ __all__ = [
     "SupportedLanguage",
     "AnalysisStatus",
     "MutationType",
+    "EvidenceType",
+    "TransitionType",
+    "DriftCategory",
 ]

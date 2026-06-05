@@ -1,0 +1,72 @@
+schema_version: "1.0"
+ontology_version: "3.0.0"
+domain: Data_Management
+nodes:
+  - id: data_management.caching
+    name: Caching
+    parent_id: null
+    is_leaf: false
+    description: "Temporary storage strategies to improve performance and reduce load."
+    children:
+      - id: data_management.caching.memory
+        name: In-Memory Cache
+        parent_id: data_management.caching
+        is_leaf: true
+        description: "Local process-memory caching (dict, lru_cache, functools)."
+      - id: data_management.caching.redis
+        name: Redis Cache
+        parent_id: data_management.caching
+        is_leaf: true
+        description: "Distributed caching using Redis or Redis Cluster."
+      - id: data_management.caching.memcached
+        name: Memcached
+        parent_id: data_management.caching
+        is_leaf: true
+        description: "Distributed caching using Memcached."
+      - id: data_management.caching.invalidation
+        name: Cache Invalidation
+        parent_id: data_management.caching
+        is_leaf: true
+        description: "Logic that removes or expires cached entries."
+  - id: data_management.database
+    name: Database Operations
+    parent_id: null
+    is_leaf: false
+    description: "Persistent data storage and retrieval operations."
+    children:
+      - id: data_management.database.raw_sql
+        name: Raw SQL Query
+        parent_id: data_management.database
+        is_leaf: true
+        description: "Direct SQL execution via cursor, connection, or raw text query."
+      - id: data_management.database.orm_query
+        name: ORM Query
+        parent_id: data_management.database
+        is_leaf: true
+        description: "Database access via an ORM (SQLAlchemy, Django ORM, Peewee)."
+      - id: data_management.database.repository_pattern
+        name: Repository Pattern
+        parent_id: data_management.database
+        is_leaf: true
+        description: "Data access encapsulated in repository objects abstracting persistence."
+      - id: data_management.database.transaction
+        name: Transaction Management
+        parent_id: data_management.database
+        is_leaf: true
+        description: "Explicit begin/commit/rollback transaction control."
+  - id: data_management.serialization
+    name: Serialization
+    parent_id: null
+    is_leaf: false
+    description: "Conversion between data structures and serialized formats."
+    children:
+      - id: data_management.serialization.json
+        name: JSON Serialization
+        parent_id: data_management.serialization
+        is_leaf: true
+        description: "JSON encode/decode operations."
+      - id: data_management.serialization.binary
+        name: Binary Serialization
+        parent_id: data_management.serialization
+        is_leaf: true
+        description: "Protobuf, MessagePack, pickle, or similar binary serialization."
