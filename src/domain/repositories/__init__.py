@@ -9,6 +9,15 @@ from .change_event_repo import IChangeEventRepository
 from .snapshot_repo import IRepositorySnapshotRepository
 from .metrics_repo import IMetricsRepository
 from .integrity_repo import IIntegrityRepository
+from .logic_signature_repo import ILogicSignatureRepository
+from .logic_version_repo import ILogicVersionRepository
+from .logic_transition_repo import ILogicTransitionRepository
+from .logic_evidence_repo import ILogicEvidenceRepository
+from .behavior_explanation_repo import ILogicExplanationRepository
+from .behavior_drift_repo import IBehaviorDriftRepository
+from .behavior_pattern_repo import IBehaviorPatternRepository
+from .logic_cluster_repo import ILogicClusterRepository
+from .ontology_node_repo import IOntologyNodeRepository
 
 __all__ = [
     "IRepositoryRepository",
@@ -22,4 +31,13 @@ __all__ = [
     "IRepositorySnapshotRepository",
     "IMetricsRepository",
     "IIntegrityRepository",
+    "ILogicSignatureRepository",
+    "ILogicVersionRepository",
+    "ILogicTransitionRepository",
+    "ILogicEvidenceRepository",
+    "ILogicExplanationRepository",
+    "IBehaviorDriftRepository",
+    "IBehaviorPatternRepository",
+    "ILogicClusterRepository",
+    "IOntologyNodeRepository",
 ]
