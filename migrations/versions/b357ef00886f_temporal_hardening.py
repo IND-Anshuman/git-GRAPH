@@ -77,213 +77,258 @@ def upgrade() -> None:
     )
     op.create_index('ix_temporal_repair_audits_repo', 'temporal_repair_audits', ['repository_id'], unique=False)
     op.add_column('change_events', sa.Column('confidence', sa.Numeric(precision=3, scale=2), nullable=False))
-    op.alter_column('change_events', 'id',
+    
+    with op.batch_alter_table('change_events') as batch_op:
+        batch_op.alter_column('id',
                existing_type=sa.NUMERIC(),
                type_=sa.Uuid(),
                existing_nullable=False)
-    op.alter_column('change_events', 'repository_id',
+        batch_op.alter_column('repository_id',
                existing_type=sa.NUMERIC(),
                type_=sa.Uuid(),
                existing_nullable=False)
-    op.alter_column('change_events', 'seid',
+        batch_op.alter_column('seid',
                existing_type=sa.NUMERIC(),
                type_=sa.Uuid(),
                existing_nullable=False)
-    op.alter_column('code_entities', 'seid',
+               
+    with op.batch_alter_table('code_entities') as batch_op:
+        batch_op.alter_column('seid',
                existing_type=sa.NUMERIC(),
                type_=sa.Uuid(),
                existing_nullable=False)
-    op.alter_column('code_entities', 'file_id',
+        batch_op.alter_column('file_id',
                existing_type=sa.NUMERIC(),
                type_=sa.Uuid(),
                existing_nullable=False)
-    op.alter_column('code_entities', 'repository_id',
+        batch_op.alter_column('repository_id',
                existing_type=sa.NUMERIC(),
                type_=sa.Uuid(),
                existing_nullable=False)
-    op.alter_column('code_entities', 'parent_seid',
+        batch_op.alter_column('parent_seid',
                existing_type=sa.NUMERIC(),
                type_=sa.Uuid(),
                existing_nullable=True)
-    op.alter_column('commits', 'repository_id',
+               
+    with op.batch_alter_table('commits') as batch_op:
+        batch_op.alter_column('repository_id',
                existing_type=sa.NUMERIC(),
                type_=sa.Uuid(),
                existing_nullable=False)
+               
     op.add_column('entity_versions', sa.Column('confidence', sa.Numeric(precision=3, scale=2), nullable=False))
-    op.alter_column('entity_versions', 'id',
+    
+    with op.batch_alter_table('entity_versions') as batch_op:
+        batch_op.alter_column('id',
                existing_type=sa.NUMERIC(),
                type_=sa.Uuid(),
                existing_nullable=False)
-    op.alter_column('entity_versions', 'seid',
+        batch_op.alter_column('seid',
                existing_type=sa.NUMERIC(),
                type_=sa.Uuid(),
                existing_nullable=False)
-    op.drop_constraint(op.f('ux_entity_versions_seid_commit'), 'entity_versions', type_='unique')
+        batch_op.drop_constraint('ux_entity_versions_seid_commit', type_='unique')
+               
     op.create_index('ux_entity_versions_seid_commit', 'entity_versions', ['seid', 'commit_hash'], unique=True)
+    
     op.add_column('relationship_versions', sa.Column('confidence', sa.Numeric(precision=3, scale=2), nullable=False))
-    op.alter_column('relationship_versions', 'id',
+    
+    with op.batch_alter_table('relationship_versions') as batch_op:
+        batch_op.alter_column('id',
                existing_type=sa.NUMERIC(),
                type_=sa.Uuid(),
                existing_nullable=False)
-    op.alter_column('relationship_versions', 'relationship_id',
+        batch_op.alter_column('relationship_id',
                existing_type=sa.NUMERIC(),
                type_=sa.Uuid(),
                existing_nullable=False)
-    op.alter_column('relationships', 'id',
+               
+    with op.batch_alter_table('relationships') as batch_op:
+        batch_op.alter_column('id',
                existing_type=sa.NUMERIC(),
                type_=sa.Uuid(),
                existing_nullable=False)
-    op.alter_column('relationships', 'repository_id',
+        batch_op.alter_column('repository_id',
                existing_type=sa.NUMERIC(),
                type_=sa.Uuid(),
                existing_nullable=False)
-    op.alter_column('relationships', 'source_seid',
+        batch_op.alter_column('source_seid',
                existing_type=sa.NUMERIC(),
                type_=sa.Uuid(),
                existing_nullable=False)
-    op.alter_column('relationships', 'target_seid',
+        batch_op.alter_column('target_seid',
                existing_type=sa.NUMERIC(),
                type_=sa.Uuid(),
                existing_nullable=False)
-    op.alter_column('repositories', 'id',
+               
+    with op.batch_alter_table('repositories') as batch_op:
+        batch_op.alter_column('id',
                existing_type=sa.NUMERIC(),
                type_=sa.Uuid(),
                existing_nullable=False)
-    op.alter_column('repository_snapshots', 'id',
+               
+    with op.batch_alter_table('repository_snapshots') as batch_op:
+        batch_op.alter_column('id',
                existing_type=sa.NUMERIC(),
                type_=sa.Uuid(),
                existing_nullable=False)
-    op.alter_column('repository_snapshots', 'repository_id',
+        batch_op.alter_column('repository_id',
                existing_type=sa.NUMERIC(),
                type_=sa.Uuid(),
                existing_nullable=False)
-    op.drop_constraint(op.f('ux_snapshots_repo_commit'), 'repository_snapshots', type_='unique')
+        batch_op.drop_constraint('ux_snapshots_repo_commit', type_='unique')
+               
     op.create_index('ux_snapshots_repo_commit', 'repository_snapshots', ['repository_id', 'commit_hash'], unique=True)
-    op.alter_column('source_files', 'id',
+    
+    with op.batch_alter_table('source_files') as batch_op:
+        batch_op.alter_column('id',
                existing_type=sa.NUMERIC(),
                type_=sa.Uuid(),
                existing_nullable=False)
-    op.alter_column('source_files', 'repository_id',
+        batch_op.alter_column('repository_id',
                existing_type=sa.NUMERIC(),
                type_=sa.Uuid(),
                existing_nullable=False)
-    op.alter_column('source_files', 'content_hash',
+        batch_op.alter_column('content_hash',
                existing_type=sa.VARCHAR(length=64),
                nullable=True)
-    op.alter_column('source_files', 'line_count',
+        batch_op.alter_column('line_count',
                existing_type=sa.INTEGER(),
                nullable=True)
-    op.alter_column('source_files', 'size_bytes',
+        batch_op.alter_column('size_bytes',
                existing_type=sa.INTEGER(),
                type_=sa.BigInteger(),
                nullable=True)
-    op.drop_index(op.f('ix_source_files_repo_path'), table_name='source_files')
+               
+    op.drop_index('ix_source_files_repo_path', table_name='source_files')
     # ### end Alembic commands ###
 
 
 def downgrade() -> None:
     # ### commands auto generated by Alembic - please adjust! ###
-    op.create_index(op.f('ix_source_files_repo_path'), 'source_files', ['repository_id', 'file_path'], unique=False)
-    op.alter_column('source_files', 'size_bytes',
+    op.create_index('ix_source_files_repo_path', 'source_files', ['repository_id', 'file_path'], unique=False)
+    
+    with op.batch_alter_table('source_files') as batch_op:
+        batch_op.alter_column('size_bytes',
                existing_type=sa.BigInteger(),
                type_=sa.INTEGER(),
                nullable=False)
-    op.alter_column('source_files', 'line_count',
+        batch_op.alter_column('line_count',
                existing_type=sa.INTEGER(),
                nullable=False)
-    op.alter_column('source_files', 'content_hash',
+        batch_op.alter_column('content_hash',
                existing_type=sa.VARCHAR(length=64),
                nullable=False)
-    op.alter_column('source_files', 'repository_id',
+        batch_op.alter_column('repository_id',
                existing_type=sa.Uuid(),
                type_=sa.NUMERIC(),
                existing_nullable=False)
-    op.alter_column('source_files', 'id',
+        batch_op.alter_column('id',
                existing_type=sa.Uuid(),
                type_=sa.NUMERIC(),
                existing_nullable=False)
+               
     op.drop_index('ux_snapshots_repo_commit', table_name='repository_snapshots')
-    op.create_unique_constraint(op.f('ux_snapshots_repo_commit'), 'repository_snapshots', ['repository_id', 'commit_hash'])
-    op.alter_column('repository_snapshots', 'repository_id',
+    
+    with op.batch_alter_table('repository_snapshots') as batch_op:
+        batch_op.create_unique_constraint('ux_snapshots_repo_commit', ['repository_id', 'commit_hash'])
+        batch_op.alter_column('repository_id',
                existing_type=sa.Uuid(),
                type_=sa.NUMERIC(),
                existing_nullable=False)
-    op.alter_column('repository_snapshots', 'id',
+        batch_op.alter_column('id',
                existing_type=sa.Uuid(),
                type_=sa.NUMERIC(),
                existing_nullable=False)
-    op.alter_column('repositories', 'id',
+               
+    with op.batch_alter_table('repositories') as batch_op:
+        batch_op.alter_column('id',
                existing_type=sa.Uuid(),
                type_=sa.NUMERIC(),
                existing_nullable=False)
-    op.alter_column('relationships', 'target_seid',
+               
+    with op.batch_alter_table('relationships') as batch_op:
+        batch_op.alter_column('target_seid',
                existing_type=sa.Uuid(),
                type_=sa.NUMERIC(),
                existing_nullable=False)
-    op.alter_column('relationships', 'source_seid',
+        batch_op.alter_column('source_seid',
                existing_type=sa.Uuid(),
                type_=sa.NUMERIC(),
                existing_nullable=False)
-    op.alter_column('relationships', 'repository_id',
+        batch_op.alter_column('repository_id',
                existing_type=sa.Uuid(),
                type_=sa.NUMERIC(),
                existing_nullable=False)
-    op.alter_column('relationships', 'id',
+        batch_op.alter_column('id',
                existing_type=sa.Uuid(),
                type_=sa.NUMERIC(),
                existing_nullable=False)
-    op.alter_column('relationship_versions', 'relationship_id',
+               
+    with op.batch_alter_table('relationship_versions') as batch_op:
+        batch_op.alter_column('relationship_id',
                existing_type=sa.Uuid(),
                type_=sa.NUMERIC(),
                existing_nullable=False)
-    op.alter_column('relationship_versions', 'id',
+        batch_op.alter_column('id',
                existing_type=sa.Uuid(),
                type_=sa.NUMERIC(),
                existing_nullable=False)
+               
     op.drop_column('relationship_versions', 'confidence')
     op.drop_index('ux_entity_versions_seid_commit', table_name='entity_versions')
-    op.create_unique_constraint(op.f('ux_entity_versions_seid_commit'), 'entity_versions', ['seid', 'commit_hash'])
-    op.alter_column('entity_versions', 'seid',
+    
+    with op.batch_alter_table('entity_versions') as batch_op:
+        batch_op.create_unique_constraint('ux_entity_versions_seid_commit', ['seid', 'commit_hash'])
+        batch_op.alter_column('seid',
                existing_type=sa.Uuid(),
                type_=sa.NUMERIC(),
                existing_nullable=False)
-    op.alter_column('entity_versions', 'id',
+        batch_op.alter_column('id',
                existing_type=sa.Uuid(),
                type_=sa.NUMERIC(),
                existing_nullable=False)
+               
     op.drop_column('entity_versions', 'confidence')
-    op.alter_column('commits', 'repository_id',
+    
+    with op.batch_alter_table('commits') as batch_op:
+        batch_op.alter_column('repository_id',
                existing_type=sa.Uuid(),
                type_=sa.NUMERIC(),
                existing_nullable=False)
-    op.alter_column('code_entities', 'parent_seid',
+               
+    with op.batch_alter_table('code_entities') as batch_op:
+        batch_op.alter_column('parent_seid',
                existing_type=sa.Uuid(),
                type_=sa.NUMERIC(),
                existing_nullable=True)
-    op.alter_column('code_entities', 'repository_id',
+        batch_op.alter_column('repository_id',
                existing_type=sa.Uuid(),
                type_=sa.NUMERIC(),
                existing_nullable=False)
-    op.alter_column('code_entities', 'file_id',
+        batch_op.alter_column('file_id',
                existing_type=sa.Uuid(),
                type_=sa.NUMERIC(),
                existing_nullable=False)
-    op.alter_column('code_entities', 'seid',
+        batch_op.alter_column('seid',
                existing_type=sa.Uuid(),
                type_=sa.NUMERIC(),
                existing_nullable=False)
-    op.alter_column('change_events', 'seid',
+               
+    with op.batch_alter_table('change_events') as batch_op:
+        batch_op.alter_column('seid',
                existing_type=sa.Uuid(),
                type_=sa.NUMERIC(),
                existing_nullable=False)
-    op.alter_column('change_events', 'repository_id',
+        batch_op.alter_column('repository_id',
                existing_type=sa.Uuid(),
                type_=sa.NUMERIC(),
                existing_nullable=False)
-    op.alter_column('change_events', 'id',
+        batch_op.alter_column('id',
                existing_type=sa.Uuid(),
                type_=sa.NUMERIC(),
                existing_nullable=False)
+               
     op.drop_column('change_events', 'confidence')
     op.drop_index('ix_temporal_repair_audits_repo', table_name='temporal_repair_audits')
     op.drop_table('temporal_repair_audits')
