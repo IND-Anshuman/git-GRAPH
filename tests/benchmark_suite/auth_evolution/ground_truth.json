@@ -1,0 +1,52 @@
+{
+  "repository_name": "auth_evolution_repo",
+  "expected_timeline": [
+    {
+      "commit_hash": "hash1",
+      "file_path": "tests/benchmark_suite/auth_evolution/v1_direct_compare.py",
+      "expected_behaviors": [
+        {
+          "canonical_name": "check_password",
+          "ontology_node_id": "security.authentication.direct_compare",
+          "min_confidence": 0.90
+        }
+      ]
+    },
+    {
+      "commit_hash": "hash2",
+      "file_path": "tests/benchmark_suite/auth_evolution/v2_sha256.py",
+      "expected_behaviors": [
+        {
+          "canonical_name": "check_password",
+          "ontology_node_id": "security.authentication.hash_comparison",
+          "min_confidence": 0.88
+        }
+      ],
+      "expected_drift": {
+        "previous_commit": "hash1",
+        "drift_category": "SIGNIFICANT",
+        "min_drift_score": 0.30,
+        "max_drift_score": 0.50,
+        "security_boundary_crossed": false
+      }
+    },
+    {
+      "commit_hash": "hash3",
+      "file_path": "tests/benchmark_suite/auth_evolution/v3_bcrypt.py",
+      "expected_behaviors": [
+        {
+          "canonical_name": "check_password",
+          "ontology_node_id": "security.authentication.hash_comparison",
+          "min_confidence": 0.92
+        }
+      ],
+      "expected_drift": {
+        "previous_commit": "hash2",
+        "drift_category": "MINOR",
+        "min_drift_score": 0.10,
+        "max_drift_score": 0.45,
+        "security_boundary_crossed": false
+      }
+    }
+  ]
+}

@@ -1,0 +1,45 @@
+{
+  "repository_name": "persistence_evolution_repo",
+  "expected_timeline": [
+    {
+      "commit_hash": "hash1",
+      "expected_behaviors": [
+        {
+          "canonical_name": "get_users",
+          "ontology_node_id": "data_management.database.raw_sql",
+          "min_confidence": 0.88
+        }
+      ]
+    },
+    {
+      "commit_hash": "hash2",
+      "expected_behaviors": [
+        {
+          "canonical_name": "get_users",
+          "ontology_node_id": "data_management.database.orm_query",
+          "min_confidence": 0.90
+        }
+      ],
+      "expected_drift": {
+        "previous_commit": "hash1",
+        "drift_category": "COMPLETE",
+        "security_boundary_crossed": false
+      }
+    },
+    {
+      "commit_hash": "hash3",
+      "expected_behaviors": [
+        {
+          "canonical_name": "UserRepository.find_all",
+          "ontology_node_id": "data_management.database.repository_pattern",
+          "min_confidence": 0.85
+        }
+      ],
+      "expected_drift": {
+        "previous_commit": "hash2",
+        "drift_category": "SIGNIFICANT",
+        "security_boundary_crossed": false
+      }
+    }
+  ]
+}

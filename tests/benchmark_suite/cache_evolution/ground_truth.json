@@ -1,0 +1,47 @@
+{
+  "repository_name": "cache_evolution_repo",
+  "expected_timeline": [
+    {
+      "commit_hash": "hash1",
+      "expected_behaviors": [
+        {
+          "canonical_name": "get_user",
+          "ontology_node_id": "data_management.caching.memory",
+          "min_confidence": 0.85
+        }
+      ]
+    },
+    {
+      "commit_hash": "hash2",
+      "expected_behaviors": [
+        {
+          "canonical_name": "get_user",
+          "ontology_node_id": "data_management.caching.redis",
+          "min_confidence": 0.90
+        }
+      ],
+      "expected_drift": {
+        "previous_commit": "hash1",
+        "drift_category": "SIGNIFICANT",
+        "min_drift_score": 0.30,
+        "security_boundary_crossed": false
+      }
+    },
+    {
+      "commit_hash": "hash3",
+      "expected_behaviors": [
+        {
+          "canonical_name": "get_user",
+          "ontology_node_id": "data_management.caching.redis",
+          "min_confidence": 0.88
+        }
+      ],
+      "expected_drift": {
+        "previous_commit": "hash2",
+        "drift_category": "MINOR",
+        "max_drift_score": 0.30,
+        "security_boundary_crossed": false
+      }
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "repository_name": "multi_behavior_repo",
+  "expected_timeline": [
+    {
+      "commit_hash": "hash1",
+      "expected_behaviors": [
+        {
+          "canonical_name": "process_payment",
+          "ontology_node_id": "data_management.caching.redis",
+          "min_confidence": 0.88,
+          "is_primary": false
+        },
+        {
+          "canonical_name": "process_payment",
+          "ontology_node_id": "data_management.database.orm_query",
+          "min_confidence": 0.85,
+          "is_primary": false
+        },
+        {
+          "canonical_name": "process_payment",
+          "ontology_node_id": "reliability.rate_limiting",
+          "min_confidence": 0.90,
+          "is_primary": true
+        },
+        {
+          "canonical_name": "process_payment",
+          "ontology_node_id": "integration.external_api",
+          "min_confidence": 0.75,
+          "is_primary": false
+        }
+      ]
+    }
+  ]
+}

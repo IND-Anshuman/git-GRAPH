@@ -1,0 +1,30 @@
+{
+  "repository_name": "security_boundary_repo",
+  "expected_timeline": [
+    {
+      "commit_hash": "hash1",
+      "expected_behaviors": [
+        {
+          "canonical_name": "verify_user",
+          "ontology_node_id": "security.authentication.direct_compare",
+          "min_confidence": 0.90
+        }
+      ]
+    },
+    {
+      "commit_hash": "hash2",
+      "expected_behaviors": [
+        {
+          "canonical_name": "verify_user",
+          "ontology_node_id": "security.authentication.hash_comparison",
+          "min_confidence": 0.92
+        }
+      ],
+      "expected_drift": {
+        "previous_commit": "hash1",
+        "drift_category": "MAJOR",
+        "security_boundary_crossed": true
+      }
+    }
+  ]
+}
