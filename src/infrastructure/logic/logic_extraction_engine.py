@@ -1,0 +1,413 @@
+"""Engine that matches AST features against behavior patterns to extract logic signatures."""
+
+import re
+import uuid
+from datetime import datetime
+from typing import Any, Dict, List, Tuple
+
+from src.application.ports.ast_feature_port import ASTFeatures, ExtractedFeature
+from src.domain.entities.behavior_explanation import BehaviorExplanation, RuleVerdict
+from src.domain.entities.behavior_pattern import BehaviorPattern
+from src.domain.entities.code_entity import CodeEntity
+from src.domain.entities.logic_evidence import LogicEvidence
+from src.domain.entities.logic_signature import LogicSignature
+from src.domain.entities.logic_version import LogicVersion
+from src.domain.enums.evidence_type import EvidenceType
+from src.domain.enums.language import SupportedLanguage
+from src.domain.exceptions import LogicExtractionException
+from src.domain.services.logic_identity_service import LogicIdentityService
+from src.domain.value_objects.confidence_breakdown import ConfidenceBreakdown
+from src.domain.value_objects.repository_id import RepositoryId
+from src.infrastructure.logic.ast_feature_extractor import (
+    TreeSitterASTFeatureExtractor,
+)
+from src.infrastructure.logic.logic_fingerprint_engine import (
+    LogicFingerprintEngine,
+)
+from src.infrastructure.logic.pattern_registry import PatternRegistry
+
+
+class LogicExtractionEngine:
+    """Orchestrates logic extraction from CodeEntities by matching AST features against patterns."""
+
+    def __init__(
+        self,
+        extractor: TreeSitterASTFeatureExtractor,
+        fingerprinter: LogicFingerprintEngine,
+        registry: PatternRegistry,
+    ) -> None:
+        self._extractor = extractor
+        self._fingerprinter = fingerprinter
+        self._registry = registry
+
+    def extract_logic(
+        self,
+        entity: CodeEntity,
+        parsed_tree: Any,
+        source_code: str,
+        commit_hash: str,
+    ) -> List[
+        Tuple[
+            LogicSignature,
+            LogicVersion,
+            List[LogicEvidence],
+            BehaviorExplanation,
+        ]
+    ]:
+        """
+        Extract behavioral logic from a CodeEntity at a given commit.
+
+        Args:
+            entity: The CodeEntity being analyzed.
+            parsed_tree: The tree-sitter parse tree of the containing source file.
+            source_code: The raw content of the containing source file.
+            commit_hash: The current commit hash.
+
+        Returns:
+            A list of tuples (Signature, Version, EvidenceList, Explanation) for
+            each matched pattern.
+        """
+        try:
+            # 1. Extract AST Features for the entity's line range
+            features = self._extractor.extract_features(
+                parsed_tree,
+                source_code,
+                entity.location.start_line,
+                entity.location.end_line,
+            )
+
+            # 2. Compute logic fingerprint
+            fingerprint = self._fingerprinter.compute_fingerprint(features)
+
+            # 3. Retrieve candidate patterns based on index keys
+            # Combine all feature symbols to query candidates
+            index_keys = []
+            for c in features.calls:
+                index_keys.append(c.symbol)
+            for imp in features.imports:
+                index_keys.append(imp.symbol)
+            for dec in features.decorators:
+                index_keys.append(dec.symbol)
+            for comp in features.comparisons:
+                index_keys.append(comp.symbol)
+
+            candidates = self._registry.get_candidate_patterns(index_keys)
+            results = []
+
+            # 4. Evaluate each candidate pattern
+            for pattern in candidates:
+                match_result = self._evaluate_pattern(entity, features, pattern)
+                if not match_result:
+                    continue
+
+                verdicts, confidence_breakdown, evidence_list = match_result
+
+                # Check if it meets a minimum threshold
+                if confidence_breakdown.overall_confidence < 0.30:
+                    continue
+
+                # 5. Build domain entities
+                # Logic Signature
+                sig_id = LogicIdentityService.generate_logic_signature_id(
+                    repository_id=entity.repository_id,
+                    language=entity.language.name,
+                    canonical_name=pattern.pattern_id,
+                )
+
+                signature = LogicSignature(
+                    id=sig_id,
+                    repository_id=entity.repository_id,
+                    canonical_name=pattern.pattern_id,
+                    language=entity.language,
+                    ontology_node_id=pattern.ontology_node_id,
+                    description=pattern.name,
+                    created_at=datetime.utcnow(),
+                    metadata={"pattern_version": pattern.pattern_version},
+                )
+
+                # Logic Version
+                version_id = uuid.uuid4()
+                version = LogicVersion(
+                    id=version_id,
+                    logic_signature_id=sig_id,
+                    code_entity_seid=entity.seid,
+                    commit_hash=commit_hash,
+                    version_ordinal=1,  # Will be adjusted by application service during timeline linking
+                    fingerprint=fingerprint,
+                    overall_confidence=confidence_breakdown.overall_confidence,
+                    confidence_breakdown=confidence_breakdown,
+                    is_primary=True,
+                    metadata={"source_file": entity.location.file_path},
+                    created_at=datetime.utcnow(),
+                )
+
+                # Update evidence logic_version_ids
+                for ev in evidence_list:
+                    ev.logic_version_id = version_id
+
+                # Behavior Explanation
+                explanation = BehaviorExplanation(
+                    id=uuid.uuid4(),
+                    logic_version_id=version_id,
+                    behavior_name=pattern.name,
+                    ontology_path=pattern.ontology_node_id,
+                    overall_confidence=confidence_breakdown.overall_confidence,
+                    confidence_breakdown=confidence_breakdown,
+                    matched_pattern_ids=[pattern.pattern_id],
+                    evidence_summary=f"Matched behavioral pattern '{pattern.name}' with {len(evidence_list)} evidence points.",
+                    rule_verdicts=verdicts,
+                    is_stale=False,
+                    generated_at=datetime.utcnow(),
+                    metadata={},
+                )
+
+                results.append((signature, version, evidence_list, explanation))
+
+            return results
+
+        except Exception as e:
+            raise LogicExtractionException(
+                f"Failed logic extraction for entity {entity.qualified_name}: {e}"
+            ) from e
+
+    def _evaluate_pattern(
+        self, entity: CodeEntity, features: ASTFeatures, pattern: BehaviorPattern
+    ) -> (
+        Tuple[List[RuleVerdict], ConfidenceBreakdown, List[LogicEvidence]] | None
+    ):
+        """Evaluate a BehaviorPattern against ASTFeatures. Returns None if negative indicators are hit."""
+        rules = pattern.rules
+        verdicts: List[RuleVerdict] = []
+        evidence_list: List[LogicEvidence] = []
+
+        # Check negative indicators first (fail-fast)
+        neg_indicators = rules.get("negative_indicators", [])
+        for neg in neg_indicators:
+            neg_sym = neg.get("symbol")
+            if not neg_sym:
+                continue
+            # If any call or import contains the negative indicator symbol
+            call_hit = any(neg_sym in c.symbol for c in features.calls)
+            imp_hit = any(neg_sym in i.symbol for i in features.imports)
+            if call_hit or imp_hit:
+                # Disqualify this pattern entirely
+                return None
+
+        # Track category scores for ConfidenceBreakdown
+        ast_score = 0.0
+        dep_score = 0.0
+        data_flow_score = 0.0
+        pattern_score = 0.0
+        struct_score = 0.0
+
+        ast_rules = rules.get("ast_features", [])
+        ast_passed = 0
+        ast_count = len(ast_rules)
+
+        for i, r in enumerate(ast_rules):
+            m_type = r.get("match_type")
+            desc = r.get("description", f"AST rule {i}")
+            passed = False
+            ev_id = None
+
+            if m_type == "call":
+                target_func = r.get("target_function")
+                target_mod = r.get("target_module")
+
+                # Match call
+                for call in features.calls:
+                    func_part = call.symbol.split(":")[-1]
+                    matches_func = target_func == func_part or (
+                        target_func in func_part
+                    )
+                    matches_mod = True
+                    if target_mod:
+                        # Check if module is imported
+                        matches_mod = any(
+                            target_mod in imp.symbol
+                            for imp in features.imports
+                        )
+
+                    if matches_func and matches_mod:
+                        passed = True
+                        ev = LogicEvidence(
+                            id=uuid.uuid4(),
+                            logic_version_id=uuid.UUID(
+                                int=0
+                            ),  # Placeholder, filled later
+                            evidence_type=EvidenceType.AST_CALL,
+                            file_path=entity.location.file_path,
+                            start_line=call.line_number,
+                            end_line=call.line_number,
+                            ast_node_type="Call",
+                            matched_symbol=call.symbol,
+                            matched_rule_id=f"{pattern.pattern_id}_ast_{i}",
+                            confidence_contribution=0.30,
+                        )
+                        evidence_list.append(ev)
+                        ev_id = ev.id
+                        break
+
+            elif m_type == "import":
+                target_mod = r.get("target_module")
+                for imp in features.imports:
+                    if target_mod in imp.symbol:
+                        passed = True
+                        ev = LogicEvidence(
+                            id=uuid.uuid4(),
+                            logic_version_id=uuid.UUID(int=0),
+                            evidence_type=EvidenceType.AST_IMPORT,
+                            file_path=entity.location.file_path,
+                            start_line=imp.line_number,
+                            end_line=imp.line_number,
+                            ast_node_type="Import",
+                            matched_symbol=imp.symbol,
+                            matched_rule_id=f"{pattern.pattern_id}_import_{i}",
+                            confidence_contribution=0.10,
+                        )
+                        evidence_list.append(ev)
+                        ev_id = ev.id
+                        break
+
+            elif m_type == "decorator":
+                target_pat = r.get("target_function_pattern")
+                for dec in features.decorators:
+                    dec_name = dec.symbol.split(":")[-1]
+                    if target_pat == dec_name or re.search(
+                        target_pat, dec_name
+                    ):
+                        passed = True
+                        ev = LogicEvidence(
+                            id=uuid.uuid4(),
+                            logic_version_id=uuid.UUID(int=0),
+                            evidence_type=EvidenceType.STRUCTURAL,
+                            file_path=entity.location.file_path,
+                            start_line=dec.line_number,
+                            end_line=dec.line_number,
+                            ast_node_type="Decorator",
+                            matched_symbol=dec.symbol,
+                            matched_rule_id=f"{pattern.pattern_id}_dec_{i}",
+                            confidence_contribution=0.15,
+                        )
+                        evidence_list.append(ev)
+                        ev_id = ev.id
+                        break
+
+            if passed:
+                ast_passed += 1
+
+            verdicts.append(
+                RuleVerdict(
+                    rule_id=f"ast_{i}",
+                    rule_description=desc,
+                    passed=passed,
+                    contribution=0.20 if passed else 0.0,
+                    evidence_ref=ev_id,
+                )
+            )
+
+        if ast_count > 0:
+            ast_score = ast_passed / ast_count
+            struct_score = ast_score  # decorators and structure
+            dep_score = (
+                ast_score  # calls and imports map to dependency score as well
+            )
+
+        # Evaluate data flow rules
+        df_rules = rules.get("data_flow", [])
+        df_passed = 0
+        df_count = len(df_rules)
+
+        for i, r in enumerate(df_rules):
+            src_pat = r.get("source_param_pattern")
+            sink_call = r.get("sink_call")
+            passed = False
+            ev_id = None
+
+            for flow in features.data_flows:
+                source_matches = re.search(
+                    src_pat, flow["source"], re.IGNORECASE
+                )
+                sink_matches = sink_call in flow["sink"]
+
+                if source_matches and sink_matches:
+                    passed = True
+                    ev = LogicEvidence(
+                        id=uuid.uuid4(),
+                        logic_version_id=uuid.UUID(int=0),
+                        evidence_type=EvidenceType.DATA_FLOW,
+                        file_path=entity.location.file_path,
+                        start_line=flow["line"],
+                        end_line=flow["line"],
+                        ast_node_type="Call",
+                        matched_symbol=flow["sink"],
+                        matched_rule_id=f"{pattern.pattern_id}_df_{i}",
+                        data_flow_path=flow["path"],
+                        confidence_contribution=0.40,
+                    )
+                    evidence_list.append(ev)
+                    ev_id = ev.id
+                    break
+
+            if passed:
+                df_passed += 1
+
+            verdicts.append(
+                RuleVerdict(
+                    rule_id=f"df_{i}",
+                    rule_description=f"Data flow from param matching '{src_pat}' to call '{sink_call}'",
+                    passed=passed,
+                    contribution=0.30 if passed else 0.0,
+                    evidence_ref=ev_id,
+                )
+            )
+
+        if df_count > 0:
+            data_flow_score = df_passed / df_count
+
+        # Evaluate required parameters
+        rp_rules = rules.get("required_params", [])
+        rp_passed = 0
+        rp_count = len(rp_rules)
+
+        # Extract parameter names from entity signature
+        # We can extract from metadata or do regex on source text
+        # If parameters are empty, we check if they are in data flow sources
+        params = list({flow["source"] for flow in features.data_flows})
+
+        for i, r in enumerate(rp_rules):
+            name_pat = r.get("name_pattern")
+            passed = False
+            for p in params:
+                if re.search(name_pat, p, re.IGNORECASE):
+                    passed = True
+                    break
+
+            if passed:
+                rp_passed += 1
+
+            verdicts.append(
+                RuleVerdict(
+                    rule_id=f"rp_{i}",
+                    rule_description=f"Parameter name matching pattern '{name_pat}' required",
+                    passed=passed,
+                    contribution=0.10 if passed else 0.0,
+                )
+            )
+
+        # Compute general pattern score based on passed verdicts fraction
+        total_rules = len(verdicts)
+        passed_rules = sum(1 for v in verdicts if v.passed)
+        pattern_score = passed_rules / total_rules if total_rules > 0 else 0.0
+
+        # Build ConfidenceBreakdown
+        breakdown = ConfidenceBreakdown.compute(
+            ast=ast_score,
+            dependency=dep_score,
+            data_flow=data_flow_score,
+            pattern=pattern_score,
+            structural=struct_score,
+            evidence_count=len(evidence_list),
+        )
+
+        return verdicts, breakdown, evidence_list
