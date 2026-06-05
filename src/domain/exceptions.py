@@ -25,3 +25,15 @@ class ParsingException(DomainException):
 class ExtractionException(DomainException):
     """Raised when entity extraction fails."""
     pass
+
+
+class LogicExtractionException(DomainException):
+    """Raised when logic extraction fails for an entity."""
+
+    pass
+
+
+class OntologyLoadException(DomainException):
+    """Raised when ontology YAML files fail to load or validate."""
+
+    pass

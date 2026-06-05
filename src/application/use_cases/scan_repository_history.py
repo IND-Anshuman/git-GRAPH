@@ -95,7 +95,8 @@ class ScanRepositoryHistoryUseCase:
         diff_engine: TemporalDiffEngine,
         uow_factory: Callable[[], IUnitOfWork],
         identity_service: Any,
-        reconstruction_service: Any = None
+        reconstruction_service: Any = None,
+        logic_orchestrator: Any = None
     ) -> None:
         self.git_adapter = git_adapter
         self.file_scanner = file_scanner
@@ -106,6 +107,7 @@ class ScanRepositoryHistoryUseCase:
         self.uow_factory = uow_factory
         self.identity_service = identity_service
         self.reconstruction_service = reconstruction_service
+        self.logic_orchestrator = logic_orchestrator
 
     def execute(self, repository_id: uuid.UUID, branch: str = "main", snapshot_interval: int = 100) -> dict:
         """Walks the commit history and ingests the repository temporally."""
@@ -311,6 +313,13 @@ class ScanRepositoryHistoryUseCase:
                         uow.repositories.save(repo_db)
 
                     uow.commit()
+
+                # Run Phase 3 logic extraction hook
+                if self.logic_orchestrator:
+                    try:
+                        self.logic_orchestrator.extract_repository_logic(repo_id, commit_hash)
+                    except Exception as le:
+                        logger.error(f"Error extracting logic for commit {commit_hash}: {le}", exc_info=True)
 
                 # Post-commit benchmark telemetry collection
                 try:
