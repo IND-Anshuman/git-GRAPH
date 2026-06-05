@@ -1,0 +1,29 @@
+schema_version: "1.0"
+patterns:
+  - pattern_id: authz_permission_check
+    name: Permission Check
+    pattern_version: "1.0.0"
+    ontology_node_id: security.authorization.permission_check
+    base_confidence: 0.82
+    index_keys:
+      - "call:has_permission"
+      - "call:check_permission"
+      - "call:is_authorized"
+    rules:
+      ast_features:
+        - match_type: call
+          target_function_pattern: "(has_permission|check_permission|is_authorized|can_access)"
+
+  - pattern_id: authz_rbac
+    name: Role-Based Access Control Check
+    pattern_version: "1.0.0"
+    ontology_node_id: security.authorization.rbac
+    base_confidence: 0.85
+    index_keys:
+      - "call:has_role"
+      - "call:check_role"
+      - "call:is_in_role"
+    rules:
+      ast_features:
+        - match_type: call
+          target_function_pattern: "(has_role|check_role|is_in_role|require_role)"

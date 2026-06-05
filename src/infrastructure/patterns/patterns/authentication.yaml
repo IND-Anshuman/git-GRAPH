@@ -1,0 +1,141 @@
+schema_version: "1.0"
+patterns:
+  - pattern_id: auth_direct_compare
+    name: Direct Credential Comparison
+    pattern_version: "1.0.0"
+    ontology_node_id: security.authentication.direct_compare
+    base_confidence: 0.85
+    index_keys:
+      - "struct:comparison"
+    rules:
+      ast_features:
+        - match_type: comparison
+          operators: ["==", "!="]
+          description: "Direct equality comparison of credential strings"
+      negative_indicators:
+        - symbol: hashlib
+        - symbol: bcrypt
+        - symbol: passlib
+        - symbol: jwt
+      required_params:
+        - name_pattern: "(password|passwd|pwd|credential|secret|token)"
+
+  - pattern_id: auth_sha256_verification
+    name: SHA256 Password Verification
+    pattern_version: "1.0.0"
+    ontology_node_id: security.authentication.hash_comparison
+    base_confidence: 0.90
+    index_keys:
+      - "call:hashlib.sha256"
+      - "import:hashlib"
+      - "call:sha256"
+    rules:
+      ast_features:
+        - match_type: call
+          target_module: hashlib
+          target_function: sha256
+          description: "SHA256 hash computation via hashlib"
+        - match_type: call
+          target_function: hexdigest
+          description: "Hex digest extraction"
+      data_flow:
+        - source_param_pattern: "(password|passwd|pwd|secret)"
+          sink_call: sha256
+
+  - pattern_id: auth_bcrypt_verification
+    name: Bcrypt Password Verification
+    pattern_version: "1.0.0"
+    ontology_node_id: security.authentication.hash_comparison
+    base_confidence: 0.95
+    index_keys:
+      - "call:bcrypt.checkpw"
+      - "import:bcrypt"
+      - "call:checkpw"
+    rules:
+      ast_features:
+        - match_type: call
+          target_module: bcrypt
+          target_function: checkpw
+          description: "bcrypt.checkpw invocation"
+      data_flow:
+        - source_param_pattern: "(password|passwd|pwd)"
+          sink_call: checkpw
+
+  - pattern_id: auth_bcrypt_hash
+    name: Bcrypt Password Hashing
+    pattern_version: "1.0.0"
+    ontology_node_id: security.authentication.hash_comparison
+    base_confidence: 0.93
+    index_keys:
+      - "call:bcrypt.hashpw"
+      - "call:bcrypt.gensalt"
+      - "import:bcrypt"
+    rules:
+      ast_features:
+        - match_type: call
+          target_module: bcrypt
+          target_function: hashpw
+        - match_type: call
+          target_module: bcrypt
+          target_function: gensalt
+
+  - pattern_id: auth_jwt_generation
+    name: JWT Token Generation
+    pattern_version: "1.0.0"
+    ontology_node_id: security.authentication.jwt
+    base_confidence: 0.92
+    index_keys:
+      - "call:jwt.encode"
+      - "import:jwt"
+      - "call:encode"
+    rules:
+      ast_features:
+        - match_type: call
+          target_module: jwt
+          target_function: encode
+
+  - pattern_id: auth_jwt_verification
+    name: JWT Token Verification
+    pattern_version: "1.0.0"
+    ontology_node_id: security.authentication.jwt
+    base_confidence: 0.92
+    index_keys:
+      - "call:jwt.decode"
+      - "import:jwt"
+      - "call:decode"
+    rules:
+      ast_features:
+        - match_type: call
+          target_module: jwt
+          target_function: decode
+
+  - pattern_id: auth_passlib_verify
+    name: Passlib Password Verification
+    pattern_version: "1.0.0"
+    ontology_node_id: security.authentication.hash_comparison
+    base_confidence: 0.91
+    index_keys:
+      - "call:verify"
+      - "import:passlib"
+    rules:
+      ast_features:
+        - match_type: import
+          target_module: passlib
+        - match_type: call
+          target_function: verify
+          target_class_pattern: "(CryptContext|pwd_context)"
+
+  - pattern_id: auth_argon2_verification
+    name: Argon2 Password Verification
+    pattern_version: "1.0.0"
+    ontology_node_id: security.authentication.hash_comparison
+    base_confidence: 0.94
+    index_keys:
+      - "import:argon2"
+      - "call:verify"
+    rules:
+      ast_features:
+        - match_type: import
+          target_module: argon2
+        - match_type: call
+          target_function: verify

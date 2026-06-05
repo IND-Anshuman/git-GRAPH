@@ -1,0 +1,30 @@
+schema_version: "1.0"
+patterns:
+  - pattern_id: circuit_breaker_pybreaker
+    name: Circuit Breaker (pybreaker)
+    pattern_version: "1.0.0"
+    ontology_node_id: reliability.circuit_breaker.state_check
+    base_confidence: 0.95
+    index_keys:
+      - "import:pybreaker"
+      - "decorator:CircuitBreaker"
+    rules:
+      ast_features:
+        - match_type: import
+          target_module: pybreaker
+        - match_type: decorator
+          target_class: CircuitBreaker
+
+  - pattern_id: circuit_breaker_manual
+    name: Manual Circuit Breaker
+    pattern_version: "1.0.0"
+    ontology_node_id: reliability.circuit_breaker.state_check
+    base_confidence: 0.75
+    index_keys:
+      - "struct:circuit_state"
+    rules:
+      ast_features:
+        - match_type: attribute_access
+          attribute_pattern: "(state|is_open|is_closed|circuit_state)"
+        - match_type: string_literal_pattern
+          pattern: "(OPEN|CLOSED|HALF_OPEN|HALF-OPEN)"

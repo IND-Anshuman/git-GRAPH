@@ -1,0 +1,57 @@
+schema_version: "1.0"
+ontology_version: "3.0.0"
+domain: Reliability
+nodes:
+  - id: reliability.retry
+    name: Retry Logic
+    parent_id: null
+    is_leaf: false
+    description: "Mechanisms for retrying failed operations."
+    children:
+      - id: reliability.retry.exponential_backoff
+        name: Exponential Backoff
+        parent_id: reliability.retry
+        is_leaf: true
+        description: "Retry with exponentially increasing delays."
+      - id: reliability.retry.fixed_interval
+        name: Fixed Interval Retry
+        parent_id: reliability.retry
+        is_leaf: true
+        description: "Retry with fixed delay intervals."
+      - id: reliability.retry.max_attempts
+        name: Max Attempts Retry
+        parent_id: reliability.retry
+        is_leaf: true
+        description: "Retry up to a maximum number of attempts."
+  - id: reliability.circuit_breaker
+    name: Circuit Breaker
+    parent_id: null
+    is_leaf: false
+    description: "Prevents cascade failures by short-circuiting failing calls."
+    children:
+      - id: reliability.circuit_breaker.state_check
+        name: Circuit State Check
+        parent_id: reliability.circuit_breaker
+        is_leaf: true
+        description: "Checking whether circuit is OPEN, CLOSED, or HALF-OPEN."
+  - id: reliability.rate_limiting
+    name: Rate Limiting
+    parent_id: null
+    is_leaf: false
+    description: "Controls the rate of requests or operations."
+    children:
+      - id: reliability.rate_limiting.token_bucket
+        name: Token Bucket
+        parent_id: reliability.rate_limiting
+        is_leaf: true
+        description: "Rate limiting via token bucket algorithm."
+      - id: reliability.rate_limiting.sliding_window
+        name: Sliding Window
+        parent_id: reliability.rate_limiting
+        is_leaf: true
+        description: "Rate limiting via sliding time window counter."
+      - id: reliability.rate_limiting.fixed_window
+        name: Fixed Window
+        parent_id: reliability.rate_limiting
+        is_leaf: true
+        description: "Rate limiting via fixed time window counter."

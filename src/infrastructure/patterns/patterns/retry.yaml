@@ -1,0 +1,47 @@
+schema_version: "1.0"
+patterns:
+  - pattern_id: retry_tenacity
+    name: Retry with Tenacity
+    pattern_version: "1.0.0"
+    ontology_node_id: reliability.retry.max_attempts
+    base_confidence: 0.95
+    index_keys:
+      - "import:tenacity"
+      - "decorator:retry"
+    rules:
+      ast_features:
+        - match_type: import
+          target_module: tenacity
+        - match_type: decorator
+          target_function_pattern: "(retry|Retrying)"
+
+  - pattern_id: retry_manual_loop
+    name: Manual Retry Loop
+    pattern_version: "1.0.0"
+    ontology_node_id: reliability.retry.max_attempts
+    base_confidence: 0.78
+    index_keys:
+      - "struct:retry_loop"
+    rules:
+      ast_features:
+        - match_type: while_loop
+          description: "While loop with attempt counter"
+        - match_type: variable_pattern
+          name_pattern: "(attempt|retry|retries|max_retries)"
+
+  - pattern_id: retry_backoff
+    name: Exponential Backoff Retry
+    pattern_version: "1.0.0"
+    ontology_node_id: reliability.retry.exponential_backoff
+    base_confidence: 0.86
+    index_keys:
+      - "call:time.sleep"
+      - "call:sleep"
+      - "struct:exponential"
+    rules:
+      ast_features:
+        - match_type: call
+          target_function: sleep
+        - match_type: binary_op
+          operators: ["**", "*"]
+          description: "Exponential or multiplicative delay computation"

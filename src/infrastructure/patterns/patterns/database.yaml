@@ -1,0 +1,64 @@
+schema_version: "1.0"
+patterns:
+  - pattern_id: db_raw_sql_execute
+    name: Raw SQL Execution
+    pattern_version: "1.0.0"
+    ontology_node_id: data_management.database.raw_sql
+    base_confidence: 0.88
+    index_keys:
+      - "call:cursor.execute"
+      - "call:execute"
+      - "call:connection.execute"
+    rules:
+      ast_features:
+        - match_type: call
+          target_method: execute
+          target_class_pattern: "(cursor|Cursor|connection|Connection)"
+      string_literals:
+        - pattern: "^(SELECT|INSERT|UPDATE|DELETE|CREATE|DROP)"
+          description: "SQL keyword in string argument"
+
+  - pattern_id: db_orm_sqlalchemy_query
+    name: SQLAlchemy ORM Query
+    pattern_version: "1.0.0"
+    ontology_node_id: data_management.database.orm_query
+    base_confidence: 0.92
+    index_keys:
+      - "import:sqlalchemy"
+      - "call:session.query"
+      - "call:query"
+      - "call:filter"
+    rules:
+      ast_features:
+        - match_type: import
+          target_module_pattern: "sqlalchemy"
+        - match_type: call
+          target_method_pattern: "(query|filter|filter_by|select|execute)"
+
+  - pattern_id: db_repository_pattern
+    name: Repository Pattern
+    pattern_version: "1.0.0"
+    ontology_node_id: data_management.database.repository_pattern
+    base_confidence: 0.82
+    index_keys:
+      - "struct:class_repository"
+    rules:
+      ast_features:
+        - match_type: class_name_pattern
+          pattern: "(Repository|Repo|Store|DAO|DataAccessObject)"
+        - match_type: method_pattern
+          patterns: ["find", "save", "delete", "get_by"]
+
+  - pattern_id: db_transaction
+    name: Database Transaction
+    pattern_version: "1.0.0"
+    ontology_node_id: data_management.database.transaction
+    base_confidence: 0.87
+    index_keys:
+      - "call:commit"
+      - "call:rollback"
+      - "call:begin"
+    rules:
+      ast_features:
+        - match_type: call
+          target_method_pattern: "(commit|rollback|begin_transaction|start_transaction)"

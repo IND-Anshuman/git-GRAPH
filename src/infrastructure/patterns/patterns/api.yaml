@@ -1,0 +1,51 @@
+schema_version: "1.0"
+patterns:
+  - pattern_id: api_requests_call
+    name: HTTP REST API Call (requests)
+    pattern_version: "1.0.0"
+    ontology_node_id: integration.http_client.rest_call
+    base_confidence: 0.88
+    index_keys:
+      - "import:requests"
+      - "call:requests.get"
+      - "call:requests.post"
+    rules:
+      ast_features:
+        - match_type: import
+          target_module: requests
+        - match_type: call
+          target_module: requests
+          target_function_pattern: "(get|post|put|delete|patch|head|request)"
+
+  - pattern_id: api_httpx_call
+    name: HTTP REST API Call (httpx)
+    pattern_version: "1.0.0"
+    ontology_node_id: integration.http_client.rest_call
+    base_confidence: 0.88
+    index_keys:
+      - "import:httpx"
+      - "call:httpx.get"
+      - "call:client.get"
+    rules:
+      ast_features:
+        - match_type: import
+          target_module: httpx
+        - match_type: call
+          target_module_pattern: "(httpx|client)"
+          target_function_pattern: "(get|post|put|delete|patch)"
+
+  - pattern_id: api_endpoint_handler
+    name: API Endpoint Handler
+    pattern_version: "1.0.0"
+    ontology_node_id: presentation.api_handling.endpoint
+    base_confidence: 0.87
+    index_keys:
+      - "decorator:app.get"
+      - "decorator:app.post"
+      - "decorator:router.get"
+      - "decorator:route"
+    rules:
+      ast_features:
+        - match_type: decorator
+          target_method_pattern: "(get|post|put|delete|patch)"
+          target_object_pattern: "(app|router|api|blueprint)"

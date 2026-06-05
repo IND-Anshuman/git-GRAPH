@@ -1,0 +1,52 @@
+schema_version: "1.0"
+ontology_version: "3.0.0"
+domain: Integration
+nodes:
+  - id: integration.messaging
+    name: Messaging
+    parent_id: null
+    is_leaf: false
+    description: "Asynchronous message-based communication patterns."
+    children:
+      - id: integration.messaging.publish
+        name: Message Publishing
+        parent_id: integration.messaging
+        is_leaf: true
+        description: "Publishing messages to a queue, topic, or broker."
+      - id: integration.messaging.consume
+        name: Message Consumption
+        parent_id: integration.messaging
+        is_leaf: true
+        description: "Consuming or subscribing to messages from a queue or topic."
+  - id: integration.http_client
+    name: HTTP Client
+    parent_id: null
+    is_leaf: false
+    description: "Outbound HTTP request patterns."
+    children:
+      - id: integration.http_client.rest_call
+        name: REST API Call
+        parent_id: integration.http_client
+        is_leaf: true
+        description: "Outbound REST API invocation via requests, httpx, aiohttp."
+      - id: integration.http_client.graphql_call
+        name: GraphQL Call
+        parent_id: integration.http_client
+        is_leaf: true
+        description: "Outbound GraphQL query or mutation."
+  - id: integration.event
+    name: Event Handling
+    parent_id: null
+    is_leaf: false
+    description: "Event-driven patterns including emit, subscribe, and handle."
+    children:
+      - id: integration.event.emit
+        name: Event Emission
+        parent_id: integration.event
+        is_leaf: true
+        description: "Emitting or dispatching domain events."
+      - id: integration.event.handler
+        name: Event Handler
+        parent_id: integration.event
+        is_leaf: true
+        description: "Handling or processing received domain events."

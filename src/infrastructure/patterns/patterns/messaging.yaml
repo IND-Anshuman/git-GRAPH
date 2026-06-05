@@ -1,0 +1,46 @@
+schema_version: "1.0"
+patterns:
+  - pattern_id: msg_publish_kafka
+    name: Kafka Message Publishing
+    pattern_version: "1.0.0"
+    ontology_node_id: integration.messaging.publish
+    base_confidence: 0.92
+    index_keys:
+      - "import:kafka"
+      - "call:producer.send"
+      - "call:produce"
+    rules:
+      ast_features:
+        - match_type: import
+          target_module_pattern: "(kafka|confluent_kafka)"
+        - match_type: call
+          target_method_pattern: "(send|produce|publish)"
+
+  - pattern_id: msg_publish_rabbitmq
+    name: RabbitMQ Message Publishing
+    pattern_version: "1.0.0"
+    ontology_node_id: integration.messaging.publish
+    base_confidence: 0.91
+    index_keys:
+      - "import:pika"
+      - "call:basic_publish"
+    rules:
+      ast_features:
+        - match_type: import
+          target_module: pika
+        - match_type: call
+          target_method: basic_publish
+
+  - pattern_id: msg_consume
+    name: Message Consumption
+    pattern_version: "1.0.0"
+    ontology_node_id: integration.messaging.consume
+    base_confidence: 0.85
+    index_keys:
+      - "call:consume"
+      - "call:subscribe"
+      - "decorator:consumer"
+    rules:
+      ast_features:
+        - match_type: call
+          target_method_pattern: "(consume|subscribe|poll|receive)"

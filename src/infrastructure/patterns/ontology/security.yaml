@@ -1,0 +1,77 @@
+schema_version: "1.0"
+ontology_version: "3.0.0"
+domain: Security
+nodes:
+  - id: security.authentication
+    name: Authentication
+    parent_id: null
+    is_leaf: false
+    description: "Mechanisms that verify the identity of a user, service, or system."
+    children:
+      - id: security.authentication.direct_compare
+        name: Direct Credential Comparison
+        parent_id: security.authentication
+        is_leaf: true
+        description: "Plaintext or raw comparison of credentials without hashing."
+      - id: security.authentication.hash_comparison
+        name: Cryptographic Hash Verification
+        parent_id: security.authentication
+        is_leaf: true
+        description: "Verification via one-way cryptographic hash (SHA256, bcrypt, Argon2, PBKDF2)."
+      - id: security.authentication.jwt
+        name: JWT Token Authentication
+        parent_id: security.authentication
+        is_leaf: true
+        description: "Stateless authentication using signed JSON Web Tokens."
+      - id: security.authentication.oauth
+        name: OAuth / SSO Authentication
+        parent_id: security.authentication
+        is_leaf: true
+        description: "Delegated authentication via OAuth2 or SSO providers."
+      - id: security.authentication.session
+        name: Session-Based Authentication
+        parent_id: security.authentication
+        is_leaf: true
+        description: "Server-side session management for user authentication state."
+  - id: security.authorization
+    name: Authorization
+    parent_id: null
+    is_leaf: false
+    description: "Mechanisms that enforce access control policies."
+    children:
+      - id: security.authorization.rbac
+        name: Role-Based Access Control
+        parent_id: security.authorization
+        is_leaf: true
+        description: "Access control based on user roles."
+      - id: security.authorization.abac
+        name: Attribute-Based Access Control
+        parent_id: security.authorization
+        is_leaf: true
+        description: "Access control based on entity attributes and policies."
+      - id: security.authorization.permission_check
+        name: Permission Check
+        parent_id: security.authorization
+        is_leaf: true
+        description: "Direct permission or scope validation."
+  - id: security.cryptography
+    name: Cryptography
+    parent_id: null
+    is_leaf: false
+    description: "Encryption, signing, and key management operations."
+    children:
+      - id: security.cryptography.symmetric
+        name: Symmetric Encryption
+        parent_id: security.cryptography
+        is_leaf: true
+        description: "AES, DES, or similar symmetric cipher operations."
+      - id: security.cryptography.asymmetric
+        name: Asymmetric Encryption
+        parent_id: security.cryptography
+        is_leaf: true
+        description: "RSA, EC, or similar asymmetric cipher operations."
+      - id: security.cryptography.signing
+        name: Digital Signing
+        parent_id: security.cryptography
+        is_leaf: true
+        description: "HMAC, RSA-sign, or EC-sign operations."

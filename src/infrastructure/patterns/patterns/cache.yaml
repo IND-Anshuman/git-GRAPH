@@ -1,0 +1,91 @@
+schema_version: "1.0"
+patterns:
+  - pattern_id: cache_memory_dict
+    name: In-Memory Dictionary Cache
+    pattern_version: "1.0.0"
+    ontology_node_id: data_management.caching.memory
+    base_confidence: 0.78
+    index_keys:
+      - "struct:dict_lookup"
+    rules:
+      ast_features:
+        - match_type: subscript
+          description: "Dictionary subscript access pattern"
+      negative_indicators:
+        - symbol: redis
+        - symbol: memcache
+
+  - pattern_id: cache_lru_cache
+    name: LRU Cache (functools)
+    pattern_version: "1.0.0"
+    ontology_node_id: data_management.caching.memory
+    base_confidence: 0.95
+    index_keys:
+      - "decorator:lru_cache"
+      - "decorator:cache"
+      - "import:functools"
+    rules:
+      ast_features:
+        - match_type: decorator
+          target_function_pattern: "(lru_cache|cache)"
+          target_module: functools
+
+  - pattern_id: cache_redis_lookup
+    name: Redis Cache Lookup
+    pattern_version: "1.0.0"
+    ontology_node_id: data_management.caching.redis
+    base_confidence: 0.90
+    index_keys:
+      - "call:Redis.get"
+      - "call:redis.get"
+      - "import:redis"
+    rules:
+      ast_features:
+        - match_type: call
+          target_method: get
+          target_class_pattern: "(Redis|StrictRedis|redis)"
+
+  - pattern_id: cache_redis_set
+    name: Redis Cache Write
+    pattern_version: "1.0.0"
+    ontology_node_id: data_management.caching.redis
+    base_confidence: 0.88
+    index_keys:
+      - "call:Redis.set"
+      - "call:redis.set"
+      - "import:redis"
+    rules:
+      ast_features:
+        - match_type: call
+          target_method: set
+          target_class_pattern: "(Redis|StrictRedis)"
+
+  - pattern_id: cache_redis_cluster
+    name: Redis Cluster Cache
+    pattern_version: "1.0.0"
+    ontology_node_id: data_management.caching.redis
+    base_confidence: 0.91
+    index_keys:
+      - "call:RedisCluster"
+      - "import:redis.cluster"
+    rules:
+      ast_features:
+        - match_type: call
+          target_class: RedisCluster
+        - match_type: import
+          target_module_pattern: "redis.cluster"
+
+  - pattern_id: cache_invalidation
+    name: Cache Invalidation
+    pattern_version: "1.0.0"
+    ontology_node_id: data_management.caching.invalidation
+    base_confidence: 0.85
+    index_keys:
+      - "call:Redis.delete"
+      - "call:redis.delete"
+      - "call:cache.clear"
+      - "call:delete"
+    rules:
+      ast_features:
+        - match_type: call
+          target_method_pattern: "(delete|invalidate|clear|expire|evict)"
