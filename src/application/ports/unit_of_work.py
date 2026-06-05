@@ -11,7 +11,16 @@ from src.domain.repositories import (
     IChangeEventRepository,
     IRepositorySnapshotRepository,
     IMetricsRepository,
-    IIntegrityRepository
+    IIntegrityRepository,
+    ILogicSignatureRepository,
+    ILogicVersionRepository,
+    ILogicTransitionRepository,
+    ILogicEvidenceRepository,
+    ILogicExplanationRepository,
+    IBehaviorDriftRepository,
+    IBehaviorPatternRepository,
+    ILogicClusterRepository,
+    IOntologyNodeRepository,
 )
 
 class IUnitOfWork(ABC):
@@ -84,4 +93,49 @@ class IUnitOfWork(ABC):
     @property
     @abstractmethod
     def integrity(self) -> IIntegrityRepository:
+        pass
+
+    @property
+    @abstractmethod
+    def logic_signatures(self) -> ILogicSignatureRepository:
+        pass
+
+    @property
+    @abstractmethod
+    def logic_versions(self) -> ILogicVersionRepository:
+        pass
+
+    @property
+    @abstractmethod
+    def logic_transitions(self) -> ILogicTransitionRepository:
+        pass
+
+    @property
+    @abstractmethod
+    def logic_evidence(self) -> ILogicEvidenceRepository:
+        pass
+
+    @property
+    @abstractmethod
+    def behavior_explanations(self) -> ILogicExplanationRepository:
+        pass
+
+    @property
+    @abstractmethod
+    def behavior_drift(self) -> IBehaviorDriftRepository:
+        pass
+
+    @property
+    @abstractmethod
+    def behavior_patterns(self) -> IBehaviorPatternRepository:
+        pass
+
+    @property
+    @abstractmethod
+    def logic_clusters(self) -> ILogicClusterRepository:
+        pass
+
+    @property
+    @abstractmethod
+    def ontology_nodes(self) -> IOntologyNodeRepository:
         pass
