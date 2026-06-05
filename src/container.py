@@ -14,6 +14,31 @@ from src.application.use_cases.get_commit_changes import GetCommitChangesUseCase
 from src.application.use_cases.get_repository_timeline import GetRepositoryTimelineUseCase
 from src.application.use_cases.reconstruct_graph import ReconstructGraphUseCase
 
+# Phase 3 Use Cases
+from src.application.use_cases.extract_logic_use_case import ExtractLogicUseCase
+from src.application.use_cases.get_entity_logic_use_case import GetEntityLogicUseCase
+from src.application.use_cases.get_entity_logic_history_use_case import GetEntityLogicHistoryUseCase
+from src.application.use_cases.get_behavior_evolution_use_case import GetBehaviorEvolutionUseCase
+from src.application.use_cases.get_logic_evidence_use_case import GetLogicEvidenceUseCase
+from src.application.use_cases.get_behavior_explanation_use_case import GetBehaviorExplanationUseCase
+from src.application.use_cases.get_behavior_drift_use_case import GetBehaviorDriftUseCase
+from src.application.use_cases.validate_logic_use_case import ValidateLogicUseCase
+
+# Phase 3 Services & Engines
+from src.infrastructure.logic.ast_feature_extractor import TreeSitterASTFeatureExtractor
+from src.infrastructure.logic.logic_fingerprint_engine import LogicFingerprintEngine
+from src.infrastructure.logic.ontology_loader import OntologyLoader
+from src.infrastructure.logic.pattern_registry import PatternRegistry
+from src.infrastructure.logic.logic_extraction_engine import LogicExtractionEngine
+from src.infrastructure.logic.logic_similarity_engine import LogicSimilarityEngine
+from src.infrastructure.logic.logic_diff_engine import LogicDiffEngine
+from src.infrastructure.logic.behavior_drift_engine import BehaviorDriftEngine
+
+from src.application.services.ontology_registry import OntologyRegistryService
+from src.application.services.logic_extraction_orchestrator import LogicExtractionOrchestrator
+from src.application.services.logic_evolution_service import LogicEvolutionService
+
+
 from src.infrastructure.git.gitpython_adapter import GitPythonAdapter
 from src.infrastructure.git.rename_detection import RenameDetector
 from src.infrastructure.git.move_detection import MoveDetector
@@ -87,6 +112,40 @@ class Container:
         self.temporal_explorer = TemporalExplorer()
         self.temporal_replay_service = TemporalReplayService(self.reconstruction_service)
 
+        # Phase 3 Behavioral Intelligence setup
+        self.in_memory_pattern_registry = PatternRegistry()
+        self.ontology_loader = OntologyLoader()
+        self.ast_feature_extractor = TreeSitterASTFeatureExtractor()
+        self.logic_fingerprint_engine = LogicFingerprintEngine()
+        self.logic_similarity_engine = LogicSimilarityEngine()
+        self.logic_diff_engine = LogicDiffEngine()
+        self.behavior_drift_engine = BehaviorDriftEngine()
+
+        self.logic_extraction_engine = LogicExtractionEngine(
+            extractor=self.ast_feature_extractor,
+            fingerprinter=self.logic_fingerprint_engine,
+            registry=self.in_memory_pattern_registry
+        )
+
+        self.ontology_registry_service = OntologyRegistryService(
+            uow_factory=self.get_uow_factory(),
+            loader=self.ontology_loader,
+            in_memory_patterns=self.in_memory_pattern_registry
+        )
+        self.logic_evolution_service = LogicEvolutionService(
+            uow_factory=self.get_uow_factory()
+        )
+        self.logic_extraction_orchestrator = LogicExtractionOrchestrator(
+            uow_factory=self.get_uow_factory(),
+            git_adapter=self.git_adapter,
+            parser=self.parser,
+            extraction_engine=self.logic_extraction_engine,
+            similarity_engine=self.logic_similarity_engine,
+            diff_engine=self.logic_diff_engine,
+            drift_engine=self.behavior_drift_engine
+        )
+
+
     def get_uow_factory(self) -> Callable:
         # Resolve class using lambda and create database connection wrapper
         # To avoid class instantiation, we use self.engine wrapper or pass self directly.
@@ -139,7 +198,8 @@ class Container:
             diff_engine=self.diff_engine,
             uow_factory=self.get_uow_factory(),
             identity_service=self.identity_service,
-            reconstruction_service=self.reconstruction_service
+            reconstruction_service=self.reconstruction_service,
+            logic_orchestrator=self.logic_extraction_orchestrator
         )
 
     def get_get_commits_use_case(self) -> GetCommitsUseCase:
@@ -159,3 +219,34 @@ class Container:
             reconstruction_service=self.reconstruction_service,
             uow_factory=self.get_uow_factory()
         )
+
+    def get_extract_logic_use_case(self) -> ExtractLogicUseCase:
+        return ExtractLogicUseCase(
+            uow_factory=self.get_uow_factory(),
+            orchestrator=self.logic_extraction_orchestrator
+        )
+
+    def get_get_entity_logic_use_case(self) -> GetEntityLogicUseCase:
+        return GetEntityLogicUseCase(uow_factory=self.get_uow_factory())
+
+    def get_get_entity_logic_history_use_case(self) -> GetEntityLogicHistoryUseCase:
+        return GetEntityLogicHistoryUseCase(uow_factory=self.get_uow_factory())
+
+    def get_get_behavior_evolution_use_case(self) -> GetBehaviorEvolutionUseCase:
+        return GetBehaviorEvolutionUseCase(
+            uow_factory=self.get_uow_factory(),
+            evolution_service=self.logic_evolution_service
+        )
+
+    def get_get_logic_evidence_use_case(self) -> GetLogicEvidenceUseCase:
+        return GetLogicEvidenceUseCase(uow_factory=self.get_uow_factory())
+
+    def get_get_behavior_explanation_use_case(self) -> GetBehaviorExplanationUseCase:
+        return GetBehaviorExplanationUseCase(uow_factory=self.get_uow_factory())
+
+    def get_get_behavior_drift_use_case(self) -> GetBehaviorDriftUseCase:
+        return GetBehaviorDriftUseCase(uow_factory=self.get_uow_factory())
+
+    def get_validate_logic_use_case(self) -> ValidateLogicUseCase:
+        return ValidateLogicUseCase(uow_factory=self.get_uow_factory())
+

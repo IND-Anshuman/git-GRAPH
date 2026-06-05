@@ -29,6 +29,17 @@ from src.infrastructure.persistence.repositories.sa_change_event_repo import SAC
 from src.infrastructure.persistence.repositories.sa_snapshot_repo import SARepositorySnapshotRepository
 from src.infrastructure.persistence.repositories.sa_metrics_repo import SAMetricsRepository
 from src.infrastructure.persistence.repositories.sa_integrity_repo import SAIntegrityRepository
+from src.infrastructure.persistence.repositories.sa_logic_repositories import (
+    SALogicSignatureRepository,
+    SALogicVersionRepository,
+    SALogicTransitionRepository,
+    SALogicEvidenceRepository,
+    SABehaviorExplanationRepository,
+    SABehaviorDriftRepository,
+    SABehaviorPatternRepository,
+    SALogicClusterRepository,
+    SAOntologyNodeRepository,
+)
 from src.infrastructure.persistence.database import DatabaseEngine
 
 
@@ -52,6 +63,15 @@ class SQLAlchemyUnitOfWork(IUnitOfWork):
         self._snapshots = SARepositorySnapshotRepository(self._session)
         self._metrics = SAMetricsRepository(self._session)
         self._integrity = SAIntegrityRepository(self._session)
+        self._logic_signatures = SALogicSignatureRepository(self._session)
+        self._logic_versions = SALogicVersionRepository(self._session)
+        self._logic_transitions = SALogicTransitionRepository(self._session)
+        self._logic_evidence = SALogicEvidenceRepository(self._session)
+        self._behavior_explanations = SABehaviorExplanationRepository(self._session)
+        self._behavior_drift = SABehaviorDriftRepository(self._session)
+        self._behavior_patterns = SABehaviorPatternRepository(self._session)
+        self._logic_clusters = SALogicClusterRepository(self._session)
+        self._ontology_nodes = SAOntologyNodeRepository(self._session)
         return self
 
     def __exit__(self, exc_type: Any, exc_val: Any, exc_tb: Any) -> None:
@@ -110,3 +130,39 @@ class SQLAlchemyUnitOfWork(IUnitOfWork):
     @property
     def integrity(self) -> IIntegrityRepository:
         return self._integrity
+
+    @property
+    def logic_signatures(self):
+        return self._logic_signatures
+
+    @property
+    def logic_versions(self):
+        return self._logic_versions
+
+    @property
+    def logic_transitions(self):
+        return self._logic_transitions
+
+    @property
+    def logic_evidence(self):
+        return self._logic_evidence
+
+    @property
+    def behavior_explanations(self):
+        return self._behavior_explanations
+
+    @property
+    def behavior_drift(self):
+        return self._behavior_drift
+
+    @property
+    def behavior_patterns(self):
+        return self._behavior_patterns
+
+    @property
+    def logic_clusters(self):
+        return self._logic_clusters
+
+    @property
+    def ontology_nodes(self):
+        return self._ontology_nodes
