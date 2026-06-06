@@ -92,15 +92,22 @@ class LogicExtractionEngine:
                 index_keys.append(comp.symbol)
 
             candidates = self._registry.get_candidate_patterns(index_keys)
+            print(f"  [ExtractionEngine] Entity: {entity.qualified_name}")
+            print(f"  [ExtractionEngine] Features: calls={len(features.calls)}, imports={len(features.imports)}")
+            print(f"  [ExtractionEngine] Index keys: {index_keys}")
+            print(f"  [ExtractionEngine] Candidates found: {[p.pattern_id for p in candidates]}")
+
             results = []
 
             # 4. Evaluate each candidate pattern
             for pattern in candidates:
                 match_result = self._evaluate_pattern(entity, features, pattern)
                 if not match_result:
+                    print(f"  [ExtractionEngine] Pattern {pattern.pattern_id} evaluation returned None (negative indicator or filter).")
                     continue
 
                 verdicts, confidence_breakdown, evidence_list = match_result
+                print(f"  [ExtractionEngine] Pattern {pattern.pattern_id} evaluated: overall_confidence={confidence_breakdown.overall_confidence}")
 
                 # Check if it meets a minimum threshold
                 if confidence_breakdown.overall_confidence < 0.30:
@@ -110,6 +117,7 @@ class LogicExtractionEngine:
                 # Logic Signature
                 sig_id = LogicIdentityService.generate_logic_signature_id(
                     repository_id=entity.repository_id,
+                    entity_seid=entity.seid,
                     language=entity.language.name,
                     canonical_name=pattern.pattern_id,
                 )
