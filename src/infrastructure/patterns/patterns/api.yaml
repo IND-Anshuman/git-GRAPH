@@ -49,3 +49,33 @@ patterns:
         - match_type: decorator
           target_method_pattern: "(get|post|put|delete|patch)"
           target_object_pattern: "(app|router|api|blueprint)"
+
+  - pattern_id: api_gemini_client
+    name: Gemini GenAI Client Call
+    pattern_version: "1.0.0"
+    ontology_node_id: integration.http_client.rest_call
+    base_confidence: 0.95
+    index_keys:
+      - "import:google.genai"
+      - "call:generate_content"
+    rules:
+      ast_features:
+        - match_type: import
+          target_module: google.genai
+        - match_type: call
+          target_function: generate_content
+
+  - pattern_id: tts_parler_generation
+    name: Parler TTS Audio Generation
+    pattern_version: "1.0.0"
+    ontology_node_id: integration.http_client.rest_call
+    base_confidence: 0.90
+    index_keys:
+      - "import:parler_tts"
+      - "call:generate"
+    rules:
+      ast_features:
+        - match_type: import
+          target_module: parler_tts
+        - match_type: call
+          target_function: generate
