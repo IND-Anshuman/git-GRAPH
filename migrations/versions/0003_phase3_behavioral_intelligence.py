@@ -110,7 +110,6 @@ def upgrade() -> None:
             name='fk_logic_signatures_ontology_node',
         ),
         sa.PrimaryKeyConstraint('id'),
-        sa.UniqueConstraint('repository_id', 'entity_seid', name='uq_logic_signatures_repo_seid'),
     )
     op.create_index('ix_logic_signatures_entity_seid', 'logic_signatures', ['entity_seid'], unique=False)
     op.create_index('ix_logic_signatures_entity_type', 'logic_signatures', ['entity_type'], unique=False)
