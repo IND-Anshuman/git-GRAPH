@@ -130,30 +130,65 @@ class ScanRepositoryHistoryUseCase:
         if not start_commit:
             logger.info(f"Clearing existing static data for repository {repo_id} to perform chronological walk...")
             with self.uow_factory() as uow:
-                uow._session.execute(
-                    text("DELETE FROM repository_snapshots WHERE repository_id = :repo_id"),
-                    {"repo_id": str(repo_id.value)}
+                # To be database agnostic (Postgres/SQLite) and bypass hyphen differences:
+                # We use SQLAlchemy's model-based deletes instead of raw SQL strings.
+                from sqlalchemy import delete, select
+                from src.infrastructure.persistence.models import (
+                    RepositorySnapshotModel,
+                    CommitModel,
+                    BenchmarkReportModel,
+                    ChangeEventModel,
+                    RelationshipVersionModel,
+                    EntityVersionModel,
+                    RelationshipModel,
+                    CodeEntityModel,
+                    AccuracyReportModel,
+                    # Phase 3 models
+                    LogicSignatureModel,
+                    LogicVersionModel,
+                    LogicEvidenceModel,
+                    LogicTransitionModel,
+                    BehaviorExplanationModel,
+                    BehaviorDriftModel,
+                    LogicClusterMemberModel,
+                    LogicVersionPatternModel,
                 )
-                uow._session.execute(
-                    text("DELETE FROM commits WHERE repository_id = :repo_id"),
-                    {"repo_id": str(repo_id.value)}
+
+                # Clear Phase 3 tables first (due to FK constraints and cascade deletions)
+                sig_ids_subq = select(LogicSignatureModel.id).where(LogicSignatureModel.repository_id == repo_id.value)
+                ver_ids_subq = select(LogicVersionModel.id).where(LogicVersionModel.signature_id.in_(sig_ids_subq))
+                trans_ids_subq = select(LogicTransitionModel.id).where(
+                    (LogicTransitionModel.from_version_id.in_(ver_ids_subq)) |
+                    (LogicTransitionModel.to_version_id.in_(ver_ids_subq))
                 )
-                uow._session.execute(
-                    text("DELETE FROM temporal_benchmarks WHERE repository_id = :repo_id"),
-                    {"repo_id": str(repo_id.value)}
-                )
-                uow._session.execute(
-                    text("DELETE FROM change_events WHERE repository_id = :repo_id"),
-                    {"repo_id": str(repo_id.value)}
-                )
-                uow._session.execute(
-                    text("DELETE FROM relationship_versions WHERE ID IN (SELECT rv.id FROM relationship_versions rv JOIN relationships r ON rv.relationship_id = r.id WHERE r.repository_id = :repo_id)"),
-                    {"repo_id": str(repo_id.value)}
-                )
-                uow._session.execute(
-                    text("DELETE FROM entity_versions WHERE seid IN (SELECT e.seid FROM code_entities e WHERE e.repository_id = :repo_id)"),
-                    {"repo_id": str(repo_id.value)}
-                )
+
+                uow._session.execute(delete(LogicVersionPatternModel).where(LogicVersionPatternModel.version_id.in_(ver_ids_subq)))
+                uow._session.execute(delete(LogicEvidenceModel).where(LogicEvidenceModel.version_id.in_(ver_ids_subq)))
+                uow._session.execute(delete(BehaviorExplanationModel).where(BehaviorExplanationModel.version_id.in_(ver_ids_subq)))
+                uow._session.execute(delete(BehaviorDriftModel).where(BehaviorDriftModel.transition_id.in_(trans_ids_subq)))
+                uow._session.execute(delete(LogicTransitionModel).where(
+                    (LogicTransitionModel.from_version_id.in_(ver_ids_subq)) |
+                    (LogicTransitionModel.to_version_id.in_(ver_ids_subq))
+                ))
+                uow._session.execute(delete(LogicVersionModel).where(LogicVersionModel.signature_id.in_(sig_ids_subq)))
+                uow._session.execute(delete(LogicClusterMemberModel).where(LogicClusterMemberModel.signature_id.in_(sig_ids_subq)))
+                uow._session.execute(delete(LogicSignatureModel).where(LogicSignatureModel.repository_id == repo_id.value))
+
+                # Clear Phase 1 and 2 tables
+                uow._session.execute(delete(RepositorySnapshotModel).where(RepositorySnapshotModel.repository_id == repo_id.value))
+                uow._session.execute(delete(BenchmarkReportModel).where(BenchmarkReportModel.repository_id == repo_id.value))
+                uow._session.execute(delete(AccuracyReportModel).where(AccuracyReportModel.repository_id == repo_id.value))
+                uow._session.execute(delete(ChangeEventModel).where(ChangeEventModel.repository_id == repo_id.value))
+
+                rel_ids_subq = select(RelationshipModel.id).where(RelationshipModel.repository_id == repo_id.value)
+                uow._session.execute(delete(RelationshipVersionModel).where(RelationshipVersionModel.relationship_id.in_(rel_ids_subq)))
+
+                entity_seids_subq = select(CodeEntityModel.seid).where(CodeEntityModel.repository_id == repo_id.value)
+                uow._session.execute(delete(EntityVersionModel).where(EntityVersionModel.seid.in_(entity_seids_subq)))
+
+                uow._session.execute(delete(CommitModel).where(CommitModel.repository_id == repo_id.value))
+                
+                # Delete relationships, code_entities, source_files
                 uow.relationships.delete_by_repository(repo_id)
                 uow.code_entities.delete_by_repository(repo_id)
                 uow.source_files.delete_by_repository(repo_id)
