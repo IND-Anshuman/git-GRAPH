@@ -48,41 +48,60 @@ class LogicExtractionOrchestrator:
         This checks out the commit, reads files, runs the extraction engine,
         generates signatures/versions/evidence, and computes transitions/drift.
         """
+        print(f"[LogicOrchestrator] extract_repository_logic called for repo={repository_id.value}, commit={commit_hash}")
         # 1. Fetch Repository and Checkout commit
         with self._uow_factory() as uow:
             repo = uow.repositories.get_by_id(repository_id)
             if not repo:
+                print(f"[LogicOrchestrator] Repository {repository_id.value} not found.")
                 return
 
         self._git_adapter.checkout_commit(repo.local_path, commit_hash)
 
-        # 2. Fetch the snapshot for this commit to find active entities
+        # 2. Reconstruct active entities at this commit
+        from src.application.services.historical_reconstruction import HistoricalReconstructionService
+        reconstructor = HistoricalReconstructionService()
         with self._uow_factory() as uow:
-            snapshot = uow.snapshots.get_by_commit(repository_id, commit_hash)
-            if not snapshot:
-                return
-            entity_seids = list(snapshot.entity_seids)
+            try:
+                active_entities, _ = reconstructor.reconstruct_graph_at_commit(
+                    uow, repository_id, commit_hash
+                )
+            except Exception as e:
+                print(f"[LogicOrchestrator] Graph reconstruction failed: {e}. Falling back to snapshot.")
+                # Fallback to snapshot if reconstruction fails
+                snapshot = uow.snapshots.get_by_commit(repository_id, commit_hash)
+                if snapshot:
+                    active_entities = []
+                    for seid in snapshot.entity_seids:
+                        entity = uow.code_entities.get_by_seid(seid)
+                        if entity:
+                            active_entities.append(entity)
+                else:
+                    print(f"[LogicOrchestrator] Snapshot fallback also failed/missing.")
+                    return
+
+        print(f"[LogicOrchestrator] Reconstructed {len(active_entities)} active entities.")
 
         # 3. Iterate through active entities in the snapshot
-        for seid in entity_seids:
+        for entity in active_entities:
             with self._uow_factory() as uow:
-                entity = uow.code_entities.get_by_seid(seid)
-                if not entity:
-                    continue
-
                 # We match patterns against functions and methods
                 if entity.entity_type not in (EntityType.FUNCTION, EntityType.METHOD):
                     continue
 
+                print(f"[LogicOrchestrator] Entity matches type check: name={entity.qualified_name}, type={entity.entity_type}")
+
                 # 4. Read the containing file
                 file_abs_path = os.path.join(repo.local_path, entity.location.file_path)
                 if not os.path.exists(file_abs_path):
+                    print(f"[LogicOrchestrator] File does not exist: {file_abs_path}")
                     continue
 
                 try:
                     with open(file_abs_path, "r", encoding="utf-8") as f:
                         file_content = f.read()
-                except Exception:
+                except Exception as e:
+                    print(f"[LogicOrchestrator] Failed to read file {file_abs_path}: {e}")
                     continue
 
                 # 5. Parse the file into a tree-sitter AST
@@ -90,13 +109,23 @@ class LogicExtractionOrchestrator:
                     parse_result = self._parser.parse_file(
                         entity.location.file_path, file_content, entity.language
                     )
-                except Exception:
+                except Exception as e:
+                    print(f"[LogicOrchestrator] Parser failed for {entity.location.file_path}: {e}")
                     continue
 
                 # 6. Extract logic items matching patterns
-                extracted_items = self._extraction_engine.extract_logic(
-                    entity, parse_result.tree, file_content, commit_hash
-                )
+                try:
+                    extracted_items = self._extraction_engine.extract_logic(
+                        entity, parse_result.tree, file_content, commit_hash
+                    )
+                except Exception as e:
+                    print(f"[LogicOrchestrator] Extraction engine failed for {entity.qualified_name}: {e}")
+                    continue
+
+                if extracted_items:
+                    print(f"[LogicOrchestrator] Extracted {len(extracted_items)} logic items for {entity.qualified_name}!")
+                else:
+                    pass
 
                 for signature, version, evidence_list, explanation in extracted_items:
                     # Associate CodeEntity details to signature metadata for persistence mapping
