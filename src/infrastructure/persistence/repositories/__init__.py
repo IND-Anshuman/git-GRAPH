@@ -9,6 +9,17 @@ from src.infrastructure.persistence.repositories.sa_change_event_repo import SAC
 from src.infrastructure.persistence.repositories.sa_snapshot_repo import SARepositorySnapshotRepository
 from src.infrastructure.persistence.repositories.sa_metrics_repo import SAMetricsRepository
 from src.infrastructure.persistence.repositories.sa_integrity_repo import SAIntegrityRepository
+from src.infrastructure.persistence.repositories.sa_logic_repositories import (
+    SALogicSignatureRepository,
+    SALogicVersionRepository,
+    SALogicTransitionRepository,
+    SALogicEvidenceRepository,
+    SABehaviorExplanationRepository,
+    SABehaviorDriftRepository,
+    SABehaviorPatternRepository,
+    SALogicClusterRepository,
+    SAOntologyNodeRepository,
+)
 
 __all__ = [
     "SARepositoryRepository",
@@ -22,4 +33,13 @@ __all__ = [
     "SARepositorySnapshotRepository",
     "SAMetricsRepository",
     "SAIntegrityRepository",
+    "SALogicSignatureRepository",
+    "SALogicVersionRepository",
+    "SALogicTransitionRepository",
+    "SALogicEvidenceRepository",
+    "SABehaviorExplanationRepository",
+    "SABehaviorDriftRepository",
+    "SABehaviorPatternRepository",
+    "SALogicClusterRepository",
+    "SAOntologyNodeRepository",
 ]

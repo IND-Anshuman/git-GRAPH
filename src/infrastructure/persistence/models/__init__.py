@@ -10,6 +10,19 @@ from src.infrastructure.persistence.models.change_event_model import ChangeEvent
 from src.infrastructure.persistence.models.snapshot_model import RepositorySnapshotModel
 from src.infrastructure.persistence.models.metrics_model import BenchmarkReportModel, AccuracyReportModel
 from src.infrastructure.persistence.models.integrity_model import IntegrityViolationModel, RepairAuditModel
+from src.infrastructure.persistence.models.logic_models import (
+    OntologyNodeModel,
+    BehaviorPatternModel,
+    LogicSignatureModel,
+    LogicVersionModel,
+    LogicEvidenceModel,
+    LogicTransitionModel,
+    BehaviorExplanationModel,
+    BehaviorDriftModel,
+    LogicClusterModel,
+    LogicClusterMemberModel,
+    LogicVersionPatternModel,
+)
 
 __all__ = [
     "Base",
@@ -26,4 +39,15 @@ __all__ = [
     "AccuracyReportModel",
     "IntegrityViolationModel",
     "RepairAuditModel",
+    "OntologyNodeModel",
+    "BehaviorPatternModel",
+    "LogicSignatureModel",
+    "LogicVersionModel",
+    "LogicEvidenceModel",
+    "LogicTransitionModel",
+    "BehaviorExplanationModel",
+    "BehaviorDriftModel",
+    "LogicClusterModel",
+    "LogicClusterMemberModel",
+    "LogicVersionPatternModel",
 ]

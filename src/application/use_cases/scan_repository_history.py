@@ -109,9 +109,12 @@ class ScanRepositoryHistoryUseCase:
         self.reconstruction_service = reconstruction_service
         self.logic_orchestrator = logic_orchestrator
 
-    def execute(self, repository_id: uuid.UUID, branch: str = "main", snapshot_interval: int = 100) -> dict:
+    def execute(self, repository_id: uuid.UUID | str, branch: str = "main", snapshot_interval: int = 100) -> dict:
         """Walks the commit history and ingests the repository temporally."""
-        repo_id = RepositoryId(repository_id)
+        if isinstance(repository_id, str):
+            repo_id = RepositoryId(uuid.UUID(repository_id))
+        else:
+            repo_id = RepositoryId(repository_id)
         
         # 1. Retrieve the repository
         with self.uow_factory() as uow:

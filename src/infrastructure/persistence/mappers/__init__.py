@@ -1,1 +1,5 @@
-"""Mappers between Domain entities and SQLAlchemy models."""
+from .logic_mapper import LogicMapper
+
+__all__ = [
+    "LogicMapper",
+]
