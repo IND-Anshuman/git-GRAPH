@@ -11,6 +11,17 @@ from src.application.use_cases.get_commit_changes import GetCommitChangesUseCase
 from src.application.use_cases.get_repository_timeline import GetRepositoryTimelineUseCase
 from src.application.use_cases.reconstruct_graph import ReconstructGraphUseCase
 
+# Phase 3 Use Cases
+from src.application.use_cases.extract_logic_use_case import ExtractLogicUseCase
+from src.application.use_cases.get_entity_logic_use_case import GetEntityLogicUseCase
+from src.application.use_cases.get_entity_logic_history_use_case import GetEntityLogicHistoryUseCase
+from src.application.use_cases.get_behavior_evolution_use_case import GetBehaviorEvolutionUseCase
+from src.application.use_cases.get_logic_evidence_use_case import GetLogicEvidenceUseCase
+from src.application.use_cases.get_behavior_explanation_use_case import GetBehaviorExplanationUseCase
+from src.application.use_cases.get_behavior_drift_use_case import GetBehaviorDriftUseCase
+from src.application.use_cases.validate_logic_use_case import ValidateLogicUseCase
+
+
 def get_container(request: Request) -> Any:
     return request.app.state.container
 
@@ -58,3 +69,27 @@ def get_temporal_explorer(request: Request) -> Any:
 
 def get_temporal_replay_service(request: Request) -> Any:
     return request.app.state.container.temporal_replay_service
+
+def get_extract_logic_use_case(request: Request) -> ExtractLogicUseCase:
+    return request.app.state.container.get_extract_logic_use_case()
+
+def get_get_entity_logic_use_case(request: Request) -> GetEntityLogicUseCase:
+    return request.app.state.container.get_get_entity_logic_use_case()
+
+def get_get_entity_logic_history_use_case(request: Request) -> GetEntityLogicHistoryUseCase:
+    return request.app.state.container.get_get_entity_logic_history_use_case()
+
+def get_get_behavior_evolution_use_case(request: Request) -> GetBehaviorEvolutionUseCase:
+    return request.app.state.container.get_get_behavior_evolution_use_case()
+
+def get_get_logic_evidence_use_case(request: Request) -> GetLogicEvidenceUseCase:
+    return request.app.state.container.get_get_logic_evidence_use_case()
+
+def get_get_behavior_explanation_use_case(request: Request) -> GetBehaviorExplanationUseCase:
+    return request.app.state.container.get_get_behavior_explanation_use_case()
+
+def get_get_behavior_drift_use_case(request: Request) -> GetBehaviorDriftUseCase:
+    return request.app.state.container.get_get_behavior_drift_use_case()
+
+def get_validate_logic_use_case(request: Request) -> ValidateLogicUseCase:
+    return request.app.state.container.get_validate_logic_use_case()
