@@ -20,6 +20,14 @@ from .get_behavior_explanation_use_case import GetBehaviorExplanationUseCase
 from .get_behavior_drift_use_case import GetBehaviorDriftUseCase
 from .validate_logic_use_case import ValidateLogicUseCase
 
+# Phase 4
+from .detect_concepts import DetectConceptsUseCase
+from .get_concepts import GetConceptsUseCase
+from .get_concept_evolution import GetConceptEvolutionUseCase
+from .get_concept_relationships import GetConceptRelationshipsUseCase
+from .get_concept_drift import GetConceptDriftUseCase
+from .get_concept_explanation import GetConceptExplanationUseCase
+
 __all__ = [
     "GetCommitChangesUseCase",
     "GetCommitsUseCase",
@@ -40,4 +48,10 @@ __all__ = [
     "GetBehaviorExplanationUseCase",
     "GetBehaviorDriftUseCase",
     "ValidateLogicUseCase",
+    "DetectConceptsUseCase",
+    "GetConceptsUseCase",
+    "GetConceptEvolutionUseCase",
+    "GetConceptRelationshipsUseCase",
+    "GetConceptDriftUseCase",
+    "GetConceptExplanationUseCase",
 ]

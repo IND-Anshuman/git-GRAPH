@@ -96,7 +96,8 @@ class ScanRepositoryHistoryUseCase:
         uow_factory: Callable[[], IUnitOfWork],
         identity_service: Any,
         reconstruction_service: Any = None,
-        logic_orchestrator: Any = None
+        logic_orchestrator: Any = None,
+        detect_concepts_use_case: Any = None
     ) -> None:
         self.git_adapter = git_adapter
         self.file_scanner = file_scanner
@@ -108,6 +109,7 @@ class ScanRepositoryHistoryUseCase:
         self.identity_service = identity_service
         self.reconstruction_service = reconstruction_service
         self.logic_orchestrator = logic_orchestrator
+        self.detect_concepts_use_case = detect_concepts_use_case
 
     def execute(self, repository_id: uuid.UUID | str, branch: str = "main", snapshot_interval: int = 100) -> dict:
         """Walks the commit history and ingests the repository temporally."""
@@ -358,6 +360,13 @@ class ScanRepositoryHistoryUseCase:
                         self.logic_orchestrator.extract_repository_logic(repo_id, commit_hash)
                     except Exception as le:
                         logger.error(f"Error extracting logic for commit {commit_hash}: {le}", exc_info=True)
+
+                # Run Phase 4 concept detection hook
+                if self.detect_concepts_use_case:
+                    try:
+                        self.detect_concepts_use_case.execute(repo_id.value, commit_hash)
+                    except Exception as ce:
+                        logger.error(f"Error executing concept detection for commit {commit_hash}: {ce}", exc_info=True)
 
                 # Post-commit benchmark telemetry collection
                 try:
