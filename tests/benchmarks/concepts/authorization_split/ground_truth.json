@@ -1,0 +1,33 @@
+{
+  "benchmark_name": "authorization_split",
+  "domain": "Security",
+  "expected_timeline": [
+    {
+      "commit_hash": "commit_v1",
+      "file_path": "tests/benchmarks/concepts/authorization_split/v1_monolithic_authz.py",
+      "expected_concepts": [
+        {
+          "ontology_node_id": "security.authorization.permission_check",
+          "min_confidence": 0.80
+        }
+      ]
+    },
+    {
+      "commit_hash": "commit_v2",
+      "file_path": "tests/benchmarks/concepts/authorization_split/v2_split_authz.py",
+      "expected_concepts": [
+        {
+          "ontology_node_id": "security.authorization.rbac",
+          "min_confidence": 0.85
+        },
+        {
+          "ontology_node_id": "security.authorization.abac",
+          "min_confidence": 0.85
+        }
+      ],
+      "expected_evolution": {
+        "transition_type": "CONCEPT_SPLIT"
+      }
+    }
+  ]
+}
