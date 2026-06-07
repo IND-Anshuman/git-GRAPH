@@ -1,0 +1,37 @@
+{
+  "benchmark_name": "persistence_merge",
+  "domain": "Data_Management",
+  "expected_timeline": [
+    {
+      "commit_hash": "commit_v1",
+      "file_path": "tests/benchmarks/concepts/persistence_merge/v1_separate_stores.py",
+      "expected_concepts": [
+        {
+          "ontology_node_id": "data_management.persistence.relational",
+          "min_confidence": 0.80
+        },
+        {
+          "ontology_node_id": "data_management.persistence.document",
+          "min_confidence": 0.80
+        }
+      ]
+    },
+    {
+      "commit_hash": "commit_v2",
+      "file_path": "tests/benchmarks/concepts/persistence_merge/v2_merged_store.py",
+      "expected_concepts": [
+        {
+          "ontology_node_id": "data_management.persistence.relational",
+          "min_confidence": 0.85
+        },
+        {
+          "ontology_node_id": "data_management.persistence.document",
+          "min_confidence": 0.85
+        }
+      ],
+      "expected_evolution": {
+        "transition_type": "CONCEPT_MERGE"
+      }
+    }
+  ]
+}
