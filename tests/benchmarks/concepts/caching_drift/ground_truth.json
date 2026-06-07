@@ -1,0 +1,31 @@
+{
+  "benchmark_name": "caching_drift",
+  "domain": "Data_Management",
+  "expected_timeline": [
+    {
+      "commit_hash": "commit_v1",
+      "file_path": "tests/benchmarks/concepts/caching_drift/v1_in_memory_cache.py",
+      "expected_concepts": [
+        {
+          "ontology_node_id": "data_management.caching.in_memory",
+          "min_confidence": 0.90
+        }
+      ]
+    },
+    {
+      "commit_hash": "commit_v2",
+      "file_path": "tests/benchmarks/concepts/caching_drift/v2_redis_cache_drifted.py",
+      "expected_concepts": [
+        {
+          "ontology_node_id": "data_management.caching.distributed",
+          "min_confidence": 0.90
+        }
+      ],
+      "expected_drift": {
+        "drift_category": "MAJOR",
+        "min_drift_score": 0.60,
+        "max_drift_score": 0.90
+      }
+    }
+  ]
+}
