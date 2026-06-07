@@ -114,10 +114,12 @@ class IngestRepositoryUseCase:
                 if self.reconstruction_service:
                     recon_start = time.perf_counter()
                     with self.uow_factory() as uow_recon:
-                        self.reconstruction_service.reconstruct_graph_at_commit(
-                            uow_recon, repository_id, commit_hash
-                        )
-                    recon_latency_ms = int((time.perf_counter() - recon_start) * 1000)
+                        commit_exists = uow_recon.commits.get_by_hash(commit_hash) is not None
+                        if commit_exists:
+                            self.reconstruction_service.reconstruct_graph_at_commit(
+                                uow_recon, repository_id, commit_hash
+                            )
+                            recon_latency_ms = int((time.perf_counter() - recon_start) * 1000)
 
                 db_size = 0
                 with self.uow_factory() as uow_db:
