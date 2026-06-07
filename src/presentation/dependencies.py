@@ -2,6 +2,7 @@ from fastapi import Request
 from typing import Callable, Any
 from src.application.use_cases.ingest_repository import IngestRepositoryUseCase
 from src.application.use_cases.get_repository import GetRepositoryUseCase
+from src.application.use_cases.delete_repository import DeleteRepositoryUseCase
 from src.application.use_cases.query_entities import QueryEntitiesUseCase
 from src.application.use_cases.query_relationships import QueryRelationshipsUseCase
 from src.application.use_cases.scan_repository_history import ScanRepositoryHistoryUseCase
@@ -93,3 +94,6 @@ def get_get_behavior_drift_use_case(request: Request) -> GetBehaviorDriftUseCase
 
 def get_validate_logic_use_case(request: Request) -> ValidateLogicUseCase:
     return request.app.state.container.get_validate_logic_use_case()
+
+def get_delete_repository_use_case(request: Request) -> DeleteRepositoryUseCase:
+    return request.app.state.container.get_delete_repository_use_case()

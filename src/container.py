@@ -5,6 +5,7 @@ from sqlalchemy.orm import sessionmaker
 from src.config import Settings
 from src.application.use_cases.ingest_repository import IngestRepositoryUseCase
 from src.application.use_cases.get_repository import GetRepositoryUseCase
+from src.application.use_cases.delete_repository import DeleteRepositoryUseCase
 from src.application.use_cases.query_entities import QueryEntitiesUseCase
 from src.application.use_cases.query_relationships import QueryRelationshipsUseCase
 from src.application.use_cases.scan_repository_history import ScanRepositoryHistoryUseCase
@@ -249,4 +250,7 @@ class Container:
 
     def get_validate_logic_use_case(self) -> ValidateLogicUseCase:
         return ValidateLogicUseCase(uow_factory=self.get_uow_factory())
+
+    def get_delete_repository_use_case(self) -> DeleteRepositoryUseCase:
+        return DeleteRepositoryUseCase(uow_factory=self.get_uow_factory())
 

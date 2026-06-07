@@ -2,6 +2,7 @@ from .get_commit_changes import GetCommitChangesUseCase
 from .get_commits import GetCommitsUseCase
 from .get_entity_history import GetEntityHistoryUseCase
 from .get_repository import GetRepositoryUseCase
+from .delete_repository import DeleteRepositoryUseCase
 from .get_repository_timeline import GetRepositoryTimelineUseCase
 from .ingest_repository import IngestRepositoryUseCase
 from .query_entities import QueryEntitiesUseCase
@@ -24,6 +25,7 @@ __all__ = [
     "GetCommitsUseCase",
     "GetEntityHistoryUseCase",
     "GetRepositoryUseCase",
+    "DeleteRepositoryUseCase",
     "GetRepositoryTimelineUseCase",
     "IngestRepositoryUseCase",
     "QueryEntitiesUseCase",

@@ -5,8 +5,14 @@ from src.presentation.schemas.responses import RepositorySchema, IngestionResult
 from src.application.dtos.commands import IngestRepositoryCommand
 from src.application.use_cases.ingest_repository import IngestRepositoryUseCase
 from src.application.use_cases.get_repository import GetRepositoryUseCase
+from src.application.use_cases.delete_repository import DeleteRepositoryUseCase
 from src.domain.exceptions import RepositoryNotFoundException
-from src.presentation.dependencies import get_ingest_use_case, get_get_repository_use_case, get_uow_factory
+from src.presentation.dependencies import (
+    get_ingest_use_case,
+    get_get_repository_use_case,
+    get_delete_repository_use_case,
+    get_uow_factory,
+)
 
 repository_router = APIRouter(prefix="/repositories", tags=["repositories"])
 
@@ -53,3 +59,17 @@ def list_repositories(uow_factory: Any = Depends(get_uow_factory)):
                 updated_at=r.updated_at
             ) for r in repos
         ]
+
+@repository_router.delete("/{repository_id}", status_code=status.HTTP_200_OK)
+def delete_repository(
+    repository_id: str,
+    use_case: DeleteRepositoryUseCase = Depends(get_delete_repository_use_case)
+):
+    """Deletes an ingested repository from the database and removes its cloned workspace on disk."""
+    try:
+        use_case.execute(repository_id)
+        return {"status": "success", "message": f"Repository {repository_id} deleted successfully."}
+    except RepositoryNotFoundException as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
