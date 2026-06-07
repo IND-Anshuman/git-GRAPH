@@ -1,0 +1,46 @@
+{
+  "benchmark_name": "authentication_evolution",
+  "domain": "Security",
+  "expected_timeline": [
+    {
+      "commit_hash": "commit_v1",
+      "file_path": "tests/benchmarks/concepts/authentication_evolution/v1_basic_auth.py",
+      "expected_concepts": [
+        {
+          "ontology_node_id": "security.authentication.direct_compare",
+          "min_confidence": 0.85
+        }
+      ]
+    },
+    {
+      "commit_hash": "commit_v2",
+      "file_path": "tests/benchmarks/concepts/authentication_evolution/v2_sha256.py",
+      "expected_concepts": [
+        {
+          "ontology_node_id": "security.authentication.hash_comparison",
+          "min_confidence": 0.90
+        }
+      ],
+      "expected_drift": {
+        "drift_category": "SIGNIFICANT",
+        "min_drift_score": 0.30,
+        "max_drift_score": 0.60
+      }
+    },
+    {
+      "commit_hash": "commit_v3",
+      "file_path": "tests/benchmarks/concepts/authentication_evolution/v3_bcrypt.py",
+      "expected_concepts": [
+        {
+          "ontology_node_id": "security.authentication.hash_comparison",
+          "min_confidence": 0.90
+        }
+      ],
+      "expected_drift": {
+        "drift_category": "MINOR",
+        "min_drift_score": 0.05,
+        "max_drift_score": 0.25
+      }
+    }
+  ]
+}
