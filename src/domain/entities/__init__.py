@@ -19,6 +19,15 @@ from .behavior_drift import BehaviorDrift
 from .behavior_pattern import BehaviorPattern
 from .logic_cluster import LogicCluster
 from .ontology_node import OntologyNode
+from .concept_node import ConceptNode
+from .concept_version import ConceptVersion
+from .concept_evidence import ConceptEvidence
+from .concept_relationship import ConceptRelationship
+from .concept_cluster import ConceptCluster
+from .concept_explanation import ConceptExplanation
+from .concept_evolution import ConceptEvolution
+from .concept_metrics import ConceptMetrics
+from .concept_drift import ConceptDrift
 
 __all__ = [
     "RepositoryEntity",
@@ -45,4 +54,13 @@ __all__ = [
     "BehaviorPattern",
     "LogicCluster",
     "OntologyNode",
+    "ConceptNode",
+    "ConceptVersion",
+    "ConceptEvidence",
+    "ConceptRelationship",
+    "ConceptCluster",
+    "ConceptExplanation",
+    "ConceptEvolution",
+    "ConceptMetrics",
+    "ConceptDrift",
 ]
