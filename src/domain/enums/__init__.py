@@ -6,6 +6,8 @@ from .mutation_type import MutationType
 from .evidence_type import EvidenceType
 from .transition_type import TransitionType
 from .drift_category import DriftCategory
+from .concept_relationship_type import ConceptRelationshipType
+from .concept_transition_type import ConceptTransitionType
 
 __all__ = [
     "EntityType",
@@ -16,4 +18,6 @@ __all__ = [
     "EvidenceType",
     "TransitionType",
     "DriftCategory",
+    "ConceptRelationshipType",
+    "ConceptTransitionType",
 ]
