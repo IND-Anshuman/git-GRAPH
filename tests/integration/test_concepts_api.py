@@ -22,6 +22,14 @@ from src.domain.enums.concept_relationship_type import ConceptRelationshipType
 from src.domain.enums.concept_transition_type import ConceptTransitionType
 from src.domain.value_objects.repository_id import RepositoryId
 from src.infrastructure.persistence.unit_of_work import SQLAlchemyUnitOfWork
+from src.infrastructure.persistence.models.concept_models import (
+    BehaviorFamilyModel,
+    CanonicalBehaviorModel,
+    BehaviorAliasModel,
+    FrameworkDefinitionModel,
+    FrameworkVersionModel,
+    CanonicalFlowModel,
+)
 
 
 @pytest.fixture
@@ -156,6 +164,63 @@ def test_concepts_api_endpoints(api_client):
         )
         uow.concept_evolution.save(c_evo)
 
+        # Seed Phase 4.5 models
+        family = BehaviorFamilyModel(
+            id="secure_hashing",
+            name="Secure Hashing Family",
+            parent_concept_id="security.authentication",
+            description="Cryptographic hash checks and validation algorithms."
+        )
+        session.add(family)
+
+        behavior = CanonicalBehaviorModel(
+            id="auth_password_verification",
+            name="Password Cryptographic Verification",
+            family_id="secure_hashing",
+            description="Verifies user-supplied credentials.",
+            created_at=now
+        )
+        session.add(behavior)
+
+        alias = BehaviorAliasModel(
+            id=uuid.uuid4(),
+            canonical_behavior_id="auth_password_verification",
+            language="python",
+            imports=["bcrypt"],
+            calls=["bcrypt.checkpw"],
+            heuristics={}
+        )
+        session.add(alias)
+
+        framework_def = FrameworkDefinitionModel(
+            id="spring_security",
+            framework_name="Spring Security",
+            language="java",
+            metadata_={}
+        )
+        session.add(framework_def)
+
+        framework_ver = FrameworkVersionModel(
+            id=uuid.uuid4(),
+            framework_id="spring_security",
+            version_string="6.0.0",
+            supported_syntax_rules={},
+            released_at=now
+        )
+        session.add(framework_ver)
+
+        flow = CanonicalFlowModel(
+            id=uuid.uuid4(),
+            flow_type="REQUEST_RESPONSE_FLOW",
+            source_entity_id=uuid.uuid4(),
+            target_entity_id=uuid.uuid4(),
+            intermediate_entities=[],
+            confidence=0.95,
+            metadata_={},
+            created_at=now
+        )
+        session.add(flow)
+
         uow.commit()
 
     # 1. GET /api/v1/repositories/{id}/concepts
@@ -207,3 +272,46 @@ def test_concepts_api_endpoints(api_client):
     backfill_data = resp.json()
     assert backfill_data["status"] == "success"
     assert backfill_data["processed_commits"] == 2
+
+    # 7. GET /api/v1/frameworks/definitions
+    resp = api_client.get("/api/v1/frameworks/definitions")
+    assert resp.status_code == 200
+    frameworks = resp.json()
+    assert len(frameworks) == 1
+    assert frameworks[0]["framework_name"] == "Spring Security"
+
+    # 8. GET /api/v1/frameworks/versions
+    resp = api_client.get("/api/v1/frameworks/versions")
+    assert resp.status_code == 200
+    versions = resp.json()
+    assert len(versions) == 1
+    assert versions[0]["version_string"] == "6.0.0"
+
+    # 9. GET /api/v1/behaviors/families
+    resp = api_client.get("/api/v1/behaviors/families")
+    assert resp.status_code == 200
+    families = resp.json()
+    assert len(families) == 1
+    assert families[0]["name"] == "Secure Hashing Family"
+
+    # 10. GET /api/v1/behaviors/canonical
+    resp = api_client.get("/api/v1/behaviors/canonical")
+    assert resp.status_code == 200
+    behaviors = resp.json()
+    assert len(behaviors) == 1
+    assert behaviors[0]["name"] == "Password Cryptographic Verification"
+
+    # 11. GET /api/v1/behaviors/aliases
+    resp = api_client.get("/api/v1/behaviors/aliases")
+    assert resp.status_code == 200
+    aliases = resp.json()
+    assert len(aliases) == 1
+    assert aliases[0]["language"] == "python"
+
+    # 12. GET /api/v1/flows
+    resp = api_client.get("/api/v1/flows")
+    assert resp.status_code == 200
+    flows = resp.json()
+    assert len(flows) == 1
+    assert flows[0]["flow_type"] == "REQUEST_RESPONSE_FLOW"
+
