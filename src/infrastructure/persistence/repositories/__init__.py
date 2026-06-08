@@ -20,6 +20,17 @@ from src.infrastructure.persistence.repositories.sa_logic_repositories import (
     SALogicClusterRepository,
     SAOntologyNodeRepository,
 )
+from src.infrastructure.persistence.repositories.sa_concept_repositories import (
+    SAConceptNodeRepository,
+    SAConceptVersionRepository,
+    SAConceptEvidenceRepository,
+    SAConceptRelationshipRepository,
+    SAConceptClusterRepository,
+    SAConceptExplanationRepository,
+    SAConceptMetricsRepository,
+    SAConceptEvolutionRepository,
+    SAConceptDriftRepository,
+)
 
 __all__ = [
     "SARepositoryRepository",
@@ -42,4 +53,13 @@ __all__ = [
     "SABehaviorPatternRepository",
     "SALogicClusterRepository",
     "SAOntologyNodeRepository",
+    "SAConceptNodeRepository",
+    "SAConceptVersionRepository",
+    "SAConceptEvidenceRepository",
+    "SAConceptRelationshipRepository",
+    "SAConceptClusterRepository",
+    "SAConceptExplanationRepository",
+    "SAConceptMetricsRepository",
+    "SAConceptEvolutionRepository",
+    "SAConceptDriftRepository",
 ]
