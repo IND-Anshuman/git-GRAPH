@@ -6,6 +6,7 @@ from src.presentation.api.relationships import relationship_router
 from src.presentation.api.temporal import temporal_router
 from src.presentation.api.temporal_diagnostics import diagnostics_router
 from src.presentation.api.logic import logic_router
+from src.presentation.api.concepts import concepts_router
 
 api_router = APIRouter(prefix="/api/v1")
 
@@ -16,3 +17,4 @@ api_router.include_router(relationship_router)
 api_router.include_router(temporal_router)
 api_router.include_router(diagnostics_router)
 api_router.include_router(logic_router)
+api_router.include_router(concepts_router)

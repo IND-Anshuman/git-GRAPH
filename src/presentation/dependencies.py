@@ -22,6 +22,15 @@ from src.application.use_cases.get_behavior_explanation_use_case import GetBehav
 from src.application.use_cases.get_behavior_drift_use_case import GetBehaviorDriftUseCase
 from src.application.use_cases.validate_logic_use_case import ValidateLogicUseCase
 
+# Phase 4 Use Cases
+from src.application.use_cases.detect_concepts import DetectConceptsUseCase
+from src.application.use_cases.get_concepts import GetConceptsUseCase
+from src.application.use_cases.get_concept_evolution import GetConceptEvolutionUseCase
+from src.application.use_cases.get_concept_relationships import GetConceptRelationshipsUseCase
+from src.application.use_cases.get_concept_drift import GetConceptDriftUseCase
+from src.application.use_cases.get_concept_explanation import GetConceptExplanationUseCase
+from src.application.services.concept_backfill_service import ConceptBackfillService
+
 
 def get_container(request: Request) -> Any:
     return request.app.state.container
@@ -97,3 +106,24 @@ def get_validate_logic_use_case(request: Request) -> ValidateLogicUseCase:
 
 def get_delete_repository_use_case(request: Request) -> DeleteRepositoryUseCase:
     return request.app.state.container.get_delete_repository_use_case()
+
+def get_detect_concepts_use_case(request: Request) -> DetectConceptsUseCase:
+    return request.app.state.container.get_detect_concepts_use_case()
+
+def get_get_concepts_use_case(request: Request) -> GetConceptsUseCase:
+    return request.app.state.container.get_get_concepts_use_case()
+
+def get_get_concept_evolution_use_case(request: Request) -> GetConceptEvolutionUseCase:
+    return request.app.state.container.get_get_concept_evolution_use_case()
+
+def get_get_concept_relationships_use_case(request: Request) -> GetConceptRelationshipsUseCase:
+    return request.app.state.container.get_get_concept_relationships_use_case()
+
+def get_get_concept_drift_use_case(request: Request) -> GetConceptDriftUseCase:
+    return request.app.state.container.get_get_concept_drift_use_case()
+
+def get_get_concept_explanation_use_case(request: Request) -> GetConceptExplanationUseCase:
+    return request.app.state.container.get_get_concept_explanation_use_case()
+
+def get_concept_backfill_service(request: Request) -> ConceptBackfillService:
+    return request.app.state.container.get_concept_backfill_service()
