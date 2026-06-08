@@ -37,3 +37,22 @@ class OntologyLoadException(DomainException):
     """Raised when ontology YAML files fail to load or validate."""
 
     pass
+
+
+class ConceptDomainException(DomainException):
+    """Base exception for all Concept Graph domain issues."""
+
+    pass
+
+
+class ConceptNotFoundException(ConceptDomainException):
+    """Raised when the requested Concept UUID is not registered in the database."""
+
+    pass
+
+
+class ConceptOntologyViolationException(ConceptDomainException):
+    """Raised when concept detection rules violate ontology validation invariants."""
+
+    pass
+

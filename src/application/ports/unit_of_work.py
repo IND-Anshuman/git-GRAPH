@@ -21,6 +21,15 @@ from src.domain.repositories import (
     IBehaviorPatternRepository,
     ILogicClusterRepository,
     IOntologyNodeRepository,
+    IConceptNodeRepository,
+    IConceptVersionRepository,
+    IConceptEvidenceRepository,
+    IConceptRelationshipRepository,
+    IConceptClusterRepository,
+    IConceptExplanationRepository,
+    IConceptMetricsRepository,
+    IConceptEvolutionRepository,
+    IConceptDriftRepository,
 )
 
 class IUnitOfWork(ABC):
@@ -139,3 +148,49 @@ class IUnitOfWork(ABC):
     @abstractmethod
     def ontology_nodes(self) -> IOntologyNodeRepository:
         pass
+
+    @property
+    @abstractmethod
+    def concept_nodes(self) -> IConceptNodeRepository:
+        pass
+
+    @property
+    @abstractmethod
+    def concept_versions(self) -> IConceptVersionRepository:
+        pass
+
+    @property
+    @abstractmethod
+    def concept_relationships(self) -> IConceptRelationshipRepository:
+        pass
+
+    @property
+    @abstractmethod
+    def concept_evidence(self) -> IConceptEvidenceRepository:
+        pass
+
+    @property
+    @abstractmethod
+    def concept_clusters(self) -> IConceptClusterRepository:
+        pass
+
+    @property
+    @abstractmethod
+    def concept_explanations(self) -> IConceptExplanationRepository:
+        pass
+
+    @property
+    @abstractmethod
+    def concept_metrics(self) -> IConceptMetricsRepository:
+        pass
+
+    @property
+    @abstractmethod
+    def concept_evolution(self) -> IConceptEvolutionRepository:
+        pass
+
+    @property
+    @abstractmethod
+    def concept_drift(self) -> IConceptDriftRepository:
+        pass
+

@@ -15,6 +15,14 @@ from src.application.use_cases.get_commit_changes import GetCommitChangesUseCase
 from src.application.use_cases.get_repository_timeline import GetRepositoryTimelineUseCase
 from src.application.use_cases.reconstruct_graph import ReconstructGraphUseCase
 
+# Phase 4 Use Cases
+from src.application.use_cases.detect_concepts import DetectConceptsUseCase
+from src.application.use_cases.get_concepts import GetConceptsUseCase
+from src.application.use_cases.get_concept_evolution import GetConceptEvolutionUseCase
+from src.application.use_cases.get_concept_relationships import GetConceptRelationshipsUseCase
+from src.application.use_cases.get_concept_drift import GetConceptDriftUseCase
+from src.application.use_cases.get_concept_explanation import GetConceptExplanationUseCase
+
 # Phase 3 Use Cases
 from src.application.use_cases.extract_logic_use_case import ExtractLogicUseCase
 from src.application.use_cases.get_entity_logic_use_case import GetEntityLogicUseCase
@@ -35,9 +43,19 @@ from src.infrastructure.logic.logic_similarity_engine import LogicSimilarityEngi
 from src.infrastructure.logic.logic_diff_engine import LogicDiffEngine
 from src.infrastructure.logic.behavior_drift_engine import BehaviorDriftEngine
 
-from src.application.services.ontology_registry import OntologyRegistryService
+from src.application.services.ontology_registry import OntologyRegistryService, ConceptOntologyRegistry
 from src.application.services.logic_extraction_orchestrator import LogicExtractionOrchestrator
 from src.application.services.logic_evolution_service import LogicEvolutionService
+
+# Phase 4 Services & Engines
+from src.application.services.concept_detection_engine import ConceptDetectionEngine
+from src.application.services.concept_relationship_engine import ConceptRelationshipEngine
+from src.application.services.concept_cluster_engine import ConceptClusterEngine
+from src.application.services.concept_metrics_engine import ConceptMetricsEngine
+from src.application.services.concept_drift_engine import ConceptDriftEngine
+from src.application.services.concept_evolution_engine import ConceptEvolutionEngine
+from src.application.services.concept_explanation_engine import ConceptExplanationEngine
+from src.application.services.concept_backfill_service import ConceptBackfillService
 
 
 from src.infrastructure.git.gitpython_adapter import GitPythonAdapter
@@ -146,6 +164,36 @@ class Container:
             drift_engine=self.behavior_drift_engine
         )
 
+        # Phase 4 Concept Intelligence setup
+        self.concept_ontology_registry = ConceptOntologyRegistry()
+        self.concept_detection_engine = ConceptDetectionEngine(
+            ontology_registry=self.concept_ontology_registry
+        )
+        self.concept_relationship_engine = ConceptRelationshipEngine(
+            reconstruction_service=self.reconstruction_service
+        )
+        self.concept_cluster_engine = ConceptClusterEngine()
+        self.concept_metrics_engine = ConceptMetricsEngine()
+        self.concept_drift_engine = ConceptDriftEngine()
+        self.concept_evolution_engine = ConceptEvolutionEngine()
+        self.concept_explanation_engine = ConceptExplanationEngine()
+
+        self.detect_concepts_use_case = DetectConceptsUseCase(
+            uow_factory=self.get_uow_factory(),
+            detection_engine=self.concept_detection_engine,
+            relationship_engine=self.concept_relationship_engine,
+            metrics_engine=self.concept_metrics_engine,
+            evolution_engine=self.concept_evolution_engine,
+            drift_engine=self.concept_drift_engine,
+            explanation_engine=self.concept_explanation_engine,
+            cluster_engine=self.concept_cluster_engine
+        )
+
+        self.concept_backfill_service = ConceptBackfillService(
+            uow_factory=self.get_uow_factory(),
+            detect_concepts_use_case=self.detect_concepts_use_case
+        )
+
 
     def get_uow_factory(self) -> Callable:
         # Resolve class using lambda and create database connection wrapper
@@ -200,7 +248,8 @@ class Container:
             uow_factory=self.get_uow_factory(),
             identity_service=self.identity_service,
             reconstruction_service=self.reconstruction_service,
-            logic_orchestrator=self.logic_extraction_orchestrator
+            logic_orchestrator=self.logic_extraction_orchestrator,
+            detect_concepts_use_case=self.detect_concepts_use_case
         )
 
     def get_get_commits_use_case(self) -> GetCommitsUseCase:
@@ -253,4 +302,28 @@ class Container:
 
     def get_delete_repository_use_case(self) -> DeleteRepositoryUseCase:
         return DeleteRepositoryUseCase(uow_factory=self.get_uow_factory())
+
+    def get_detect_concepts_use_case(self) -> DetectConceptsUseCase:
+        return self.detect_concepts_use_case
+
+    def get_get_concepts_use_case(self) -> GetConceptsUseCase:
+        return GetConceptsUseCase(uow_factory=self.get_uow_factory())
+
+    def get_get_concept_evolution_use_case(self) -> GetConceptEvolutionUseCase:
+        return GetConceptEvolutionUseCase(uow_factory=self.get_uow_factory())
+
+    def get_get_concept_relationships_use_case(self) -> GetConceptRelationshipsUseCase:
+        return GetConceptRelationshipsUseCase(uow_factory=self.get_uow_factory())
+
+    def get_get_concept_drift_use_case(self) -> GetConceptDriftUseCase:
+        return GetConceptDriftUseCase(
+            uow_factory=self.get_uow_factory(),
+            drift_engine=self.concept_drift_engine
+        )
+
+    def get_get_concept_explanation_use_case(self) -> GetConceptExplanationUseCase:
+        return GetConceptExplanationUseCase(uow_factory=self.get_uow_factory())
+
+    def get_concept_backfill_service(self) -> ConceptBackfillService:
+        return self.concept_backfill_service
 
