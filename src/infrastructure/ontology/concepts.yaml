@@ -1,0 +1,109 @@
+schema_version: "4.0"
+ontology_version: "4.1.0"
+last_updated: "2026-06-07T12:00:00Z"
+
+domains:
+  - id: security
+    name: Security
+    description: "Mechanisms enforcing data protection, identity validation, and access control."
+    concepts:
+      - id: security.authentication
+        name: Authentication
+        description: "Verification of user, service, or system identities."
+        required_patterns:
+          - auth_bcrypt_verification
+          - auth_sha256_verification
+          - auth_jwt_verification
+          - auth_argon2_verification
+          - auth_passlib_verify
+        optional_patterns:
+          - auth_bcrypt_hash
+          - auth_jwt_generation
+          - auth_direct_compare
+        min_base_confidence: 0.80
+
+      - id: security.authorization
+        name: Authorization
+        description: "Enforcement of permission-based and role-based access rights."
+        required_patterns:
+          - authz_permission_check
+          - authz_rbac
+        optional_patterns: []
+        min_base_confidence: 0.75
+
+  - id: data_management
+    name: Data Management
+    description: "Data lifecycle, transactions, and retrieval mechanisms."
+    concepts:
+      - id: data_management.caching
+        name: Caching
+        description: "High-performance memory buffers and distributed cache lookups."
+        required_patterns:
+          - cache_memory_dict
+          - cache_lru_cache
+          - cache_redis_lookup
+          - cache_redis_set
+        optional_patterns:
+          - cache_redis_cluster
+          - cache_invalidation
+        min_base_confidence: 0.70
+
+      - id: data_management.persistence
+        name: Persistence
+        description: "Persistent database operations and repository structures."
+        required_patterns:
+          - db_raw_sql_execute
+          - db_orm_sqlalchemy_query
+          - db_repository_pattern
+          - db_transaction
+        optional_patterns: []
+        min_base_confidence: 0.70
+
+  - id: reliability
+    name: Reliability
+    description: "System recovery, backoff retries, and network circuit breakers."
+    concepts:
+      - id: reliability.retry
+        name: Retry Logic
+        description: "Automatic operations retries under failure conditions."
+        required_patterns:
+          - retry_tenacity
+          - retry_manual_loop
+          - retry_backoff
+        optional_patterns: []
+        min_base_confidence: 0.75
+
+      - id: reliability.circuit_breaker
+        name: Circuit Breaker
+        description: "Circuit breaker pattern to prevent cascade failure propagation."
+        required_patterns:
+          - circuit_breaker_pybreaker
+          - circuit_breaker_manual
+        optional_patterns: []
+        min_base_confidence: 0.80
+
+  - id: communication
+    name: Communication
+    description: "API integrations, messaging, and publisher/subscriber event patterns."
+    concepts:
+      - id: communication.messaging
+        name: Messaging
+        description: "Asynchronous messaging brokers and queue publishing/consuming."
+        required_patterns:
+          - msg_publish_kafka
+          - msg_publish_rabbitmq
+          - msg_consume
+        optional_patterns: []
+        min_base_confidence: 0.75
+
+      - id: communication.api_integration
+        name: API Integration
+        description: "Integration endpoints, REST queries, and client adapters."
+        required_patterns:
+          - api_requests_call
+          - api_httpx_call
+          - api_endpoint_handler
+          - api_gemini_client
+          - tts_parler_generation
+        optional_patterns: []
+        min_base_confidence: 0.70
