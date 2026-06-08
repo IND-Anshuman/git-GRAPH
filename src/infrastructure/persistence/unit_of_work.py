@@ -40,6 +40,17 @@ from src.infrastructure.persistence.repositories.sa_logic_repositories import (
     SALogicClusterRepository,
     SAOntologyNodeRepository,
 )
+from src.infrastructure.persistence.repositories.sa_concept_repositories import (
+    SAConceptNodeRepository,
+    SAConceptVersionRepository,
+    SAConceptEvidenceRepository,
+    SAConceptRelationshipRepository,
+    SAConceptClusterRepository,
+    SAConceptExplanationRepository,
+    SAConceptMetricsRepository,
+    SAConceptEvolutionRepository,
+    SAConceptDriftRepository,
+)
 from src.infrastructure.persistence.database import DatabaseEngine
 
 
@@ -72,6 +83,15 @@ class SQLAlchemyUnitOfWork(IUnitOfWork):
         self._behavior_patterns = SABehaviorPatternRepository(self._session)
         self._logic_clusters = SALogicClusterRepository(self._session)
         self._ontology_nodes = SAOntologyNodeRepository(self._session)
+        self._concept_nodes = SAConceptNodeRepository(self._session)
+        self._concept_versions = SAConceptVersionRepository(self._session)
+        self._concept_relationships = SAConceptRelationshipRepository(self._session)
+        self._concept_evidence = SAConceptEvidenceRepository(self._session)
+        self._concept_clusters = SAConceptClusterRepository(self._session)
+        self._concept_explanations = SAConceptExplanationRepository(self._session)
+        self._concept_metrics = SAConceptMetricsRepository(self._session)
+        self._concept_evolution = SAConceptEvolutionRepository(self._session)
+        self._concept_drift = SAConceptDriftRepository(self._session)
         return self
 
     def __exit__(self, exc_type: Any, exc_val: Any, exc_tb: Any) -> None:
@@ -166,3 +186,40 @@ class SQLAlchemyUnitOfWork(IUnitOfWork):
     @property
     def ontology_nodes(self):
         return self._ontology_nodes
+
+    @property
+    def concept_nodes(self):
+        return self._concept_nodes
+
+    @property
+    def concept_versions(self):
+        return self._concept_versions
+
+    @property
+    def concept_relationships(self):
+        return self._concept_relationships
+
+    @property
+    def concept_evidence(self):
+        return self._concept_evidence
+
+    @property
+    def concept_clusters(self):
+        return self._concept_clusters
+
+    @property
+    def concept_explanations(self):
+        return self._concept_explanations
+
+    @property
+    def concept_metrics(self):
+        return self._concept_metrics
+
+    @property
+    def concept_evolution(self):
+        return self._concept_evolution
+
+    @property
+    def concept_drift(self):
+        return self._concept_drift
+

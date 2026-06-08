@@ -23,6 +23,18 @@ from src.infrastructure.persistence.models.logic_models import (
     LogicClusterMemberModel,
     LogicVersionPatternModel,
 )
+from src.infrastructure.persistence.models.concept_models import (
+    ConceptNodeModel,
+    ConceptVersionModel,
+    ConceptEvidenceModel,
+    ConceptRelationshipModel,
+    ConceptClusterModel,
+    ConceptClusterMemberModel,
+    ConceptExplanationModel,
+    ConceptMetricsModel,
+    ConceptDriftModel,
+    ConceptEvolutionModel,
+)
 
 __all__ = [
     "Base",
@@ -50,4 +62,14 @@ __all__ = [
     "LogicClusterModel",
     "LogicClusterMemberModel",
     "LogicVersionPatternModel",
+    "ConceptNodeModel",
+    "ConceptVersionModel",
+    "ConceptEvidenceModel",
+    "ConceptRelationshipModel",
+    "ConceptClusterModel",
+    "ConceptClusterMemberModel",
+    "ConceptExplanationModel",
+    "ConceptMetricsModel",
+    "ConceptDriftModel",
+    "ConceptEvolutionModel",
 ]
