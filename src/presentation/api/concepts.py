@@ -1,6 +1,6 @@
 """REST API endpoints for Phase 4 Concept Graph and Intelligence."""
 
-from typing import List, Optional
+from typing import Callable, List, Optional
 import uuid
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -19,6 +19,12 @@ from src.presentation.schemas.concept_schemas import (
     ConceptMapResponse,
     ConceptExplanationResponse,
     BackfillResponse,
+    FrameworkDefinitionResponse,
+    FrameworkVersionResponse,
+    BehaviorFamilyResponse,
+    CanonicalBehaviorResponse,
+    BehaviorAliasResponse,
+    CanonicalFlowResponse,
 )
 from src.presentation.dependencies import (
     get_detect_concepts_use_case,
@@ -28,6 +34,15 @@ from src.presentation.dependencies import (
     get_get_concept_drift_use_case,
     get_get_concept_explanation_use_case,
     get_concept_backfill_service,
+    get_uow_factory,
+)
+from src.infrastructure.persistence.models.concept_models import (
+    FrameworkDefinitionModel,
+    FrameworkVersionModel,
+    BehaviorFamilyModel,
+    CanonicalBehaviorModel,
+    BehaviorAliasModel,
+    CanonicalFlowModel,
 )
 
 concepts_router = APIRouter(tags=["concepts"])
@@ -157,3 +172,124 @@ def backfill_concepts(
         raise HTTPException(status_code=404, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@concepts_router.get("/frameworks/definitions", response_model=List[FrameworkDefinitionResponse])
+def get_framework_definitions(
+    uow_factory: Callable = Depends(get_uow_factory),
+):
+    """Retrieve all framework definitions registered in the system."""
+    with uow_factory() as uow:
+        defs = uow._session.query(FrameworkDefinitionModel).all()
+        return [
+            FrameworkDefinitionResponse(
+                id=d.id,
+                framework_name=d.framework_name,
+                language=d.language,
+                metadata=d.metadata_
+            )
+            for d in defs
+        ]
+
+
+@concepts_router.get("/frameworks/versions", response_model=List[FrameworkVersionResponse])
+def get_framework_versions(
+    uow_factory: Callable = Depends(get_uow_factory),
+):
+    """Retrieve all framework versions from the registry."""
+    with uow_factory() as uow:
+        versions = uow._session.query(FrameworkVersionModel).all()
+        return [
+            FrameworkVersionResponse(
+                id=str(v.id),
+                framework_id=v.framework_id,
+                version_string=v.version_string,
+                supported_syntax_rules=v.supported_syntax_rules,
+                released_at=v.released_at
+            )
+            for v in versions
+        ]
+
+
+@concepts_router.get("/behaviors/families", response_model=List[BehaviorFamilyResponse])
+def get_behavior_families(
+    uow_factory: Callable = Depends(get_uow_factory),
+):
+    """Retrieve all registered behavior families."""
+    with uow_factory() as uow:
+        families = uow._session.query(BehaviorFamilyModel).all()
+        return [
+            BehaviorFamilyResponse(
+                id=f.id,
+                name=f.name,
+                parent_concept_id=f.parent_concept_id,
+                description=f.description
+            )
+            for f in families
+        ]
+
+
+@concepts_router.get("/behaviors/canonical", response_model=List[CanonicalBehaviorResponse])
+def get_canonical_behaviors(
+    uow_factory: Callable = Depends(get_uow_factory),
+):
+    """Retrieve all canonical behaviors."""
+    with uow_factory() as uow:
+        behaviors = uow._session.query(CanonicalBehaviorModel).all()
+        return [
+            CanonicalBehaviorResponse(
+                id=b.id,
+                name=b.name,
+                family_id=b.family_id,
+                description=b.description,
+                created_at=b.created_at
+            )
+            for b in behaviors
+        ]
+
+
+@concepts_router.get("/behaviors/aliases", response_model=List[BehaviorAliasResponse])
+def get_behavior_aliases(
+    uow_factory: Callable = Depends(get_uow_factory),
+):
+    """Retrieve all language-specific behavior pattern aliases."""
+    with uow_factory() as uow:
+        aliases = uow._session.query(BehaviorAliasModel).all()
+        return [
+            BehaviorAliasResponse(
+                id=str(a.id),
+                canonical_behavior_id=a.canonical_behavior_id,
+                language=a.language,
+                imports=a.imports,
+                calls=a.calls,
+                heuristics=a.heuristics
+            )
+            for a in aliases
+        ]
+
+
+@concepts_router.get("/flows", response_model=List[CanonicalFlowResponse])
+def get_canonical_flows(
+    flow_type: Optional[str] = None,
+    uow_factory: Callable = Depends(get_uow_factory),
+):
+    """Retrieve traced execution flow paths."""
+    with uow_factory() as uow:
+        query = uow._session.query(CanonicalFlowModel)
+        if flow_type:
+            query = query.filter(CanonicalFlowModel.flow_type == flow_type)
+        flows = query.all()
+        return [
+            CanonicalFlowResponse(
+                id=str(f.id),
+                flow_type=f.flow_type,
+                source_entity_id=str(f.source_entity_id),
+                target_entity_id=str(f.target_entity_id),
+                intermediate_entities=[str(ie) for ie in f.intermediate_entities],
+                confidence=float(f.confidence),
+                metadata=f.metadata_,
+                created_at=f.created_at
+            )
+            for f in flows
+        ]
+

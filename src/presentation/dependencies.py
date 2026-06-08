@@ -127,3 +127,19 @@ def get_get_concept_explanation_use_case(request: Request) -> GetConceptExplanat
 
 def get_concept_backfill_service(request: Request) -> ConceptBackfillService:
     return request.app.state.container.get_concept_backfill_service()
+
+
+# Phase 4.5 Semantic Expansion Bounded Context
+from src.application.semantic.behavior_registry.canonical_registry import CanonicalRegistry
+from src.application.semantic.type_resolution.type_resolution_engine import TypeResolutionEngine
+from src.application.semantic.normalization.semantic_normalizer import SemanticNormalizer
+
+def get_canonical_registry(request: Request) -> CanonicalRegistry:
+    return request.app.state.container.get_canonical_registry()
+
+def get_type_resolution_engine(request: Request) -> TypeResolutionEngine:
+    return request.app.state.container.get_type_resolution_engine()
+
+def get_semantic_normalizer(request: Request) -> SemanticNormalizer:
+    return request.app.state.container.get_semantic_normalizer()
+

@@ -1,7 +1,7 @@
 """Pydantic API schemas for Phase 4 Concept Graph and Intelligence requests and responses."""
 
 from datetime import datetime
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Any
 from pydantic import BaseModel, Field
 
 
@@ -83,3 +83,84 @@ class BackfillResponse(BaseModel):
 
     status: str
     processed_commits: int
+
+
+class FrameworkDefinitionResponse(BaseModel):
+    """API response model representing a framework definition."""
+
+    id: str
+    framework_name: str
+    language: str
+    metadata: Dict[str, Any] = Field(default_factory=dict)
+
+    class Config:
+        from_attributes = True
+
+
+class FrameworkVersionResponse(BaseModel):
+    """API response model representing a framework version registry entry."""
+
+    id: str
+    framework_id: str
+    version_string: str
+    supported_syntax_rules: Dict[str, Any] = Field(default_factory=dict)
+    released_at: Optional[datetime] = None
+
+    class Config:
+        from_attributes = True
+
+
+class BehaviorFamilyResponse(BaseModel):
+    """API response model representing a behavior family."""
+
+    id: str
+    name: str
+    parent_concept_id: str
+    description: Optional[str] = None
+
+    class Config:
+        from_attributes = True
+
+
+class CanonicalBehaviorResponse(BaseModel):
+    """API response model representing a canonical behavior."""
+
+    id: str
+    name: str
+    family_id: str
+    description: Optional[str] = None
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class BehaviorAliasResponse(BaseModel):
+    """API response model representing a language-specific behavior alias mapping."""
+
+    id: str
+    canonical_behavior_id: str
+    language: str
+    imports: List[str]
+    calls: List[str]
+    heuristics: Dict[str, Any] = Field(default_factory=dict)
+
+    class Config:
+        from_attributes = True
+
+
+class CanonicalFlowResponse(BaseModel):
+    """API response model representing a traced canonical flow."""
+
+    id: str
+    flow_type: str
+    source_entity_id: str
+    target_entity_id: str
+    intermediate_entities: List[str]
+    confidence: float
+    metadata: Dict[str, Any] = Field(default_factory=dict)
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+

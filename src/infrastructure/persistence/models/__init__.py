@@ -34,6 +34,13 @@ from src.infrastructure.persistence.models.concept_models import (
     ConceptMetricsModel,
     ConceptDriftModel,
     ConceptEvolutionModel,
+    BehaviorFamilyModel,
+    CanonicalBehaviorModel,
+    BehaviorAliasModel,
+    FrameworkDefinitionModel,
+    FrameworkVersionModel,
+    FrameworkMappingModel,
+    CanonicalFlowModel,
 )
 
 __all__ = [
@@ -72,4 +79,11 @@ __all__ = [
     "ConceptMetricsModel",
     "ConceptDriftModel",
     "ConceptEvolutionModel",
+    "BehaviorFamilyModel",
+    "CanonicalBehaviorModel",
+    "BehaviorAliasModel",
+    "FrameworkDefinitionModel",
+    "FrameworkVersionModel",
+    "FrameworkMappingModel",
+    "CanonicalFlowModel",
 ]

@@ -236,3 +236,102 @@ class ConceptEvolutionModel(Base):
     __table_args__ = (
         Index("ix_concept_evolution_to", "to_concept_version_id"),
     )
+
+
+class BehaviorFamilyModel(Base):
+    """SQLAlchemy model representing a category grouping related canonical behaviors."""
+
+    __tablename__ = "behavior_families"
+
+    id: Mapped[str] = mapped_column(String(128), primary_key=True)
+    name: Mapped[str] = mapped_column(String(256), nullable=False)
+    parent_concept_id: Mapped[str] = mapped_column(String(128), nullable=False)
+    description: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+
+
+class CanonicalBehaviorModel(Base):
+    """SQLAlchemy model representing canonical normalized behaviors."""
+
+    __tablename__ = "canonical_behaviors"
+
+    id: Mapped[str] = mapped_column(String(128), primary_key=True)
+    name: Mapped[str] = mapped_column(String(256), nullable=False)
+    family_id: Mapped[str] = mapped_column(
+        String(128), ForeignKey("behavior_families.id", ondelete="RESTRICT"), nullable=False
+    )
+    description: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=datetime.utcnow, nullable=False)
+
+
+class BehaviorAliasModel(Base):
+    """SQLAlchemy model representing language-specific pattern aliases."""
+
+    __tablename__ = "behavior_aliases"
+
+    id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid.uuid4)
+    canonical_behavior_id: Mapped[str] = mapped_column(
+        String(128), ForeignKey("canonical_behaviors.id", ondelete="CASCADE"), nullable=False
+    )
+    language: Mapped[str] = mapped_column(String(64), nullable=False)
+    imports: Mapped[Dict[str, Any]] = mapped_column(JSON, default=list, nullable=False)
+    calls: Mapped[Dict[str, Any]] = mapped_column(JSON, default=list, nullable=False)
+    heuristics: Mapped[Dict[str, Any]] = mapped_column(JSON, default=dict, nullable=False)
+
+    __table_args__ = (
+        Index("uq_behavior_lang_idx", "canonical_behavior_id", "language", unique=True),
+    )
+
+
+class FrameworkDefinitionModel(Base):
+    """SQLAlchemy model representing framework registry mappings."""
+
+    __tablename__ = "framework_definitions"
+
+    id: Mapped[str] = mapped_column(String(128), primary_key=True)
+    framework_name: Mapped[str] = mapped_column(String(128), nullable=False)
+    language: Mapped[str] = mapped_column(String(64), nullable=False)
+    metadata_: Mapped[Dict[str, Any]] = mapped_column("metadata", JSON, default=dict, nullable=False)
+
+
+class FrameworkVersionModel(Base):
+    """SQLAlchemy model storing framework version details."""
+
+    __tablename__ = "framework_version_registry"
+
+    id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid.uuid4)
+    framework_id: Mapped[str] = mapped_column(
+        String(128), ForeignKey("framework_definitions.id", ondelete="CASCADE"), nullable=False
+    )
+    version_string: Mapped[str] = mapped_column(String(64), nullable=False)
+    supported_syntax_rules: Mapped[Dict[str, Any]] = mapped_column(JSON, default=dict, nullable=False)
+    released_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
+
+
+class FrameworkMappingModel(Base):
+    """SQLAlchemy model linking annotations/decorators to roles."""
+
+    __tablename__ = "framework_mappings"
+
+    id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid.uuid4)
+    framework_id: Mapped[str] = mapped_column(
+        String(128), ForeignKey("framework_definitions.id", ondelete="CASCADE"), nullable=False
+    )
+    annotation_identifier: Mapped[str] = mapped_column(String(256), nullable=False)
+    map_to_entity_role: Mapped[str] = mapped_column(String(64), nullable=False)
+    map_to_relationship: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
+
+
+class CanonicalFlowModel(Base):
+    """SQLAlchemy model storing execution flow traces."""
+
+    __tablename__ = "canonical_flows"
+
+    id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid.uuid4)
+    flow_type: Mapped[str] = mapped_column(String(64), nullable=False)
+    source_entity_id: Mapped[uuid.UUID] = mapped_column(Uuid, nullable=False)
+    target_entity_id: Mapped[uuid.UUID] = mapped_column(Uuid, nullable=False)
+    intermediate_entities: Mapped[Dict[str, Any]] = mapped_column(JSON, default=list, nullable=False)
+    confidence: Mapped[float] = mapped_column(Numeric(4, 3), nullable=False)
+    metadata_: Mapped[Dict[str, Any]] = mapped_column("metadata", JSON, default=dict, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=datetime.utcnow, nullable=False)
+
