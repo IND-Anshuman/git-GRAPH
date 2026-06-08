@@ -57,6 +57,10 @@ from src.application.services.concept_evolution_engine import ConceptEvolutionEn
 from src.application.services.concept_explanation_engine import ConceptExplanationEngine
 from src.application.services.concept_backfill_service import ConceptBackfillService
 
+# Phase 4.5 Semantic Expansion Bounded Context
+from src.application.semantic.behavior_registry.canonical_registry import CanonicalRegistry
+from src.application.semantic.type_resolution.type_resolution_engine import TypeResolutionEngine
+from src.application.semantic.normalization.semantic_normalizer import SemanticNormalizer
 
 from src.infrastructure.git.gitpython_adapter import GitPythonAdapter
 from src.infrastructure.git.rename_detection import RenameDetector
@@ -177,6 +181,14 @@ class Container:
         self.concept_drift_engine = ConceptDriftEngine()
         self.concept_evolution_engine = ConceptEvolutionEngine()
         self.concept_explanation_engine = ConceptExplanationEngine()
+
+        # Phase 4.5 Semantic Expansion setup
+        self.canonical_registry = CanonicalRegistry()
+        self.type_resolution_engine = TypeResolutionEngine()
+        self.semantic_normalizer = SemanticNormalizer(
+            registry=self.canonical_registry,
+            type_engine=self.type_resolution_engine
+        )
 
         self.detect_concepts_use_case = DetectConceptsUseCase(
             uow_factory=self.get_uow_factory(),
@@ -326,4 +338,14 @@ class Container:
 
     def get_concept_backfill_service(self) -> ConceptBackfillService:
         return self.concept_backfill_service
+
+    def get_canonical_registry(self) -> CanonicalRegistry:
+        return self.canonical_registry
+
+    def get_type_resolution_engine(self) -> TypeResolutionEngine:
+        return self.type_resolution_engine
+
+    def get_semantic_normalizer(self) -> SemanticNormalizer:
+        return self.semantic_normalizer
+
 
