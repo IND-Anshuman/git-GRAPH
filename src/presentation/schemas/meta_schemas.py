@@ -94,3 +94,47 @@ class DiscoveryResponse(BaseModel):
 
 class PromotionApprovalRequest(BaseModel):
     approver: str = Field(..., description="Name of the person/role approving this promotion")
+
+
+class ConceptCandidateEvidenceSchema(BaseModel):
+    supporting_entities: List[str] = Field(default_factory=list)
+    supporting_relationships: List[str] = Field(default_factory=list)
+    supporting_behaviors: List[str] = Field(default_factory=list)
+    supporting_flows: List[str] = Field(default_factory=list)
+    confidence_breakdown: Dict[str, float] = Field(default_factory=dict)
+
+
+class ConceptCandidateSchema(BaseModel):
+    id: uuid.UUID
+    name: str
+    confidence: float
+    evidence: ConceptCandidateEvidenceSchema
+    ontology_parent_candidate: Optional[str] = None
+    status: str
+
+    class Config:
+        from_attributes = True
+
+
+class CanonicalFlowSchema(BaseModel):
+    id: str
+    flow_type: str
+    source_entity_id: str
+    target_entity_id: str
+    intermediate_entities: List[str] = Field(default_factory=list)
+    confidence: float
+    metadata: Dict[str, Any] = Field(default_factory=dict)
+
+    class Config:
+        from_attributes = True
+
+
+class EvolutionDiffSchema(BaseModel):
+    added_entities: List[Dict[str, Any]] = Field(default_factory=list)
+    removed_entities: List[Dict[str, Any]] = Field(default_factory=list)
+    added_relationships: List[Dict[str, Any]] = Field(default_factory=list)
+    removed_relationships: List[Dict[str, Any]] = Field(default_factory=list)
+    added_behaviors: List[Dict[str, Any]] = Field(default_factory=list)
+    removed_behaviors: List[Dict[str, Any]] = Field(default_factory=list)
+    added_concepts: List[Dict[str, Any]] = Field(default_factory=list)
+    removed_concepts: List[Dict[str, Any]] = Field(default_factory=list)

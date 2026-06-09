@@ -1,18 +1,34 @@
 """REST API endpoints for Phase 4.75 Meta-Ontology, Schema Registry, and Discovery."""
 
-from typing import List, Optional
+from typing import Any, Dict, List, Optional
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from src.domain.value_objects.repository_id import RepositoryId
 from src.application.semantic.embedding.embedding_registry import EmbeddingRegistry
 from src.application.semantic.schema.schema_registry import SchemaRegistry
 from src.application.semantic.governance.governance_manager import GovernanceManager
-from src.application.semantic.discovery.entity_discovery_engine import EntityDiscoveryEngine
+from src.application.semantic.discovery import (
+    EntityDiscoveryEngine,
+    RelationshipDiscoveryEngine,
+    BehaviorDiscoveryEngine,
+    ConceptDiscoveryEngine,
+    FlowDiscoveryEngine,
+)
+from src.application.semantic.evolution import SemanticEvolutionEngine
+from src.application.semantic.normalization.semantic_normalizer import SemanticNormalizer
+from src.infrastructure.persistence.unit_of_work import SQLAlchemyUnitOfWork
 from src.presentation.dependencies import (
     get_embedding_registry,
     get_schema_registry,
     get_governance_manager,
     get_entity_discovery_engine,
+    get_relationship_discovery_engine,
+    get_behavior_discovery_engine,
+    get_concept_discovery_engine,
+    get_flow_discovery_engine,
+    get_semantic_evolution_engine,
+    get_semantic_normalizer,
+    get_uow_factory,
 )
 from src.presentation.schemas.meta_schemas import (
     MetaTypeSchema,
@@ -26,7 +42,11 @@ from src.presentation.schemas.meta_schemas import (
     DiscoveryResponse,
     PromotionApprovalRequest,
     DiscoveredCandidateSchema,
+    ConceptCandidateSchema,
+    CanonicalFlowSchema,
+    EvolutionDiffSchema,
 )
+from src.presentation.schemas.responses import RelationshipSchema
 
 meta_router = APIRouter(prefix="/meta", tags=["meta"])
 
@@ -212,3 +232,227 @@ def run_semantic_discovery(
             )
         )
     return DiscoveryResponse(candidates=resp_candidates)
+
+
+@meta_router.post("/discovery/relationships", response_model=List[RelationshipSchema])
+def discover_relationships(
+    repository_id: str,
+    engine: RelationshipDiscoveryEngine = Depends(get_relationship_discovery_engine),
+    normalizer: SemanticNormalizer = Depends(get_semantic_normalizer),
+    uow: SQLAlchemyUnitOfWork = Depends(get_uow_factory),
+):
+    """Triggers RelationshipDiscoveryEngine dynamic coupling scan across a repository."""
+    repo_uuid = RepositoryId.from_string(repository_id)
+    with uow:
+        db_entities = uow.code_entities.get_by_repository(repo_uuid)
+
+        canonical_entities = []
+        for de in db_entities:
+            raw_entity = {
+                "name": de.name,
+                "qualified_name": de.qualified_name,
+                "type": de.entity_type.value if hasattr(de.entity_type, "value") else str(de.entity_type),
+                "return_type": de.metadata.get("return_type", ""),
+                "visibility": de.metadata.get("visibility", "public"),
+                "decorators": de.metadata.get("decorators", []),
+                "location": de.location,
+                "metadata": de.metadata,
+            }
+            canonical_entities.append(
+                normalizer.normalize_entity(
+                    raw_entity,
+                    de.language.value if hasattr(de.language, "value") else str(de.language),
+                )
+            )
+
+        # Map behaviors
+        behaviors = []
+        for ce in canonical_entities:
+            imports = ce.metadata.get("imports", [])
+            calls = ce.metadata.get("calls", [])
+            language = ce.metadata.get("language", "python")
+            bh = normalizer.map_behavior(ce, imports, calls, language)
+            if bh:
+                behaviors.append(bh)
+
+        # Map dynamic flows
+        flows = []
+        for ce in canonical_entities:
+            flow_meta = ce.metadata.get("flows", [])
+            for fm in flow_meta:
+                flow_entities = []
+                for entity_id in [ce.id] + fm.get("intermediate_entities", []) + [fm.get("target_entity_id")]:
+                    found = next(
+                        (e for e in canonical_entities if e.id == entity_id or e.name == entity_id),
+                        None,
+                    )
+                    if found:
+                        flow_entities.append(found)
+                if len(flow_entities) >= 2:
+                    fl = normalizer.trace_flow(
+                        flow_type=fm.get("flow_type", "DATA"),
+                        entities=flow_entities,
+                        confidence=fm.get("confidence", 1.0),
+                        metadata=fm.get("metadata", {}),
+                    )
+                    if fl:
+                        flows.append(fl)
+
+    relationships = engine.discover_relationships(
+        repository_id=repo_uuid,
+        entities=canonical_entities,
+        behaviors=behaviors,
+        flows=flows,
+    )
+
+    resp_rels = []
+    for rel in relationships:
+        resp_rels.append(
+            RelationshipSchema(
+                id=str(rel.id),
+                relationship_type=rel.relationship_type.name
+                if hasattr(rel.relationship_type, "name")
+                else str(rel.relationship_type),
+                source_seid=str(rel.source_seid.value),
+                target_seid=str(rel.target_seid.value),
+                source_name=rel.metadata.get("source_name", ""),
+                target_name=rel.metadata.get("target_name", ""),
+                confidence=rel.confidence,
+                metadata=rel.metadata,
+            )
+        )
+    return resp_rels
+
+
+@meta_router.post("/discovery/behaviors", response_model=DiscoveryResponse)
+def discover_behavior_patterns(
+    repository_id: str,
+    similarity_threshold: float = 0.85,
+    engine: BehaviorDiscoveryEngine = Depends(get_behavior_discovery_engine),
+    normalizer: SemanticNormalizer = Depends(get_semantic_normalizer),
+    uow: SQLAlchemyUnitOfWork = Depends(get_uow_factory),
+):
+    """Triggers BehaviorDiscoveryEngine dynamic clustering scan across a repository."""
+    repo_uuid = RepositoryId.from_string(repository_id)
+    with uow:
+        db_entities = uow.code_entities.get_by_repository(repo_uuid)
+
+        canonical_entities = []
+        for de in db_entities:
+            raw_entity = {
+                "name": de.name,
+                "qualified_name": de.qualified_name,
+                "type": de.entity_type.value if hasattr(de.entity_type, "value") else str(de.entity_type),
+                "return_type": de.metadata.get("return_type", ""),
+                "visibility": de.metadata.get("visibility", "public"),
+                "decorators": de.metadata.get("decorators", []),
+                "location": de.location,
+                "metadata": de.metadata,
+            }
+            canonical_entities.append(
+                normalizer.normalize_entity(
+                    raw_entity,
+                    de.language.value if hasattr(de.language, "value") else str(de.language),
+                )
+            )
+
+    candidates = engine.discover_behavior_clusters(
+        repository_id=repo_uuid,
+        entities=canonical_entities,
+        similarity_threshold=similarity_threshold,
+    )
+
+    resp_candidates = []
+    for mt, md in candidates:
+        resp_candidates.append(
+            DiscoveredCandidateSchema(
+                meta_type=MetaTypeSchema.model_validate(mt),
+                definition=MetaDefinitionSchema.model_validate(md),
+            )
+        )
+    return DiscoveryResponse(candidates=resp_candidates)
+
+
+@meta_router.post("/discovery/concepts", response_model=List[ConceptCandidateSchema])
+def discover_concepts(
+    repository_id: str,
+    similarity_threshold: float = 0.80,
+    engine: ConceptDiscoveryEngine = Depends(get_concept_discovery_engine),
+):
+    """Triggers ConceptDiscoveryEngine dynamic clustering scan and stages candidates."""
+    try:
+        candidates = engine.discover_concept_candidates(
+            repository_id=RepositoryId.from_string(repository_id),
+            similarity_threshold=similarity_threshold,
+        )
+        return candidates
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+
+
+@meta_router.post("/discovery/flows", response_model=List[CanonicalFlowSchema])
+def discover_flows(
+    repository_id: str,
+    engine: FlowDiscoveryEngine = Depends(get_flow_discovery_engine),
+):
+    """Triggers FlowDiscoveryEngine dynamic multi-hop trace across a repository."""
+    try:
+        flows = engine.discover_flows(
+            repository_id=RepositoryId.from_string(repository_id),
+        )
+        return flows
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+
+
+@meta_router.post("/governance/candidates/{id}/approve")
+def approve_concept_candidate(
+    id: str,
+    payload: PromotionApprovalRequest,
+    gov_manager: GovernanceManager = Depends(get_governance_manager),
+):
+    """Promotes a ConceptCandidate/MetaType to active ConceptNode."""
+    success, msg = gov_manager.approve_promotion_to_active(
+        type_id=id,
+        approver_name=payload.approver,
+    )
+    if not success:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=msg)
+    return {"message": msg}
+
+
+@meta_router.get("/evolution/graph", response_model=Dict[str, Any])
+def get_evolution_graph(
+    repository_id: str,
+    commit_hash: str,
+    engine: SemanticEvolutionEngine = Depends(get_semantic_evolution_engine),
+):
+    """Reconstructs structural, behavioral, and conceptual graph snapshots for a given commit."""
+    try:
+        snapshot = engine.graph_at_commit(
+            repository_id=RepositoryId.from_string(repository_id),
+            commit_hash=commit_hash,
+        )
+        return snapshot
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+
+
+@meta_router.get("/evolution/diff", response_model=Dict[str, Any])
+def get_evolution_diff(
+    repository_id: str,
+    commit_a: str,
+    commit_b: str,
+    engine: SemanticEvolutionEngine = Depends(get_semantic_evolution_engine),
+):
+    """Computes structural and taxonomic additions/removals between two commits."""
+    try:
+        diff = engine.graph_diff(
+            repository_id=RepositoryId.from_string(repository_id),
+            commit_a=commit_a,
+            commit_b=commit_b,
+        )
+        return diff
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+

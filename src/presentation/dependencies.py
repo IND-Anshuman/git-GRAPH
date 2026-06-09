@@ -149,7 +149,14 @@ from src.application.semantic.embedding.embedding_registry import EmbeddingRegis
 from src.application.semantic.calibration.calibration_engine import ConfidenceCalibrationEngine
 from src.application.semantic.schema.schema_registry import SchemaRegistry
 from src.application.semantic.governance.governance_manager import GovernanceManager
-from src.application.semantic.discovery.entity_discovery_engine import EntityDiscoveryEngine
+from src.application.semantic.discovery import (
+    EntityDiscoveryEngine,
+    RelationshipDiscoveryEngine,
+    BehaviorDiscoveryEngine,
+    ConceptDiscoveryEngine,
+    FlowDiscoveryEngine,
+)
+from src.application.semantic.evolution import SemanticEvolutionEngine
 
 def get_embedding_registry(request: Request) -> EmbeddingRegistry:
     return request.app.state.container.get_embedding_registry()
@@ -165,5 +172,20 @@ def get_governance_manager(request: Request) -> GovernanceManager:
 
 def get_entity_discovery_engine(request: Request) -> EntityDiscoveryEngine:
     return request.app.state.container.get_entity_discovery_engine()
+
+def get_relationship_discovery_engine(request: Request) -> RelationshipDiscoveryEngine:
+    return request.app.state.container.get_relationship_discovery_engine()
+
+def get_behavior_discovery_engine(request: Request) -> BehaviorDiscoveryEngine:
+    return request.app.state.container.get_behavior_discovery_engine()
+
+def get_concept_discovery_engine(request: Request) -> ConceptDiscoveryEngine:
+    return request.app.state.container.get_concept_discovery_engine()
+
+def get_flow_discovery_engine(request: Request) -> FlowDiscoveryEngine:
+    return request.app.state.container.get_flow_discovery_engine()
+
+def get_semantic_evolution_engine(request: Request) -> SemanticEvolutionEngine:
+    return request.app.state.container.get_semantic_evolution_engine()
 
 
