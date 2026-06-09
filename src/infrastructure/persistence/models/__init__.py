@@ -42,6 +42,12 @@ from src.infrastructure.persistence.models.concept_models import (
     FrameworkMappingModel,
     CanonicalFlowModel,
 )
+from src.infrastructure.persistence.models.meta_models import (
+    MetaTypeModel,
+    MetaDefinitionModel,
+    EmbeddingModelModel,
+    EmbeddingVersionModel,
+)
 
 __all__ = [
     "Base",
@@ -86,4 +92,8 @@ __all__ = [
     "FrameworkVersionModel",
     "FrameworkMappingModel",
     "CanonicalFlowModel",
+    "MetaTypeModel",
+    "MetaDefinitionModel",
+    "EmbeddingModelModel",
+    "EmbeddingVersionModel",
 ]
