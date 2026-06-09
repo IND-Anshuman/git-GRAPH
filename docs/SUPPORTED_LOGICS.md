@@ -1,6 +1,6 @@
 # Supported Logics, Languages, and Schemas
 
-This document lists the active behavioral logics, programming languages, and metadata configuration schemas supported by the **Temporal Code Knowledge Graph Platform**.
+This document lists the active behavioral logics, programming languages, configuration schemas, and the complete relational database design supported by the **Temporal Code Knowledge Graph Platform**.
 
 ---
 
@@ -8,13 +8,23 @@ This document lists the active behavioral logics, programming languages, and met
 
 The platform parses codebase source trees and extracts entities using Tree-sitter. The following programming languages are supported:
 
-| Language | Tree-sitter Parser | File Extensions |
-| :--- | :--- | :--- |
-| **Python** | `tree-sitter-python` | `.py` |
-| **JavaScript** | `tree-sitter-javascript` | `.js`, `.mjs` |
-| **TypeScript** | `tree-sitter-typescript` | `.ts`, `.tsx` |
-| **Go** | `tree-sitter-go` | `.go` |
-| **Java** | `tree-sitter-java` | `.java` |
+| Language | Tree-sitter Parser | File Extensions | status |
+| :--- | :--- | :--- | :--- |
+| **Python** | `tree-sitter-python` | `.py` | Active |
+| **JavaScript** | `tree-sitter-javascript` | `.js`, `.jsx`, `.mjs` | Active |
+| **TypeScript** | `tree-sitter-typescript` | `.ts`, `.tsx` | Active |
+| **Go** | `tree-sitter-go` | `.go` | Active |
+| **Java** | `tree-sitter-java` | `.java` | Active |
+| **C#** | `tree-sitter-csharp` | `.cs` | Active |
+| **Rust** | `tree-sitter-rust` | `.rs` | Active |
+| **Kotlin** | `tree-sitter-kotlin` | `.kt` | Active |
+| **Swift** | `tree-sitter-swift` | `.swift` | Registered |
+| **PHP** | `tree-sitter-php` | `.php` | Registered |
+| **Scala** | `tree-sitter-scala` | `.scala` | Registered |
+| **Ruby** | `tree-sitter-ruby` | `.rb` | Registered |
+| **Elixir** | `tree-sitter-elixir` | `.ex`, `.exs` | Registered |
+| **HTML** | `tree-sitter-html` | `.html`, `.htm` | Registered |
+| **CSS** | `tree-sitter-css` | `.css` | Registered |
 
 ---
 
@@ -53,7 +63,7 @@ The behavioral intelligence engine supports **33 active detection patterns** cla
 * **`retry_manual_loop`** (Manual Retry Loop): Detects custom try-except loops wrapping retry indices.
 * **`retry_backoff`** (Exponential Backoff Retry): Detects backoff loop structures calling `time.sleep` with exponential calculations.
 
-### 🌐 Integration (HTTP API Client & Messaging)
+### 🌐 Integration (HTTP API Client, GenAI, Messaging)
 * **`api_requests_call`** (HTTP REST API Call via requests): Detects HTTP client methods (e.g. `requests.get`, `requests.post`).
 * **`api_httpx_call`** (HTTP REST API Call via httpx): Detects async/sync HTTP client calls via `httpx`.
 * **`api_endpoint_handler`** (API Endpoint Handler): Detects server endpoint routing decorators (e.g., `@app.get`, `@router.post`).
@@ -67,7 +77,7 @@ The behavioral intelligence engine supports **33 active detection patterns** cla
 
 ## 3. Configuration & Schema Specifications
 
-The platform uses YAML schemas to dynamically load ontology nodes and behavioral detection rules:
+The platform uses YAML schemas to dynamically load ontology nodes, behavioral detection rules, and register meta-types:
 
 ### A. Ontology Definition Schema (`ontology/*.yaml`)
 Describes the hierarchical behavior classification tree:
@@ -116,14 +126,45 @@ patterns:
           sink_call: checkpw
 ```
 
+### C. Dynamic Meta-Ontology Schema Specification
+Defines the schema validation templates for dynamically registered semantic metadata:
+```json
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "DynamicMetaSchema",
+  "type": "object",
+  "properties": {
+    "supported_frameworks": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "minimum_confidence_threshold": {
+      "type": "number",
+      "minimum": 0.0,
+      "maximum": 1.0
+    }
+  },
+  "required": ["supported_frameworks"]
+}
+```
+
 ---
 
-## 4. Relational Database Schema (SQLAlchemy Models)
+## 4. Relational Database Schema Design (SQLAlchemy Models)
 
-The relational schema representing Phase 3 Behavioral Intelligence entities is structured as follows:
+The relational schema representing the system entities across the structural, behavioral, conceptual, metadata, and semantic flow layers is defined as follows:
 
 ```mermaid
 erDiagram
+    %% AST & Core Layers
+    repositories ||--o{ source_files : "contains"
+    repositories ||--o{ commits : "tracks"
+    source_files ||--o{ code_entities : "declares"
+    code_entities ||--o{ entity_versions : "has_versions"
+    code_entities ||--o{ relationships : "participates_in"
+    entity_versions ||--o{ change_events : "causes"
+    
+    %% Behavior Graph Layer
     ontology_nodes ||--o{ behavior_patterns : "classifies"
     ontology_nodes ||--o{ logic_signatures : "categorizes"
     behavior_patterns ||--o{ logic_version_patterns : "matched_in"
@@ -132,165 +173,150 @@ erDiagram
     logic_versions ||--o{ logic_transitions : "transitions"
     logic_versions ||--o{ behavior_explanations : "has_explanation"
     logic_versions ||--o{ logic_version_patterns : "satisfies"
-    logic_transitions ||--o{ behavior_drift : "measures_drift"
+    logic_transitions ||--o{ behavior_drift : "measures_behavior_drift"
     logic_clusters ||--o{ logic_cluster_members : "groups"
     logic_signatures ||--o{ logic_cluster_members : "belongs_to"
 
-    ontology_nodes {
-        uuid id PK
-        string node_id UK
-        string name
-        string domain
-        string parent_node_id FK
-        boolean is_leaf
-        string description
-        string ontology_version
-        string schema_version
-        datetime created_at
-        datetime updated_at
-    }
+    %% Concept Graph Layer
+    concept_nodes ||--o{ concept_versions : "has_versions"
+    concept_versions ||--o{ concept_evidence : "references"
+    concept_nodes ||--o{ concept_relationships : "originates"
+    concept_nodes ||--o{ concept_cluster_members : "associates"
+    concept_clusters ||--o{ concept_cluster_members : "holds"
+    concept_versions ||--o{ concept_explanations : "explains"
+    concept_versions ||--o{ concept_metrics : "scores"
+    concept_nodes ||--o{ concept_drift : "evaluates_concept_drift"
+    concept_versions ||--o{ concept_evolution : "evolves"
 
-    behavior_patterns {
-        uuid id PK
-        string pattern_id UK
-        string name
-        string pattern_version
-        string ontology_node_id FK
-        float base_confidence
-        json index_keys
-        json rules
-        string schema_version
-        boolean is_active
-        datetime created_at
-        datetime updated_at
-    }
+    %% Dynamic Meta-Ontology Layer
+    meta_types ||--o{ meta_definitions : "defines"
+    embedding_models ||--o{ embedding_versions : "configures"
 
-    logic_signatures {
+    %% Intermediate Semantic Representation (ISR) & Flows
+    behavior_families ||--o{ canonical_behaviors : "groups"
+    canonical_behaviors ||--o{ behavior_aliases : "aliases"
+    framework_definitions ||--o{ framework_version_registry : "versions"
+    framework_definitions ||--o{ framework_mappings : "maps"
+    canonical_flows {
         uuid id PK
-        uuid repository_id FK
-        string entity_seid
-        string entity_name
-        string entity_type
-        string file_path
-        string primary_ontology_node_id FK
-        float overall_confidence
-        json metadata
-        datetime first_seen_at
-        datetime last_seen_at
-        datetime created_at
-        datetime updated_at
-    }
-
-    logic_versions {
-        uuid id PK
-        uuid signature_id FK
-        string commit_hash
-        int version_number
-        float confidence
-        json index_keys
-        string ast_fingerprint
-        float complexity_score
-        int line_start
-        int line_end
-        string raw_source_hash
-        json metadata
-        datetime observed_at
-        datetime created_at
-    }
-
-    logic_evidence {
-        uuid id PK
-        uuid version_id FK
-        string evidence_type
-        string pattern_id FK
-        string matched_text
-        int line_number
-        int column_offset
-        float confidence
-        float weight
+        string flow_type
+        uuid source_entity_id
+        uuid target_entity_id
+        json intermediate_entities
+        numeric confidence
         json metadata
         datetime created_at
     }
+```
 
-    logic_transitions {
-        uuid id PK
-        uuid from_version_id FK
-        uuid to_version_id FK
-        string transition_type
-        string from_commit_hash
-        string to_commit_hash
-        float similarity_score
-        float drift_magnitude
-        boolean is_breaking_change
-        string change_summary
-        json metadata
-        datetime detected_at
-        datetime created_at
-    }
+### 4.1 Structural & AST Tables
+* **`repositories`**: Holds workspace repository configurations.
+* **`commits`**: Tracks historical git revisions.
+* **`source_files`**: Holds the paths and language metrics for files.
+* **`code_entities`**: Stores individual AST constructs (classes, methods).
+* **`entity_versions`**: Monotonically tracked node versions at commits.
+* **`relationships`**: Direct dependency and call edges.
+* **`change_events`**: Commited mutations (ADD, MODIFY, DELETE).
+* **`integrity_checks`**: Graph consistency checkpoints.
 
-    behavior_explanations {
-        uuid id PK
-        uuid version_id FK
-        string explanation_type
-        string summary
-        string detail
-        string security_implications
-        string recommended_action
-        float confidence
-        string generated_by
-        json metadata
-        datetime created_at
-    }
+### 4.2 Behavior Graph Tables (`logic_` prefix)
+* **`ontology_nodes`**: Nodes in the hierarchical domain tree.
+* **`behavior_patterns`**: Parsed AST matching rules.
+* **`logic_signatures`**: Stable behavioral node identites.
+* **`logic_versions`**: Point-in-time signature configurations.
+* **`logic_evidence`**: Matched rules/imports/calls backing a version.
+* **`logic_transitions`**: Evolutionary steps (creation, evolution, deletion).
+* **`behavior_explanations`**: Footprint summary statistics.
+* **`behavior_drift`**: Multidimensional drift scores (structural, API, data flow).
+* **`logic_clusters`**: Clusters grouping signatures by similarity.
+* **`logic_cluster_members`**: Joins mapping signatures to clusters.
+* **`logic_version_patterns`**: Maps logic versions to matching patterns.
 
-    behavior_drift {
-        uuid id PK
-        uuid transition_id FK
-        uuid baseline_version_id FK
-        uuid current_version_id FK
-        float drift_score
-        string drift_category
-        boolean ontology_shift
-        string from_ontology_node_id FK
-        string to_ontology_node_id FK
-        json pattern_additions
-        json pattern_removals
-        json pattern_modifications
-        json metadata
-        datetime computed_at
-        datetime created_at
-    }
+### 4.3 Concept Graph Tables (`concept_` prefix)
+* **`concept_nodes`**: Stable capability identities (e.g. Authentication).
+* **`concept_versions`**: Aggregate concept snapshots at commits.
+* **`concept_evidence`**: Audit joins linking concept versions to underlying logic versions/evidences.
+* **`concept_relationships`**: Conceptual dependencies (`DEPENDS_ON`, `REQUIRES`).
+* **`concept_clusters`**: High-level groups (e.g. Identity & Access Management).
+* **`concept_cluster_members`**: Joins concepts to high-level clusters.
+* **`concept_explanations`**: Deterministic summaries explaining concept composition.
+* **`concept_metrics`**: Graph centrality, PageRank, size, and impact scores.
+* **`concept_drift`**: Drift metrics computed between two commits.
+* **`concept_evolution`**: Concept splits, merges, and rename transitions.
 
-    logic_clusters {
-        uuid id PK
-        string cluster_key UK
-        string cluster_label
-        string ontology_node_id FK
-        string centroid_fingerprint
-        int member_count
-        float cohesion_score
-        json metadata
-        datetime created_at
-        datetime updated_at
-    }
+### 4.4 Dynamic Meta-Ontology Tables (`meta_` & `embedding_` prefix)
+* **`meta_types`**:
+  * `id` (`VARCHAR(128)` PK): Unique type identifier (e.g., `"security.auth.schema"`).
+  * `name` (`VARCHAR(256)`): Friendly display name.
+  * `category` (`VARCHAR(64)`): Layer category (`STRUCTURAL`, `BEHAVIORAL`, `CONCEPTUAL`).
+  * `status` (`VARCHAR(64)`): Life-cycle status (`EXPERIMENTAL`, `CANDIDATE`, `ACTIVE`, `DEPRECATED`).
+  * `created_at` (`TIMESTAMP`): Time of registration.
+* **`meta_definitions`**:
+  * `id` (`UUID` PK): Unique definition key.
+  * `type_id` (`VARCHAR(128)` FK -> `meta_types.id`): Backing type.
+  * `major_version` (`INTEGER`): SemVer major.
+  * `minor_version` (`INTEGER`): SemVer minor.
+  * `patch_version` (`INTEGER`): SemVer patch.
+  * `schema_definition` (`JSON`): Backing JSON Schema dictionary.
+  * `semantic_signature` (`JSON`): Grounding token types required.
+  * `created_at` (`TIMESTAMP`): Time of registration.
+* **`embedding_models`**:
+  * `id` (`VARCHAR(128)` PK): Unique model key.
+  * `model_name` (`VARCHAR(256)`): Name of the vector model.
+  * `provider` (`VARCHAR(64)`): Provider provider (`local`, `openai`, `huggingface`).
+  * `dimensions` (`INTEGER`): Dimension length of the vectors.
+  * `distance_metric` (`VARCHAR(32)`): Distance metric (`cosine`, `l2`, `ip`).
+  * `is_active` (`BOOLEAN`): Active config switch.
+  * `created_at` (`TIMESTAMP`): Registration time.
+* **`embedding_versions`**:
+  * `id` (`UUID` PK): Unique configuration ID.
+  * `model_id` (`VARCHAR(128)` FK -> `embedding_models.id`): Backing model.
+  * `version_string` (`VARCHAR(64)`): Configuration checkpoint string.
+  * `configuration` (`JSON`): Model hyperparameters and config settings.
+  * `registered_at` (`TIMESTAMP`): Registration timestamp.
 
-    logic_cluster_members {
-        uuid id PK
-        uuid cluster_id FK
-        uuid signature_id FK
-        float distance_to_centroid
-        boolean is_centroid
-        datetime joined_at
-        datetime created_at
-    }
-
-    logic_version_patterns {
-        uuid id PK
-        uuid version_id FK
-        uuid behavior_pattern_id FK
-        float confidence
-        int evidence_count
-        boolean is_primary
-        json metadata
-        datetime created_at
-    }
-}
+### 4.5 Intermediate Semantic Representation (ISR) & Interaction Tables
+* **`behavior_families`**:
+  * `id` (`VARCHAR(128)` PK): Family key.
+  * `name` (`VARCHAR(256)`): Family name.
+  * `parent_concept_id` (`VARCHAR(128)`): Target concept ontology path.
+  * `description` (`TEXT`): Description.
+* **`canonical_behaviors`**:
+  * `id` (`VARCHAR(128)` PK): Unique canonical behavior key.
+  * `name` (`VARCHAR(256)`): Unified behavior name.
+  * `family_id` (`VARCHAR(128)` FK -> `behavior_families.id`): Parent family.
+  * `description` (`TEXT`): Description.
+  * `created_at` (`TIMESTAMP`): Creation time.
+* **`behavior_aliases`**:
+  * `id` (`UUID` PK): Unique alias key.
+  * `canonical_behavior_id` (`VARCHAR(128)` FK -> `canonical_behaviors.id`): Associated behavior.
+  * `language` (`VARCHAR(64)`): Language name.
+  * `imports` (`JSON`): List of matching package imports.
+  * `calls` (`JSON`): List of matching function calls.
+  * `heuristics` (`JSON`): Parameter heuristics/AST structure checks.
+* **`framework_definitions`**:
+  * `id` (`VARCHAR(128)` PK): Framework key.
+  * `framework_name` (`VARCHAR(128)`): Framework name (e.g. Django, Spring).
+  * `language` (`VARCHAR(64)`): Target language.
+  * `metadata` (`JSON`): framework properties.
+* **`framework_version_registry`**:
+  * `id` (`UUID` PK): Unique version ID.
+  * `framework_id` (`VARCHAR(128)` FK -> `framework_definitions.id`): Target framework.
+  * `version_string` (`VARCHAR(64)`): Version.
+  * `supported_syntax_rules` (`JSON`): Rules list.
+  * `released_at` (`TIMESTAMP`): Release date.
+* **`framework_mappings`**:
+  * `id` (`UUID` PK): Unique mapping key.
+  * `framework_id` (`VARCHAR(128)` FK -> `framework_definitions.id`): Framework.
+  * `annotation_identifier` (`VARCHAR(256)`): Decorator name (e.g. `@app.post`).
+  * `map_to_entity_role` (`VARCHAR(64)`): Inferred entity role (`CONTROLLER`, `SUBSCRIBER`).
+  * `map_to_relationship` (`VARCHAR(64)`): Inferred relationship edge type.
+* **`canonical_flows`**:
+  * `id` (`UUID` PK): Traced flow key.
+  * `flow_type` (`VARCHAR(64)`): Flow type category (`Execution Flow`, `AI Flow`, `Frontend Flow`, `Messaging Flow`).
+  * `source_entity_id` (`UUID`): Initial source entity SEID.
+  * `target_entity_id` (`UUID`): Terminal target entity SEID.
+  * `intermediate_entities` (`JSON`): List of traversed intermediate entity IDs.
+  * `confidence` (`NUMERIC(4,3)`): Flow confidence weight.
+  * `metadata` (`JSON`): Stores `evidence` and `fingerprint` payload details (e.g. `node_sequence` and `calls_signature`).
+  * `created_at` (`TIMESTAMP`): Creation time.

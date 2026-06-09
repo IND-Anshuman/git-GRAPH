@@ -67,7 +67,14 @@ from src.application.semantic.embedding.embedding_registry import EmbeddingRegis
 from src.application.semantic.calibration.calibration_engine import ConfidenceCalibrationEngine
 from src.application.semantic.schema.schema_registry import SchemaRegistry
 from src.application.semantic.governance.governance_manager import GovernanceManager
-from src.application.semantic.discovery.entity_discovery_engine import EntityDiscoveryEngine
+from src.application.semantic.discovery import (
+    EntityDiscoveryEngine,
+    RelationshipDiscoveryEngine,
+    BehaviorDiscoveryEngine,
+    ConceptDiscoveryEngine,
+    FlowDiscoveryEngine,
+)
+from src.application.semantic.evolution import SemanticEvolutionEngine
 
 from src.infrastructure.git.gitpython_adapter import GitPythonAdapter
 from src.infrastructure.git.rename_detection import RenameDetector
@@ -224,6 +231,29 @@ class Container:
             schema_registry=self.schema_registry,
             calibration_engine=self.calibration_engine,
         )
+        self.relationship_discovery_engine = RelationshipDiscoveryEngine(
+            uow=self.get_uow_factory()(),
+            calibration_engine=self.calibration_engine,
+        )
+        self.behavior_discovery_engine = BehaviorDiscoveryEngine(
+            uow=self.get_uow_factory()(),
+            schema_registry=self.schema_registry,
+            calibration_engine=self.calibration_engine,
+        )
+        self.concept_discovery_engine = ConceptDiscoveryEngine(
+            uow=self.get_uow_factory()(),
+            schema_registry=self.schema_registry,
+            embedding_registry=self.embedding_registry,
+            calibration_engine=self.calibration_engine,
+        )
+        self.flow_discovery_engine = FlowDiscoveryEngine(
+            uow=self.get_uow_factory()(),
+        )
+        self.semantic_evolution_engine = SemanticEvolutionEngine(
+            uow=self.get_uow_factory()(),
+            reconstructor=self.reconstruction_service,
+        )
+
 
 
 
@@ -382,6 +412,21 @@ class Container:
 
     def get_entity_discovery_engine(self) -> EntityDiscoveryEngine:
         return self.entity_discovery_engine
+
+    def get_relationship_discovery_engine(self) -> RelationshipDiscoveryEngine:
+        return self.relationship_discovery_engine
+
+    def get_behavior_discovery_engine(self) -> BehaviorDiscoveryEngine:
+        return self.behavior_discovery_engine
+
+    def get_concept_discovery_engine(self) -> ConceptDiscoveryEngine:
+        return self.concept_discovery_engine
+
+    def get_flow_discovery_engine(self) -> FlowDiscoveryEngine:
+        return self.flow_discovery_engine
+
+    def get_semantic_evolution_engine(self) -> SemanticEvolutionEngine:
+        return self.semantic_evolution_engine
 
 
 

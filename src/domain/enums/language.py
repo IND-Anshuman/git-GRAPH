@@ -15,4 +15,6 @@ class SupportedLanguage(Enum):
     SCALA = auto()
     RUBY = auto()
     ELIXIR = auto()
+    HTML = auto()
+    CSS = auto()
     UNKNOWN = auto()
