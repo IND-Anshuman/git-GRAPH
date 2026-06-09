@@ -143,3 +143,27 @@ def get_type_resolution_engine(request: Request) -> TypeResolutionEngine:
 def get_semantic_normalizer(request: Request) -> SemanticNormalizer:
     return request.app.state.container.get_semantic_normalizer()
 
+
+# Phase 5A Discovery / Meta-Ontology Bounded Context
+from src.application.semantic.embedding.embedding_registry import EmbeddingRegistry
+from src.application.semantic.calibration.calibration_engine import ConfidenceCalibrationEngine
+from src.application.semantic.schema.schema_registry import SchemaRegistry
+from src.application.semantic.governance.governance_manager import GovernanceManager
+from src.application.semantic.discovery.entity_discovery_engine import EntityDiscoveryEngine
+
+def get_embedding_registry(request: Request) -> EmbeddingRegistry:
+    return request.app.state.container.get_embedding_registry()
+
+def get_calibration_engine(request: Request) -> ConfidenceCalibrationEngine:
+    return request.app.state.container.get_calibration_engine()
+
+def get_schema_registry(request: Request) -> SchemaRegistry:
+    return request.app.state.container.get_schema_registry()
+
+def get_governance_manager(request: Request) -> GovernanceManager:
+    return request.app.state.container.get_governance_manager()
+
+def get_entity_discovery_engine(request: Request) -> EntityDiscoveryEngine:
+    return request.app.state.container.get_entity_discovery_engine()
+
+

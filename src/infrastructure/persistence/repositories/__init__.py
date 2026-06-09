@@ -31,6 +31,12 @@ from src.infrastructure.persistence.repositories.sa_concept_repositories import 
     SAConceptEvolutionRepository,
     SAConceptDriftRepository,
 )
+from src.infrastructure.persistence.repositories.sa_meta_repositories import (
+    SAMetaTypeRepository,
+    SAMetaDefinitionRepository,
+    SAEmbeddingModelRepository,
+    SAEmbeddingVersionRepository,
+)
 
 __all__ = [
     "SARepositoryRepository",
@@ -62,4 +68,8 @@ __all__ = [
     "SAConceptMetricsRepository",
     "SAConceptEvolutionRepository",
     "SAConceptDriftRepository",
+    "SAMetaTypeRepository",
+    "SAMetaDefinitionRepository",
+    "SAEmbeddingModelRepository",
+    "SAEmbeddingVersionRepository",
 ]
