@@ -18,7 +18,7 @@ from .behavior_drift_repo import IBehaviorDriftRepository
 from .behavior_pattern_repo import IBehaviorPatternRepository
 from .logic_cluster_repo import ILogicClusterRepository
 from .ontology_node_repo import IOntologyNodeRepository
-from .concept_repositories import (
+from src.domain.repositories.concept_repositories import (
     IConceptNodeRepository,
     IConceptVersionRepository,
     IConceptEvidenceRepository,
@@ -28,6 +28,12 @@ from .concept_repositories import (
     IConceptMetricsRepository,
     IConceptEvolutionRepository,
     IConceptDriftRepository,
+)
+from src.domain.repositories.meta_ontology_repo import (
+    IMetaTypeRepository,
+    IMetaDefinitionRepository,
+    IEmbeddingModelRepository,
+    IEmbeddingVersionRepository,
 )
 
 __all__ = [
@@ -60,4 +66,8 @@ __all__ = [
     "IConceptMetricsRepository",
     "IConceptEvolutionRepository",
     "IConceptDriftRepository",
+    "IMetaTypeRepository",
+    "IMetaDefinitionRepository",
+    "IEmbeddingModelRepository",
+    "IEmbeddingVersionRepository",
 ]

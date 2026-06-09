@@ -51,6 +51,12 @@ from src.infrastructure.persistence.repositories.sa_concept_repositories import 
     SAConceptEvolutionRepository,
     SAConceptDriftRepository,
 )
+from src.infrastructure.persistence.repositories.sa_meta_repositories import (
+    SAMetaTypeRepository,
+    SAMetaDefinitionRepository,
+    SAEmbeddingModelRepository,
+    SAEmbeddingVersionRepository,
+)
 from src.infrastructure.persistence.database import DatabaseEngine
 
 
@@ -92,6 +98,10 @@ class SQLAlchemyUnitOfWork(IUnitOfWork):
         self._concept_metrics = SAConceptMetricsRepository(self._session)
         self._concept_evolution = SAConceptEvolutionRepository(self._session)
         self._concept_drift = SAConceptDriftRepository(self._session)
+        self._meta_types = SAMetaTypeRepository(self._session)
+        self._meta_definitions = SAMetaDefinitionRepository(self._session)
+        self._embedding_models = SAEmbeddingModelRepository(self._session)
+        self._embedding_versions = SAEmbeddingVersionRepository(self._session)
         return self
 
     def __exit__(self, exc_type: Any, exc_val: Any, exc_tb: Any) -> None:
@@ -222,4 +232,21 @@ class SQLAlchemyUnitOfWork(IUnitOfWork):
     @property
     def concept_drift(self):
         return self._concept_drift
+
+    @property
+    def meta_types(self):
+        return self._meta_types
+
+    @property
+    def meta_definitions(self):
+        return self._meta_definitions
+
+    @property
+    def embedding_models(self):
+        return self._embedding_models
+
+    @property
+    def embedding_versions(self):
+        return self._embedding_versions
+
 
