@@ -20,7 +20,7 @@ class SourceFile:
         """Detect the programming language from the file extension."""
         if file_path.endswith('.py'):
             return SupportedLanguage.PYTHON
-        elif file_path.endswith('.js'):
+        elif file_path.endswith('.js') or file_path.endswith('.jsx') or file_path.endswith('.mjs'):
             return SupportedLanguage.JAVASCRIPT
         elif file_path.endswith('.ts') or file_path.endswith('.tsx'):
             return SupportedLanguage.TYPESCRIPT
@@ -28,5 +28,9 @@ class SourceFile:
             return SupportedLanguage.GO
         elif file_path.endswith('.java'):
             return SupportedLanguage.JAVA
+        elif file_path.endswith('.html') or file_path.endswith('.htm'):
+            return SupportedLanguage.HTML
+        elif file_path.endswith('.css'):
+            return SupportedLanguage.CSS
         else:
             return SupportedLanguage.UNKNOWN

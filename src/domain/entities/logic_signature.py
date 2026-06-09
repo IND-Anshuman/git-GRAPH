@@ -56,3 +56,19 @@ class LogicSignature:
             raise InvalidEntityException(
                 f"LogicSignature.canonical_name must not be empty (id={self.id})"
             )
+
+    @property
+    def file_path(self) -> str:
+        return self.metadata.get("file_path", "unknown")
+
+    @property
+    def entity_seid(self) -> str:
+        return self.metadata.get("entity_seid", "")
+
+    @property
+    def entity_name(self) -> str:
+        return self.metadata.get("entity_name", self.canonical_name)
+
+    @property
+    def entity_type(self) -> str:
+        return self.metadata.get("entity_type", "FUNCTION")
