@@ -30,6 +30,10 @@ from src.domain.repositories import (
     IConceptMetricsRepository,
     IConceptEvolutionRepository,
     IConceptDriftRepository,
+    IMetaTypeRepository,
+    IMetaDefinitionRepository,
+    IEmbeddingModelRepository,
+    IEmbeddingVersionRepository,
 )
 
 class IUnitOfWork(ABC):
@@ -193,4 +197,25 @@ class IUnitOfWork(ABC):
     @abstractmethod
     def concept_drift(self) -> IConceptDriftRepository:
         pass
+
+    @property
+    @abstractmethod
+    def meta_types(self) -> IMetaTypeRepository:
+        pass
+
+    @property
+    @abstractmethod
+    def meta_definitions(self) -> IMetaDefinitionRepository:
+        pass
+
+    @property
+    @abstractmethod
+    def embedding_models(self) -> IEmbeddingModelRepository:
+        pass
+
+    @property
+    @abstractmethod
+    def embedding_versions(self) -> IEmbeddingVersionRepository:
+        pass
+
 

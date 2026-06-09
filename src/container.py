@@ -62,6 +62,13 @@ from src.application.semantic.behavior_registry.canonical_registry import Canoni
 from src.application.semantic.type_resolution.type_resolution_engine import TypeResolutionEngine
 from src.application.semantic.normalization.semantic_normalizer import SemanticNormalizer
 
+# Phase 5A Discovery / Meta-Ontology Bounded Context
+from src.application.semantic.embedding.embedding_registry import EmbeddingRegistry
+from src.application.semantic.calibration.calibration_engine import ConfidenceCalibrationEngine
+from src.application.semantic.schema.schema_registry import SchemaRegistry
+from src.application.semantic.governance.governance_manager import GovernanceManager
+from src.application.semantic.discovery.entity_discovery_engine import EntityDiscoveryEngine
+
 from src.infrastructure.git.gitpython_adapter import GitPythonAdapter
 from src.infrastructure.git.rename_detection import RenameDetector
 from src.infrastructure.git.move_detection import MoveDetector
@@ -206,6 +213,19 @@ class Container:
             detect_concepts_use_case=self.detect_concepts_use_case
         )
 
+        # Phase 5A Discovery / Meta-Ontology Bounded Context
+        self.embedding_registry = EmbeddingRegistry(uow=self.get_uow_factory()())
+        self.calibration_engine = ConfidenceCalibrationEngine()
+        self.schema_registry = SchemaRegistry(uow=self.get_uow_factory()())
+        self.governance_manager = GovernanceManager(uow=self.get_uow_factory()())
+        self.entity_discovery_engine = EntityDiscoveryEngine(
+            uow=self.get_uow_factory()(),
+            embedding_registry=self.embedding_registry,
+            schema_registry=self.schema_registry,
+            calibration_engine=self.calibration_engine,
+        )
+
+
 
     def get_uow_factory(self) -> Callable:
         # Resolve class using lambda and create database connection wrapper
@@ -347,5 +367,21 @@ class Container:
 
     def get_semantic_normalizer(self) -> SemanticNormalizer:
         return self.semantic_normalizer
+
+    def get_embedding_registry(self) -> EmbeddingRegistry:
+        return self.embedding_registry
+
+    def get_calibration_engine(self) -> ConfidenceCalibrationEngine:
+        return self.calibration_engine
+
+    def get_schema_registry(self) -> SchemaRegistry:
+        return self.schema_registry
+
+    def get_governance_manager(self) -> GovernanceManager:
+        return self.governance_manager
+
+    def get_entity_discovery_engine(self) -> EntityDiscoveryEngine:
+        return self.entity_discovery_engine
+
 
 
