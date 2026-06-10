@@ -28,7 +28,15 @@ class TreeSitterParserService(IParser):
         """
         adapter = self._registry.get_adapter(language)
         if not adapter:
-            raise ParsingException(f"Unsupported language: {language.name} for file {file_path}")
+            capability = self._registry.get_capability(language)
+            if capability.missing_dependency:
+                raise ParsingException(
+                    f"Language {language.name} is declared but unavailable for file "
+                    f"{file_path}. Missing dependency: {capability.missing_dependency}"
+                )
+            raise ParsingException(
+                f"Unsupported language: {language.name} for file {file_path}"
+            )
             
         try:
             parser = adapter.get_parser()
