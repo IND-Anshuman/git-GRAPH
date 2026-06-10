@@ -11,8 +11,20 @@ from tree_sitter import Language
 # Languages to pull and compile
 LANGUAGES = {
     "python": "https://github.com/tree-sitter/tree-sitter-python.git",
+    "javascript": "https://github.com/tree-sitter/tree-sitter-javascript.git",
     "typescript": "https://github.com/tree-sitter/tree-sitter-typescript.git",
     "go": "https://github.com/tree-sitter/tree-sitter-go.git",
+    "java": "https://github.com/tree-sitter/tree-sitter-java.git",
+    "c-sharp": "https://github.com/tree-sitter/tree-sitter-c-sharp.git",
+    "rust": "https://github.com/tree-sitter/tree-sitter-rust.git",
+    "kotlin": "https://github.com/fwcd/tree-sitter-kotlin.git",
+    "swift": "https://github.com/alex-pinkus/tree-sitter-swift.git",
+    "php": "https://github.com/tree-sitter/tree-sitter-php.git",
+    "scala": "https://github.com/tree-sitter/tree-sitter-scala.git",
+    "ruby": "https://github.com/tree-sitter/tree-sitter-ruby.git",
+    "elixir": "https://github.com/elixir-lang/tree-sitter-elixir.git",
+    "html": "https://github.com/tree-sitter/tree-sitter-html.git",
+    "css": "https://github.com/tree-sitter/tree-sitter-css.git",
 }
 
 VENDOR_DIR = Path("vendor")
@@ -43,8 +55,10 @@ def compile_grammars() -> None:
     #     str(lib_path),
     #     [
     #         str(VENDOR_DIR / "tree-sitter-python"),
+    #         str(VENDOR_DIR / "tree-sitter-javascript"),
     #         str(VENDOR_DIR / "tree-sitter-typescript" / "typescript"),
     #         str(VENDOR_DIR / "tree-sitter-go"),
+    #         str(VENDOR_DIR / "tree-sitter-java"),
     #     ]
     # )
     
