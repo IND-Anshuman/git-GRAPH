@@ -7,7 +7,7 @@ from src.domain.value_objects.repository_id import RepositoryId
 from src.domain.value_objects.code_location import CodeLocation
 from src.domain.services.identity_service import EntityIdentityService
 from src.infrastructure.parsing.language_registry import LanguageRegistry
-from src.infrastructure.extraction.strategies.python_strategy import PythonExtractionStrategy
+from src.infrastructure.extraction.strategy_registry import ExtractionStrategyRegistry
 
 class EntityExtractorService:
     """Extracts CodeEntity objects using language-specific strategies."""
@@ -15,10 +15,7 @@ class EntityExtractorService:
     def __init__(self, registry: LanguageRegistry, identity_service: EntityIdentityService):
         self._registry = registry
         self._identity_service = identity_service
-        self._strategies = {
-            "PYTHON": PythonExtractionStrategy()
-            # other languages would be added here
-        }
+        self._strategy_registry = ExtractionStrategyRegistry()
         
     def extract(self, parsed_tree: Any, source_code: str, source_file: SourceFile, repository_id: RepositoryId) -> List[CodeEntity]:
         """Extracts code entities from a parsed AST.
@@ -32,8 +29,7 @@ class EntityExtractorService:
         Returns:
             List of domain CodeEntity objects
         """
-        language_name = source_file.language.name
-        strategy = self._strategies.get(language_name)
+        strategy = self._strategy_registry.get(source_file.language)
         
         if not strategy:
             return []

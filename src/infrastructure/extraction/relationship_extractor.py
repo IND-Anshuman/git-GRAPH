@@ -7,16 +7,14 @@ from src.domain.entities.code_entity import CodeEntity
 from src.domain.entities.source_file import SourceFile
 from src.domain.value_objects.entity_id import SEID
 from src.infrastructure.parsing.language_registry import LanguageRegistry
-from src.infrastructure.extraction.strategies.python_strategy import PythonExtractionStrategy
+from src.infrastructure.extraction.strategy_registry import ExtractionStrategyRegistry
 
 class RelationshipExtractorService:
     """Extracts Relationship objects using language-specific strategies."""
     
     def __init__(self, registry: LanguageRegistry):
         self._registry = registry
-        self._strategies = {
-            "PYTHON": PythonExtractionStrategy()
-        }
+        self._strategy_registry = ExtractionStrategyRegistry()
         
     def extract(self, parsed_tree: Any, source_code: str, entities: List[CodeEntity], source_file: SourceFile) -> List[Relationship]:
         """Extracts relationships from a parsed AST.
@@ -30,8 +28,7 @@ class RelationshipExtractorService:
         Returns:
             List of domain Relationship objects
         """
-        language_name = source_file.language.name
-        strategy = self._strategies.get(language_name)
+        strategy = self._strategy_registry.get(source_file.language)
         
         if not strategy:
             return []
