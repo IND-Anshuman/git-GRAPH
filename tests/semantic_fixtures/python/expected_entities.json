@@ -1,0 +1,10 @@
+[
+  {
+    "name": "OrderCoordinator",
+    "entity_type": "Coordinator"
+  },
+  {
+    "name": "OrderService",
+    "entity_type": "Service"
+  }
+]

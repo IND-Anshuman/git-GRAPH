@@ -1,0 +1,7 @@
+[
+  {
+    "from_entity_name": "OrderCoordinator",
+    "to_entity_name": "OrderService",
+    "relationship_type": "CALLS"
+  }
+]
