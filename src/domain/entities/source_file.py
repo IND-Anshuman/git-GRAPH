@@ -18,19 +18,37 @@ class SourceFile:
     @staticmethod
     def detect_language(file_path: str) -> SupportedLanguage:
         """Detect the programming language from the file extension."""
-        if file_path.endswith('.py'):
+        lowered = file_path.lower()
+
+        if lowered.endswith('.py'):
             return SupportedLanguage.PYTHON
-        elif file_path.endswith('.js') or file_path.endswith('.jsx') or file_path.endswith('.mjs'):
+        elif lowered.endswith('.js') or lowered.endswith('.jsx') or lowered.endswith('.mjs'):
             return SupportedLanguage.JAVASCRIPT
-        elif file_path.endswith('.ts') or file_path.endswith('.tsx'):
+        elif lowered.endswith('.ts') or lowered.endswith('.tsx'):
             return SupportedLanguage.TYPESCRIPT
-        elif file_path.endswith('.go'):
+        elif lowered.endswith('.go'):
             return SupportedLanguage.GO
-        elif file_path.endswith('.java'):
+        elif lowered.endswith('.java'):
             return SupportedLanguage.JAVA
-        elif file_path.endswith('.html') or file_path.endswith('.htm'):
+        elif lowered.endswith('.cs'):
+            return SupportedLanguage.CSHARP
+        elif lowered.endswith('.rs'):
+            return SupportedLanguage.RUST
+        elif lowered.endswith('.kt'):
+            return SupportedLanguage.KOTLIN
+        elif lowered.endswith('.swift'):
+            return SupportedLanguage.SWIFT
+        elif lowered.endswith('.php'):
+            return SupportedLanguage.PHP
+        elif lowered.endswith('.scala'):
+            return SupportedLanguage.SCALA
+        elif lowered.endswith('.rb'):
+            return SupportedLanguage.RUBY
+        elif lowered.endswith('.ex') or lowered.endswith('.exs'):
+            return SupportedLanguage.ELIXIR
+        elif lowered.endswith('.html') or lowered.endswith('.htm'):
             return SupportedLanguage.HTML
-        elif file_path.endswith('.css'):
+        elif lowered.endswith('.css'):
             return SupportedLanguage.CSS
         else:
             return SupportedLanguage.UNKNOWN

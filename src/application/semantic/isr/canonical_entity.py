@@ -3,6 +3,7 @@
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional
 from src.domain.value_objects.code_location import CodeLocation
+from src.domain.value_objects.semantic_type import SemanticType
 
 
 @dataclass
@@ -19,3 +20,5 @@ class CanonicalEntity:
     decorators: List[str] = field(default_factory=list)
     location: Optional[CodeLocation] = None
     metadata: Dict[str, Any] = field(default_factory=dict)
+    semantic_type: Optional[SemanticType] = None
+

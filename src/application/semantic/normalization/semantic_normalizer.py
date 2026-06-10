@@ -54,10 +54,19 @@ class SemanticNormalizer:
             generics=resolved_type["generic_args"],
             decorators=raw_entity.get("decorators", []),
             location=raw_entity.get("location"),
-            metadata=raw_entity.get("metadata", {})
+            metadata=raw_entity.get("metadata", {}),
+            semantic_type=raw_entity.get("semantic_type")
         )
 
-    def normalize_relationship(self, from_entity: CanonicalEntity, to_entity: CanonicalEntity, rel_type: str, confidence: float = 1.0) -> CanonicalRelationship:
+    def normalize_relationship(
+        self,
+        from_entity: CanonicalEntity,
+        to_entity: CanonicalEntity,
+        rel_type: str,
+        confidence: float = 1.0,
+        properties: Optional[Dict[str, Any]] = None,
+        semantic_relationship_type: Optional[Any] = None
+    ) -> CanonicalRelationship:
         """
         Creates a CanonicalRelationship edge between two entities.
         
@@ -66,6 +75,8 @@ class SemanticNormalizer:
             to_entity: Destination entity.
             rel_type: Relationship code string.
             confidence: Extraction confidence value.
+            properties: Additional relationship properties.
+            semantic_relationship_type: Ontology semantic relationship type.
             
         Returns:
             CanonicalRelationship edge.
@@ -79,7 +90,9 @@ class SemanticNormalizer:
             from_entity_id=from_entity.id,
             to_entity_id=to_entity.id,
             relationship_type=rel_type,
-            confidence=confidence
+            confidence=confidence,
+            properties=properties or {},
+            semantic_relationship_type=semantic_relationship_type
         )
 
     def map_behavior(self, entity: CanonicalEntity, imports: List[str], calls: List[str], language: str) -> Optional[CanonicalBehavior]:
