@@ -28,19 +28,20 @@ class Pass1ASTExtraction(ICompilerPass):
         parser = adapter.get_parser()
         tree = parser.parse(bytes(context.source_code, "utf8"))
         
-        strategy = self.strategy_registry.get(lang_enum)
-        if not strategy:
-            return
-            
-        module_name = context.file_path.replace("/", ".").replace("\\", ".").replace(".py", "")
+        from src.infrastructure.extraction.semantic_evidence_engine.semantic_evidence_engine import SemanticEvidenceExtractionEngine
+        engine = SemanticEvidenceExtractionEngine()
         
-        raw_entities = strategy.extract_entities(tree, context.source_code, context.file_path, module_name)
-        raw_relationships = strategy.extract_relationships(tree, context.source_code, raw_entities)
+        extraction_result = engine.extract(tree, context.source_code, context.file_path)
         
-        context.raw_entities = raw_entities
-        context.raw_relationships = raw_relationships
+        context.raw_entities = extraction_result.entities
+        context.raw_relationships = extraction_result.relationships
+        
+        # Attach the full extraction result to the context
+        setattr(context, "extraction_result", extraction_result)
         
         # Populate context imports based on raw relationships of type IMPORTS
-        for rel in raw_relationships:
-            if getattr(rel.relationship_type, "name", None) == "IMPORTS":
+        for rel in extraction_result.relationships:
+            rel_type = rel.relationship_type
+            rel_name = rel_type.name if hasattr(rel_type, "name") else str(rel_type)
+            if rel_name == "IMPORTS":
                 context.imports.append(rel.target_name)

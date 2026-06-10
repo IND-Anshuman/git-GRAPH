@@ -18,6 +18,8 @@ def setup_logging(log_level: int = logging.INFO) -> None:
         cache_logger_on_first_use=True,
     )
     logging.basicConfig(level=log_level)
+    # Suppress verbose watchfiles main/reload logs
+    logging.getLogger("watchfiles").setLevel(logging.WARNING)
 
 def get_logger(name: str | None = None) -> structlog.BoundLogger:
     """Get a bound structlog logger."""

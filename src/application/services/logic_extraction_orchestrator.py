@@ -147,6 +147,16 @@ class LogicExtractionOrchestrator:
                         signature.id
                     )
 
+                    # Idempotency check: check if a version for this commit already exists
+                    existing_ver = next((v for v in prev_versions if v.commit_hash == commit_hash), None)
+                    if existing_ver:
+                        # Reuse the version ID
+                        version.id = existing_ver.id
+                        # Remove existing evidence for this version before saving new evidence
+                        uow.logic_evidence.delete_by_logic_version(existing_ver.id)
+                        # Filter out the existing version from prev_versions list for timeline linking
+                        prev_versions = [v for v in prev_versions if v.id != existing_ver.id]
+
                     if prev_versions:
                         # Sort chronologically by version number
                         prev_versions.sort(key=lambda x: x.version_ordinal)
@@ -187,10 +197,22 @@ class LogicExtractionOrchestrator:
                             created_at=datetime.utcnow(),
                         )
 
+                        # Reuse transition ID if it exists
+                        if existing_ver:
+                            existing_trans = uow.logic_transitions.get_by_to_version(existing_ver.id)
+                            if existing_trans:
+                                transition.id = existing_trans[0].id
+
                         # Compute behavior drift
                         drift = self._drift_engine.compute_drift(
                             transition, latest_prev, version
                         )
+
+                        # Reuse drift ID if it exists
+                        if existing_ver:
+                            existing_drift = uow.behavior_drift.get_by_transition(transition.id)
+                            if existing_drift:
+                                drift.id = existing_drift.id
 
                         # Save Transition & Drift
                         uow.logic_transitions.save(transition)
@@ -213,7 +235,20 @@ class LogicExtractionOrchestrator:
                             },
                             created_at=datetime.utcnow(),
                         )
+
+                        # Reuse transition ID if it exists
+                        if existing_ver:
+                            existing_trans = uow.logic_transitions.get_by_to_version(existing_ver.id)
+                            if existing_trans:
+                                transition.id = existing_trans[0].id
+
                         uow.logic_transitions.save(transition)
+
+                    # Reuse explanation ID if it exists
+                    if existing_ver:
+                        existing_exp = uow.behavior_explanations.get_by_logic_version(existing_ver.id)
+                        if existing_exp:
+                            explanation.id = existing_exp.id
 
                     # 9. Save Version, Evidence, and Explanation
                     uow.logic_versions.save(version)

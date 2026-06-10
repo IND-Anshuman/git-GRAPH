@@ -13,6 +13,8 @@ class RelationshipType(Enum):
     USES = auto()
     TESTS = auto()
     DECORATES = auto()
+    CONTAINS = auto()
+    DECLARES = auto()
 
     # Phase 5B Distributed & Messaging Relationships
     PASSES_STATE_TO = auto()
