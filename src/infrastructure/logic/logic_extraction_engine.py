@@ -220,36 +220,60 @@ class LogicExtractionEngine:
 
             if m_type == "call":
                 target_func = r.get("target_function")
+                target_func_pat = r.get("target_function_pattern")
+                target_method = r.get("target_method")
+                target_method_pat = r.get("target_method_pattern")
                 target_mod = r.get("target_module")
+                target_mod_pat = r.get("target_module_pattern")
+                target_class_pat = r.get("target_class_pattern")
 
                 # Match call
                 for call in features.calls:
-                    func_part = call.symbol.split(":")[-1]
-                    matches_func = target_func == func_part or (
-                        target_func in func_part
-                    )
-                    matches_mod = True
-                    if target_mod:
-                        # Check if module is imported
-                        matches_mod = any(
-                            target_mod in imp.symbol
-                            for imp in features.imports
-                        )
+                    func_part = call.symbol.split(":")[-1] if ":" in call.symbol else call.symbol
+                    
+                    # 1. Match function/method name
+                    func_matched = False
+                    has_func_rule = any([target_func, target_func_pat, target_method, target_method_pat])
+                    if not has_func_rule:
+                        func_matched = True
+                    else:
+                        if target_func and (target_func == func_part or target_func in func_part):
+                            func_matched = True
+                        elif target_func_pat and re.search(target_func_pat, func_part, re.IGNORECASE):
+                            func_matched = True
+                        elif target_method and (target_method == func_part or target_method in func_part):
+                            func_matched = True
+                        elif target_method_pat and re.search(target_method_pat, func_part, re.IGNORECASE):
+                            func_matched = True
 
-                    if matches_func and matches_mod:
+                    # 2. Match module
+                    mod_matched = True
+                    if target_mod:
+                        mod_matched = any(target_mod in imp.symbol for imp in features.imports)
+                    elif target_mod_pat:
+                        mod_matched = any(re.search(target_mod_pat, imp.symbol, re.IGNORECASE) for imp in features.imports)
+
+                    # 3. Match class (e.g. cursor / connection)
+                    class_matched = True
+                    if target_class_pat:
+                        if "." in func_part:
+                            class_part = func_part.split(".")[0]
+                            class_matched = bool(re.search(target_class_pat, class_part, re.IGNORECASE))
+                        else:
+                            class_matched = False
+
+                    if func_matched and mod_matched and class_matched:
                         passed = True
                         ev = LogicEvidence(
                             id=uuid.uuid4(),
-                            logic_version_id=uuid.UUID(
-                                int=0
-                            ),  # Placeholder, filled later
+                            logic_version_id=uuid.UUID(int=0),  # Placeholder, filled later
                             evidence_type=EvidenceType.AST_CALL,
                             file_path=entity.location.file_path,
                             start_line=call.line_number,
                             end_line=call.line_number,
                             ast_node_type="Call",
                             matched_symbol=call.symbol,
-                            matched_rule_id=f"{pattern.pattern_id}_ast_{i}",
+                            matched_rule_id=f"{pattern.pattern_id}_call_{i}",
                             confidence_contribution=0.30,
                         )
                         evidence_list.append(ev)
@@ -258,8 +282,16 @@ class LogicExtractionEngine:
 
             elif m_type == "import":
                 target_mod = r.get("target_module")
+                target_mod_pat = r.get("target_module_pattern")
                 for imp in features.imports:
-                    if target_mod in imp.symbol:
+                    imp_module = imp.symbol.split(":")[-1] if ":" in imp.symbol else imp.symbol
+                    import_matched = False
+                    if target_mod and target_mod in imp_module:
+                        import_matched = True
+                    elif target_mod_pat and re.search(target_mod_pat, imp_module, re.IGNORECASE):
+                        import_matched = True
+
+                    if import_matched:
                         passed = True
                         ev = LogicEvidence(
                             id=uuid.uuid4(),
@@ -279,11 +311,39 @@ class LogicExtractionEngine:
 
             elif m_type == "decorator":
                 target_pat = r.get("target_function_pattern")
+                target_method_pat = r.get("target_method_pattern")
+                target_obj_pat = r.get("target_object_pattern")
+
                 for dec in features.decorators:
-                    dec_name = dec.symbol.split(":")[-1]
-                    if target_pat == dec_name or re.search(
-                        target_pat, dec_name
-                    ):
+                    dec_name = dec.symbol.split(":")[-1] if ":" in dec.symbol else dec.symbol
+                    
+                    matched_dec = False
+                    has_dec_rule = any([target_pat, target_method_pat, target_obj_pat])
+                    if not has_dec_rule:
+                        matched_dec = True
+                    else:
+                        if target_pat and (target_pat == dec_name or re.search(target_pat, dec_name, re.IGNORECASE)):
+                            matched_dec = True
+                        
+                        method_matched = True
+                        obj_matched = True
+                        if target_method_pat or target_obj_pat:
+                            if "." in dec_name:
+                                obj_part, method_part = dec_name.split(".", 1)
+                                if target_method_pat:
+                                    method_matched = bool(re.search(target_method_pat, method_part, re.IGNORECASE))
+                                if target_obj_pat:
+                                    obj_matched = bool(re.search(target_obj_pat, obj_part, re.IGNORECASE))
+                            else:
+                                if target_method_pat:
+                                    method_matched = bool(re.search(target_method_pat, dec_name, re.IGNORECASE))
+                                if target_obj_pat:
+                                    obj_matched = False
+                        
+                        if method_matched and obj_matched:
+                            matched_dec = True
+
+                    if matched_dec:
                         passed = True
                         ev = LogicEvidence(
                             id=uuid.uuid4(),
@@ -296,6 +356,50 @@ class LogicExtractionEngine:
                             matched_symbol=dec.symbol,
                             matched_rule_id=f"{pattern.pattern_id}_dec_{i}",
                             confidence_contribution=0.15,
+                        )
+                        evidence_list.append(ev)
+                        ev_id = ev.id
+                        break
+
+            elif m_type == "comparison":
+                target_op = r.get("operator_pattern")
+                for comp in features.comparisons:
+                    op_part = comp.symbol.split(":")[-1] if ":" in comp.symbol else comp.symbol
+                    if target_op and re.search(target_op, op_part, re.IGNORECASE):
+                        passed = True
+                        ev = LogicEvidence(
+                            id=uuid.uuid4(),
+                            logic_version_id=uuid.UUID(int=0),
+                            evidence_type=EvidenceType.DATA_FLOW,
+                            file_path=entity.location.file_path,
+                            start_line=comp.line_number,
+                            end_line=comp.line_number,
+                            ast_node_type="Comparison",
+                            matched_symbol=comp.symbol,
+                            matched_rule_id=f"{pattern.pattern_id}_comp_{i}",
+                            confidence_contribution=0.10,
+                        )
+                        evidence_list.append(ev)
+                        ev_id = ev.id
+                        break
+
+            elif m_type == "subscript":
+                target_key = r.get("key_pattern")
+                for sub in features.subscripts:
+                    raw_text = sub.metadata.get("raw", "") if sub.metadata else ""
+                    if not target_key or re.search(target_key, raw_text, re.IGNORECASE):
+                        passed = True
+                        ev = LogicEvidence(
+                            id=uuid.uuid4(),
+                            logic_version_id=uuid.UUID(int=0),
+                            evidence_type=EvidenceType.STRUCTURAL,
+                            file_path=entity.location.file_path,
+                            start_line=sub.line_number,
+                            end_line=sub.line_number,
+                            ast_node_type="Subscript",
+                            matched_symbol=sub.symbol,
+                            matched_rule_id=f"{pattern.pattern_id}_sub_{i}",
+                            confidence_contribution=0.10,
                         )
                         evidence_list.append(ev)
                         ev_id = ev.id

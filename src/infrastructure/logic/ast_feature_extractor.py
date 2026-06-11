@@ -43,7 +43,8 @@ class TreeSitterASTFeatureExtractor(IASTFeatureExtractor):
         self, node: Any, source_bytes: bytes, features: ASTFeatures
     ) -> None:
         """Scan the entire file for imports."""
-        if node.type in ("import_statement", "import_from_statement"):
+        # Python imports
+        if node.type in ("import_statement", "import_from_statement") and not node.child_by_field_name("source"):
             line = node.start_point[0] + 1
             text = source_bytes[node.start_byte : node.end_byte].decode("utf-8")
 
@@ -95,6 +96,23 @@ class TreeSitterASTFeatureExtractor(IASTFeatureExtractor):
                                     metadata={"raw": text},
                                 )
                             )
+        # JS/TS imports
+        elif node.type == "import_statement":
+            line = node.start_point[0] + 1
+            text = source_bytes[node.start_byte : node.end_byte].decode("utf-8")
+            source_node = node.child_by_field_name("source")
+            if source_node:
+                module_name = source_bytes[
+                    source_node.start_byte : source_node.end_byte
+                ].decode("utf-8").strip("'\" ")
+                features.imports.append(
+                    ExtractedFeature(
+                        feature_type="import",
+                        symbol=f"import:{module_name}",
+                        line_number=line,
+                        metadata={"raw": text},
+                    )
+                )
 
         for child in node.children:
             self._extract_module_imports(child, source_bytes, features)
@@ -103,12 +121,17 @@ class TreeSitterASTFeatureExtractor(IASTFeatureExtractor):
         self, node: Any, start_line: int, end_line: int, source_bytes: bytes
     ) -> List[str]:
         """Find parameters of the function definition enclosing or matching the range."""
-        if node.type == "function_definition":
+        if node.type in ("function_definition", "function_declaration", "arrow_function", "function_expression", "method_definition"):
             func_start = node.start_point[0] + 1
             func_end = node.end_point[0] + 1
             # If this function matches our line range
             if func_start <= start_line and func_end >= end_line:
                 params_node = node.child_by_field_name("parameters")
+                if not params_node:
+                    for child in node.children:
+                        if child.type in ("formal_parameters", "parameters"):
+                            params_node = child
+                            break
                 if params_node:
                     params = []
                     for child in params_node.children:
@@ -116,12 +139,16 @@ class TreeSitterASTFeatureExtractor(IASTFeatureExtractor):
                             "identifier",
                             "typed_parameter",
                             "default_parameter",
+                            "formal_parameters",
+                            "assignment_pattern",
                         ):
                             ident = child
                             if child.type == "typed_parameter":
                                 ident = child.child(0)
                             elif child.type == "default_parameter":
                                 ident = child.child_by_field_name("name")
+                            elif child.type == "assignment_pattern":
+                                ident = child.child_by_field_name("left")
 
                             if ident and ident.type == "identifier":
                                 p_name = source_bytes[
@@ -155,19 +182,19 @@ class TreeSitterASTFeatureExtractor(IASTFeatureExtractor):
         if node_end < start_line or node_start > end_line:
             return
 
-        if node.type == "call":
+        if node.type in ("call", "call_expression"):
             self._extract_call(node, source_bytes, params, features)
 
         elif node.type == "decorator":
             self._extract_decorator(node, source_bytes, features)
 
-        elif node.type in ("comparison_operator", "comparison"):
+        elif node.type in ("comparison_operator", "comparison", "binary_expression"):
             self._extract_comparison(node, source_bytes, features)
 
-        elif node.type == "string":
+        elif node.type in ("string", "string_fragment", "template_string"):
             self._extract_string(node, source_bytes, features)
 
-        elif node.type == "subscript":
+        elif node.type in ("subscript", "subscript_expression", "member_expression"):
             self._extract_subscript(node, source_bytes, features)
 
         for child in node.children:
@@ -257,8 +284,22 @@ class TreeSitterASTFeatureExtractor(IASTFeatureExtractor):
     ) -> None:
         """Extract comparison operators."""
         line = node.start_point[0] + 1
-        # In tree-sitter comparisons, the operator is a child node
-        # e.g., '==', '!=', 'in', etc.
+        # Check for binary_expression operator first
+        operator_node = node.child_by_field_name("operator")
+        if operator_node:
+            op = source_bytes[operator_node.start_byte:operator_node.end_byte].decode("utf-8")
+            if op in ("==", "!=", "===", "!==", "in", "instanceof", "<", ">", "<=", ">="):
+                features.comparisons.append(
+                    ExtractedFeature(
+                        feature_type="comparison",
+                        symbol=f"operator:{op}",
+                        line_number=line,
+                        metadata={"operator": op},
+                    )
+                )
+                return
+
+        # Fallback to walking children (for python comparison)
         for child in node.children:
             if child.type in ("==", "!=", "in", "not in", "<", ">", "<=", ">="):
                 op = child.type
