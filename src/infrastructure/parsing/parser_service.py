@@ -46,7 +46,7 @@ class TreeSitterParserService(IParser):
             # Very basic error detection (tree-sitter sets has_error if parsing fails)
             errors = []
             if tree.root_node.has_error:
-                errors.append("AST contains errors")
+                errors.append(f"AST contains errors in {file_path}")
                 
             return ParseResult(tree=tree, errors=errors, language=language)
         except Exception as e:

@@ -79,3 +79,32 @@ patterns:
           target_module: parler_tts
         - match_type: call
           target_function: generate
+
+  - pattern_id: api_fetch_call
+    name: HTTP REST API Call (fetch)
+    pattern_version: "1.0.0"
+    ontology_node_id: integration.http_client.rest_call
+    base_confidence: 0.90
+    index_keys:
+      - "call:fetch"
+    rules:
+      ast_features:
+        - match_type: call
+          target_function: fetch
+          description: "fetch API request invocation"
+
+  - pattern_id: api_axios_call
+    name: HTTP REST API Call (axios)
+    pattern_version: "1.0.0"
+    ontology_node_id: integration.http_client.rest_call
+    base_confidence: 0.92
+    index_keys:
+      - "call:axios"
+      - "call:axios.get"
+      - "call:axios.post"
+      - "import:axios"
+    rules:
+      ast_features:
+        - match_type: call
+          target_function: axios
+          description: "axios API request invocation"
