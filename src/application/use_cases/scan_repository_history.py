@@ -266,7 +266,7 @@ class ScanRepositoryHistoryUseCase:
 
                         parse_result = self.parser.parse_file(scanned.absolute_path, content, scanned.language)
                         
-                        file_entities = self.entity_extractor.extract(
+                        file_entities, ext_result = self.entity_extractor.extract(
                             parsed_tree=parse_result.tree,
                             source_code=content,
                             source_file=source_file,
@@ -278,7 +278,8 @@ class ScanRepositoryHistoryUseCase:
                             parsed_tree=parse_result.tree,
                             source_code=content,
                             entities=file_entities,
-                            source_file=source_file
+                            source_file=source_file,
+                            extraction_result=ext_result
                         )
                         current_relationships.extend(file_relationships)
 
@@ -410,8 +411,7 @@ class ScanRepositoryHistoryUseCase:
                 except Exception as telemetry_error:
                     logger.warning(f"Error collecting benchmark metrics: {telemetry_error}", exc_info=True)
                 
-                processed_count += 0.5 # use float to accumulate or int
-                processed_count = int(processed_count + 0.5)
+                processed_count += 1
 
             # Update Repository status to completed
             with self.uow_factory() as uow:

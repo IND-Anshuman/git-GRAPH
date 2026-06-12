@@ -92,3 +92,70 @@ def test_scan_history_telemetry_benchmark_saved(mock_commit_walker_cls, db_sessi
         assert report.diff_throughput_nodes_sec == 0.0
         assert report.memory_rss_bytes >= 0
         assert report.db_size_bytes >= 0
+
+
+@patch("src.application.use_cases.scan_repository_history.CommitWalker")
+def test_scan_history_processed_commits_multiple(mock_commit_walker_cls, db_session):
+    repo_id = RepositoryId.generate()
+    repo_uuid = repo_id.value
+    now = datetime.datetime.now(datetime.timezone.utc)
+    uow_factory = lambda: SQLAlchemyUnitOfWork(DummyEngine(db_session))
+    
+    with uow_factory() as uow:
+        repo = RepositoryEntity(
+            id=repo_id,
+            url="https://github.com/user/repo-mult",
+            name="test-repo-mult",
+            default_branch="main",
+            local_path="/tmp/repo-mult",
+            status=AnalysisStatus.PENDING,
+            created_at=now,
+            updated_at=now
+        )
+        uow.repositories.save(repo)
+        uow.commit()
+
+    mock_walker = MagicMock()
+    mock_commit1 = Commit("hash1", repo_id, "Author", "email", now, "Msg1", [])
+    mock_commit2 = Commit("hash2", repo_id, "Author", "email", now, "Msg2", ["hash1"])
+    mock_walker.walk_history.return_value = [(mock_commit1, []), (mock_commit2, ["hash1"])]
+    mock_commit_walker_cls.return_value = mock_walker
+
+    git_adapter = MagicMock()
+    file_scanner = MagicMock()
+    file_scanner.scan_repository.return_value = []
+    parser = MagicMock()
+    entity_extractor = MagicMock()
+    entity_extractor.extract.return_value = ([], None)
+    relationship_extractor = MagicMock()
+    relationship_extractor.extract.return_value = []
+    identity_service = MagicMock()
+    
+    diff_engine = MagicMock()
+    diff_result = MagicMock()
+    diff_result.entities_to_save = []
+    diff_result.versions_to_save = []
+    diff_result.relationships_to_save = []
+    diff_result.relationship_versions_to_save = []
+    diff_result.change_events_to_save = []
+    diff_engine.compute_diff.return_value = diff_result
+
+    reconstruction_service = MagicMock()
+    reconstruction_service.reconstruct_graph_at_commit.return_value = ([], [])
+
+    use_case = ScanRepositoryHistoryUseCase(
+        git_adapter=git_adapter,
+        file_scanner=file_scanner,
+        parser=parser,
+        entity_extractor=entity_extractor,
+        relationship_extractor=relationship_extractor,
+        diff_engine=diff_engine,
+        uow_factory=uow_factory,
+        identity_service=identity_service,
+        reconstruction_service=reconstruction_service
+    )
+
+    res = use_case.execute(repo_uuid)
+
+    assert res["status"] == "success"
+    assert res["processed_commits"] == 2
