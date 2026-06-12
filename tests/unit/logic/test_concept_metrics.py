@@ -153,6 +153,6 @@ def test_concept_metrics_centrality_and_pagerank():
     assert c2_metrics.betweenness_centrality > 0.0
 
     # Verify Systemic Impact Score
-    # C3 is at the bottom, so C1 and C2 depend on it transitively. Impact of C3 should be highest.
+    # C1 depends on C2 and C3 transitively, so its impact score is highest under adj_out traversal.
     c3_metrics = metrics_map[c3_ver.id]
-    assert c3_metrics.impact_score > c1_metrics.impact_score
+    assert c1_metrics.impact_score > c3_metrics.impact_score

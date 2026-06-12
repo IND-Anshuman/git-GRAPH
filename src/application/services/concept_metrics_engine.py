@@ -151,10 +151,10 @@ class ConceptMetricsEngine:
                     entity_cnt = concept_sizes.get(curr, (0, 0))[0]
                     impact += path_conf * entity_cnt
 
-                for neighbor in adj_in[curr]:
+                for neighbor in adj_out[curr]:
                     if neighbor not in visited:
                         visited.add(neighbor)
-                        link_conf = edge_confidences.get((neighbor, curr), 1.0)
+                        link_conf = edge_confidences.get((curr, neighbor), 1.0)
                         queue.append((neighbor, path_conf * link_conf))
 
             impact_scores[cid] = impact
