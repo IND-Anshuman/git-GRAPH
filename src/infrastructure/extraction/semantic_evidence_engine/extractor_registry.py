@@ -14,11 +14,13 @@ class ExtractorRegistry:
     """Registry to register and resolve all pipeline extractors dynamically."""
     
     def __init__(self) -> None:
-        self._extractors: List[Type[IBaseExtractor]] = []
+        self._extractor_classes: List[Type[IBaseExtractor]] = []
+        self._instances: List[IBaseExtractor] = []
 
     def register(self, extractor_class: Type[IBaseExtractor]) -> None:
-        if extractor_class not in self._extractors:
-            self._extractors.append(extractor_class)
+        if extractor_class not in self._extractor_classes:
+            self._extractor_classes.append(extractor_class)
+            self._instances.append(extractor_class())
 
     def get_extractors(self) -> List[IBaseExtractor]:
-        return [cls() for cls in self._extractors]
+        return self._instances
