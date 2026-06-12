@@ -1,4 +1,4 @@
-from src.domain.entities.semantic_compiler_context import SemanticCompilerContext
+from src.infrastructure.extraction.compiler.compiler_context import CompilerContext
 from src.domain.value_objects.intelligence_hints import SemanticHint
 from src.infrastructure.extraction.registries.semantic_hint_registry import SemanticHintRegistry
 from src.infrastructure.extraction.compiler.passes.base import ICompilerPass
@@ -9,7 +9,7 @@ class Pass4HintExtraction(ICompilerPass):
     def __init__(self, registry: SemanticHintRegistry | None = None):
         self.registry = registry or SemanticHintRegistry()
 
-    def execute(self, context: SemanticCompilerContext) -> None:
+    def execute(self, context: CompilerContext) -> None:
         seen_hints = set()
         
         for entity in context.raw_entities:

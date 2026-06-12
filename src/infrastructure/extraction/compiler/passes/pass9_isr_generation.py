@@ -1,5 +1,5 @@
 import uuid
-from src.domain.entities.semantic_compiler_context import SemanticCompilerContext
+from src.infrastructure.extraction.compiler.compiler_context import CompilerContext
 from src.domain.value_objects.semantic_type import SemanticType
 from src.domain.value_objects.semantic_relationship_type import SemanticRelationshipType
 from src.domain.value_objects.semantic_extraction_report import SemanticExtractionReport
@@ -11,7 +11,7 @@ from src.infrastructure.extraction.compiler.passes.base import ICompilerPass
 class Pass9ISRGeneration(ICompilerPass):
     """Pass 9: ISR Generation. Assembles Canonical entities/relationships and outputs SemanticExtractionReport."""
 
-    def execute(self, context: SemanticCompilerContext) -> None:
+    def execute(self, context: CompilerContext) -> None:
         semantic_types_set = set()
         
         # 1. Generate Canonical Entities

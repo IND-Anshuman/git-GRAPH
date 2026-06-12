@@ -1,4 +1,4 @@
-from src.domain.entities.semantic_compiler_context import SemanticCompilerContext
+from src.infrastructure.extraction.compiler.compiler_context import CompilerContext
 from src.domain.value_objects.intelligence_hints import CapabilityHint
 from src.infrastructure.extraction.registries.capability_registry import CapabilityRegistry
 from src.infrastructure.extraction.compiler.passes.base import ICompilerPass
@@ -9,7 +9,7 @@ class Pass7CapabilityHinting(ICompilerPass):
     def __init__(self, registry: CapabilityRegistry | None = None):
         self.registry = registry or CapabilityRegistry()
 
-    def execute(self, context: SemanticCompilerContext) -> None:
+    def execute(self, context: CompilerContext) -> None:
         caps = self.registry.get_capabilities()
         for cap_name, config in caps.items():
             evidence = []

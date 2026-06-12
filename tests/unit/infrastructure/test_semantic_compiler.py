@@ -32,6 +32,9 @@ def test_semantic_compiler_python_fixture():
     )
     
     # Assert
+    from src.application.dtos.compiler_output import CompilerOutput
+    assert isinstance(context, CompilerOutput)
+
     # 1. Frameworks
     assert "fastapi" in context.frameworks_detected
     assert "langgraph" in context.frameworks_detected

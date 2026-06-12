@@ -1,11 +1,11 @@
-from src.domain.entities.semantic_compiler_context import SemanticCompilerContext
+from src.infrastructure.extraction.compiler.compiler_context import CompilerContext
 from src.domain.value_objects.intelligence_hints import ArchitectureHint
 from src.infrastructure.extraction.compiler.passes.base import ICompilerPass
 
 class Pass8ArchitectureHinting(ICompilerPass):
     """Pass 8: Architecture Hinting. Maps structural and role compositions to ArchitectureHints."""
 
-    def execute(self, context: SemanticCompilerContext) -> None:
+    def execute(self, context: CompilerContext) -> None:
         # 1. Detect CQRS
         cqrs_evidence = []
         for entity in context.raw_entities:

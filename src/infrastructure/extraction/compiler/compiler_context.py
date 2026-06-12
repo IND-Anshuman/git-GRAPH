@@ -7,9 +7,8 @@ from src.application.semantic.isr.canonical_entity import CanonicalEntity
 from src.application.semantic.isr.canonical_relationship import CanonicalRelationship
 from src.domain.value_objects.semantic_extraction_report import SemanticExtractionReport
 
-
 @dataclass
-class SemanticCompilerContext:
+class CompilerContext:
     """Shared state container passed sequentially through the 9 Semantic Compiler passes."""
     language: str
     source_code: str
@@ -45,8 +44,10 @@ class SemanticCompilerContext:
     imports: List[str] = field(default_factory=list)
     detected_patterns: List[str] = field(default_factory=list)
     
+    # SEEE extraction result
+    extraction_result: Any = None
+    
     # Pass 9 final output
     generated_entities: List[CanonicalEntity] = field(default_factory=list)
     generated_relationships: List[CanonicalRelationship] = field(default_factory=list)
     report: SemanticExtractionReport | None = None
-

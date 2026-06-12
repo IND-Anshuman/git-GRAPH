@@ -1,8 +1,8 @@
 from abc import ABC, abstractmethod
-from src.domain.entities.semantic_compiler_context import SemanticCompilerContext
+from src.infrastructure.extraction.compiler.compiler_context import CompilerContext
 
 class ICompilerPass(ABC):
     @abstractmethod
-    def execute(self, context: SemanticCompilerContext) -> None:
+    def execute(self, context: CompilerContext) -> None:
         """Execute the compiler pass, mutating the context."""
         pass

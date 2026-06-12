@@ -1,7 +1,7 @@
 import os
 import yaml
 from pathlib import Path
-from src.domain.entities.semantic_compiler_context import SemanticCompilerContext
+from src.infrastructure.extraction.compiler.compiler_context import CompilerContext
 from src.infrastructure.extraction.registries.framework_pack_registry import FrameworkPackRegistry
 from src.infrastructure.extraction.compiler.passes.base import ICompilerPass
 
@@ -11,7 +11,7 @@ class Pass2FrameworkResolution(ICompilerPass):
     def __init__(self, registry: FrameworkPackRegistry | None = None):
         self.registry = registry or FrameworkPackRegistry()
 
-    def execute(self, context: SemanticCompilerContext) -> None:
+    def execute(self, context: CompilerContext) -> None:
         pack_names = []
         if self.registry.data_dir.exists():
             for f in os.listdir(self.registry.data_dir):

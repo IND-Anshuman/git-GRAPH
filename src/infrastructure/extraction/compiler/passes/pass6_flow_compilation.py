@@ -1,12 +1,12 @@
 import uuid
-from src.domain.entities.semantic_compiler_context import SemanticCompilerContext
+from src.infrastructure.extraction.compiler.compiler_context import CompilerContext
 from src.application.semantic.isr.canonical_flow import CanonicalFlow
 from src.infrastructure.extraction.compiler.passes.base import ICompilerPass
 
 class Pass6FlowCompilation(ICompilerPass):
     """Pass 6: Flow Compilation. Performs DFS multi-hop tracing across relationships to build execution flows."""
 
-    def execute(self, context: SemanticCompilerContext) -> None:
+    def execute(self, context: CompilerContext) -> None:
         # Build adjacency list from calls
         adj = {}
         for rel in context.raw_relationships:

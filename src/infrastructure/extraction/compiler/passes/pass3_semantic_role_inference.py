@@ -1,4 +1,4 @@
-from src.domain.entities.semantic_compiler_context import SemanticCompilerContext
+from src.infrastructure.extraction.compiler.compiler_context import CompilerContext
 from src.domain.value_objects.intelligence_hints import SemanticRole
 from src.infrastructure.extraction.registries.framework_pack_registry import FrameworkPackRegistry
 from src.infrastructure.extraction.compiler.passes.base import ICompilerPass
@@ -9,7 +9,7 @@ class Pass3SemanticRoleInference(ICompilerPass):
     def __init__(self, registry: FrameworkPackRegistry | None = None):
         self.registry = registry or FrameworkPackRegistry()
 
-    def execute(self, context: SemanticCompilerContext) -> None:
+    def execute(self, context: CompilerContext) -> None:
         packs = {f: self.registry.get_pack(f) for f in context.frameworks_detected}
         
         for entity in context.raw_entities:
