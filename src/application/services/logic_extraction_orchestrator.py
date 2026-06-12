@@ -55,8 +55,9 @@ class LogicExtractionOrchestrator:
             if not repo:
                 print(f"[LogicOrchestrator] Repository {repository_id.value} not found.")
                 return
+            local_path = repo.local_path
 
-        self._git_adapter.checkout_commit(repo.local_path, commit_hash)
+        self._git_adapter.checkout_commit(local_path, commit_hash)
 
         # 2. Reconstruct active entities at this commit
         from src.application.services.historical_reconstruction import HistoricalReconstructionService
@@ -82,178 +83,180 @@ class LogicExtractionOrchestrator:
 
         print(f"[LogicOrchestrator] Reconstructed {len(active_entities)} active entities.")
 
-        # 3. Iterate through active entities in the snapshot
+        # 3. Group active entities by file
+        from collections import defaultdict
+        file_groups = defaultdict(list)
         for entity in active_entities:
+            if entity.entity_type in (EntityType.FUNCTION, EntityType.METHOD):
+                file_groups[entity.location.file_path].append(entity)
+
+        # 4. Iterate on a per-file basis
+        for file_path, entities_in_file in file_groups.items():
+            file_abs_path = os.path.join(local_path, file_path)
+            if not os.path.exists(file_abs_path):
+                print(f"[LogicOrchestrator] File does not exist: {file_abs_path}")
+                continue
+
+            try:
+                with open(file_abs_path, "r", encoding="utf-8") as f:
+                    file_content = f.read()
+            except Exception as e:
+                print(f"[LogicOrchestrator] Failed to read file {file_abs_path}: {e}")
+                continue
+
+            # Parse the file into a tree-sitter AST once per file
+            try:
+                parse_result = self._parser.parse_file(
+                    file_path, file_content, entities_in_file[0].language
+                )
+            except Exception as e:
+                print(f"[LogicOrchestrator] Parser failed for {file_path}: {e}")
+                continue
+
+            # Process all entities of this file under a single transaction block
             with self._uow_factory() as uow:
-                # We match patterns against functions and methods
-                if entity.entity_type not in (EntityType.FUNCTION, EntityType.METHOD):
-                    continue
+                for entity in entities_in_file:
+                    print(f"[LogicOrchestrator] Entity matches type check: name={entity.qualified_name}, type={entity.entity_type}")
 
-                print(f"[LogicOrchestrator] Entity matches type check: name={entity.qualified_name}, type={entity.entity_type}")
-
-                # 4. Read the containing file
-                file_abs_path = os.path.join(repo.local_path, entity.location.file_path)
-                if not os.path.exists(file_abs_path):
-                    print(f"[LogicOrchestrator] File does not exist: {file_abs_path}")
-                    continue
-
-                try:
-                    with open(file_abs_path, "r", encoding="utf-8") as f:
-                        file_content = f.read()
-                except Exception as e:
-                    print(f"[LogicOrchestrator] Failed to read file {file_abs_path}: {e}")
-                    continue
-
-                # 5. Parse the file into a tree-sitter AST
-                try:
-                    parse_result = self._parser.parse_file(
-                        entity.location.file_path, file_content, entity.language
-                    )
-                except Exception as e:
-                    print(f"[LogicOrchestrator] Parser failed for {entity.location.file_path}: {e}")
-                    continue
-
-                # 6. Extract logic items matching patterns
-                try:
-                    extracted_items = self._extraction_engine.extract_logic(
-                        entity, parse_result.tree, file_content, commit_hash
-                    )
-                except Exception as e:
-                    print(f"[LogicOrchestrator] Extraction engine failed for {entity.qualified_name}: {e}")
-                    continue
-
-                if extracted_items:
-                    print(f"[LogicOrchestrator] Extracted {len(extracted_items)} logic items for {entity.qualified_name}!")
-                else:
-                    pass
-
-                for signature, version, evidence_list, explanation in extracted_items:
-                    # Associate CodeEntity details to signature metadata for persistence mapping
-                    signature.metadata["entity_seid"] = str(entity.seid.value)
-                    signature.metadata["entity_name"] = entity.qualified_name
-                    signature.metadata["entity_type"] = entity.entity_type.value
-                    signature.metadata["file_path"] = entity.location.file_path
-                    signature.metadata["overall_confidence"] = version.overall_confidence
-
-                    version.metadata["entity_seid"] = str(entity.seid.value)
-                    version.metadata["line_start"] = entity.location.start_line
-                    version.metadata["line_end"] = entity.location.end_line
-
-                    # 7. Check if signature exists, and save
-                    uow.logic_signatures.save(signature)
-
-                    # 8. Link timeline to previous version
-                    prev_versions = uow.logic_versions.list_by_signature(
-                        signature.id
-                    )
-
-                    # Idempotency check: check if a version for this commit already exists
-                    existing_ver = next((v for v in prev_versions if v.commit_hash == commit_hash), None)
-                    if existing_ver:
-                        # Reuse the version ID
-                        version.id = existing_ver.id
-                        # Remove existing evidence for this version before saving new evidence
-                        uow.logic_evidence.delete_by_logic_version(existing_ver.id)
-                        # Filter out the existing version from prev_versions list for timeline linking
-                        prev_versions = [v for v in prev_versions if v.id != existing_ver.id]
-
-                    if prev_versions:
-                        # Sort chronologically by version number
-                        prev_versions.sort(key=lambda x: x.version_ordinal)
-                        latest_prev = prev_versions[-1]
-
-                        # Assign ordinal
-                        version.version_ordinal = latest_prev.version_ordinal + 1
-
-                        # Compute similarity and diff
-                        similarity = self._similarity_engine.compute_version_similarity(
-                            latest_prev, version
+                    # Extract logic items matching patterns
+                    try:
+                        extracted_items = self._extraction_engine.extract_logic(
+                            entity, parse_result.tree, file_content, commit_hash
                         )
-                        diff = self._diff_engine.diff_versions(latest_prev, version)
+                    except Exception as e:
+                        print(f"[LogicOrchestrator] Extraction engine failed for {entity.qualified_name}: {e}")
+                        continue
 
-                        # Determine transition type
-                        if similarity >= 0.99:
-                            trans_type = TransitionType.UNCHANGED
-                        elif similarity >= 0.30:
-                            trans_type = TransitionType.EVOLVED
+                    if extracted_items:
+                        print(f"[LogicOrchestrator] Extracted {len(extracted_items)} logic items for {entity.qualified_name}!")
+
+                    for signature, version, evidence_list, explanation in extracted_items:
+                        # Associate CodeEntity details to signature metadata for persistence mapping
+                        signature.metadata["entity_seid"] = str(entity.seid.value)
+                        signature.metadata["entity_name"] = entity.qualified_name
+                        signature.metadata["entity_type"] = entity.entity_type.value
+                        signature.metadata["file_path"] = entity.location.file_path
+                        signature.metadata["overall_confidence"] = version.overall_confidence
+
+                        version.metadata["entity_seid"] = str(entity.seid.value)
+                        version.metadata["line_start"] = entity.location.start_line
+                        version.metadata["line_end"] = entity.location.end_line
+
+                        # Check if signature exists, and save
+                        uow.logic_signatures.save(signature)
+
+                        # Link timeline to previous version
+                        prev_versions = uow.logic_versions.list_by_signature(
+                            signature.id
+                        )
+
+                        # Idempotency check: check if a version for this commit already exists
+                        existing_ver = next((v for v in prev_versions if v.commit_hash == commit_hash), None)
+                        if existing_ver:
+                            # Reuse the version ID
+                            version.id = existing_ver.id
+                            # Remove existing evidence for this version before saving new evidence
+                            uow.logic_evidence.delete_by_logic_version(existing_ver.id)
+                            # Filter out the existing version from prev_versions list for timeline linking
+                            prev_versions = [v for v in prev_versions if v.id != existing_ver.id]
+
+                        if prev_versions:
+                            # Sort chronologically by version number
+                            prev_versions.sort(key=lambda x: x.version_ordinal)
+                            latest_prev = prev_versions[-1]
+
+                            # Assign ordinal
+                            version.version_ordinal = latest_prev.version_ordinal + 1
+
+                            # Compute similarity and diff
+                            similarity = self._similarity_engine.compute_version_similarity(
+                                latest_prev, version
+                            )
+                            diff = self._diff_engine.diff_versions(latest_prev, version)
+
+                            # Determine transition type
+                            if similarity >= 0.99:
+                                trans_type = TransitionType.UNCHANGED
+                            elif similarity >= 0.30:
+                                trans_type = TransitionType.EVOLVED
+                            else:
+                                trans_type = TransitionType.REPLACED
+
+                            # Create Transition
+                            transition = LogicTransition(
+                                id=uuid.uuid4(),
+                                from_logic_version_id=latest_prev.id,
+                                to_logic_version_id=version.id,
+                                transition_type=trans_type,
+                                similarity_score=similarity,
+                                overall_confidence=version.overall_confidence,
+                                metadata={
+                                    "from_commit": latest_prev.commit_hash,
+                                    "to_commit": version.commit_hash,
+                                    "summary": diff.get("summary", ""),
+                                    "dependency_hash": version.fingerprint.dependency_hash,
+                                    "behavioral_hash": version.fingerprint.behavioral_hash,
+                                },
+                                created_at=datetime.utcnow(),
+                            )
+
+                            # Reuse transition ID if it exists
+                            if existing_ver:
+                                existing_trans = uow.logic_transitions.get_by_to_version(existing_ver.id)
+                                if existing_trans:
+                                    transition.id = existing_trans[0].id
+
+                            # Compute behavior drift
+                            drift = self._drift_engine.compute_drift(
+                                transition, latest_prev, version
+                            )
+
+                            # Reuse drift ID if it exists
+                            if existing_ver:
+                                existing_drift = uow.behavior_drift.get_by_transition(transition.id)
+                                if existing_drift:
+                                    drift.id = existing_drift.id
+
+                            # Save Transition & Drift
+                            uow.logic_transitions.save(transition)
+                            uow.behavior_drift.save(drift)
                         else:
-                            trans_type = TransitionType.REPLACED
+                            # First appearance
+                            version.version_ordinal = 1
+                            transition = LogicTransition(
+                                id=uuid.uuid4(),
+                                from_logic_version_id=None,
+                                to_logic_version_id=version.id,
+                                transition_type=TransitionType.CREATED,
+                                similarity_score=1.0,
+                                overall_confidence=version.overall_confidence,
+                                metadata={
+                                    "to_commit": version.commit_hash,
+                                    "summary": "First appearance of this behavioral logic in codebase.",
+                                    "dependency_hash": version.fingerprint.dependency_hash,
+                                    "behavioral_hash": version.fingerprint.behavioral_hash,
+                                },
+                                created_at=datetime.utcnow(),
+                            )
 
-                        # Create Transition
-                        transition = LogicTransition(
-                            id=uuid.uuid4(),
-                            from_logic_version_id=latest_prev.id,
-                            to_logic_version_id=version.id,
-                            transition_type=trans_type,
-                            similarity_score=similarity,
-                            overall_confidence=version.overall_confidence,
-                            metadata={
-                                "from_commit": latest_prev.commit_hash,
-                                "to_commit": version.commit_hash,
-                                "summary": diff.get("summary", ""),
-                                "dependency_hash": version.fingerprint.dependency_hash,
-                                "behavioral_hash": version.fingerprint.behavioral_hash,
-                            },
-                            created_at=datetime.utcnow(),
-                        )
+                            # Reuse transition ID if it exists
+                            if existing_ver:
+                                existing_trans = uow.logic_transitions.get_by_to_version(existing_ver.id)
+                                if existing_trans:
+                                    transition.id = existing_trans[0].id
 
-                        # Reuse transition ID if it exists
+                            uow.logic_transitions.save(transition)
+
+                        # Reuse explanation ID if it exists
                         if existing_ver:
-                            existing_trans = uow.logic_transitions.get_by_to_version(existing_ver.id)
-                            if existing_trans:
-                                transition.id = existing_trans[0].id
+                            existing_exp = uow.behavior_explanations.get_by_logic_version(existing_ver.id)
+                            if existing_exp:
+                                explanation.id = existing_exp.id
 
-                        # Compute behavior drift
-                        drift = self._drift_engine.compute_drift(
-                            transition, latest_prev, version
-                        )
+                        # Save Version, Evidence, and Explanation
+                        uow.logic_versions.save(version)
+                        uow.logic_evidence.save_batch(evidence_list)
+                        uow.behavior_explanations.save(explanation)
 
-                        # Reuse drift ID if it exists
-                        if existing_ver:
-                            existing_drift = uow.behavior_drift.get_by_transition(transition.id)
-                            if existing_drift:
-                                drift.id = existing_drift.id
-
-                        # Save Transition & Drift
-                        uow.logic_transitions.save(transition)
-                        uow.behavior_drift.save(drift)
-                    else:
-                        # First appearance
-                        version.version_ordinal = 1
-                        transition = LogicTransition(
-                            id=uuid.uuid4(),
-                            from_logic_version_id=None,
-                            to_logic_version_id=version.id,
-                            transition_type=TransitionType.CREATED,
-                            similarity_score=1.0,
-                            overall_confidence=version.overall_confidence,
-                            metadata={
-                                "to_commit": version.commit_hash,
-                                "summary": "First appearance of this behavioral logic in codebase.",
-                                "dependency_hash": version.fingerprint.dependency_hash,
-                                "behavioral_hash": version.fingerprint.behavioral_hash,
-                            },
-                            created_at=datetime.utcnow(),
-                        )
-
-                        # Reuse transition ID if it exists
-                        if existing_ver:
-                            existing_trans = uow.logic_transitions.get_by_to_version(existing_ver.id)
-                            if existing_trans:
-                                transition.id = existing_trans[0].id
-
-                        uow.logic_transitions.save(transition)
-
-                    # Reuse explanation ID if it exists
-                    if existing_ver:
-                        existing_exp = uow.behavior_explanations.get_by_logic_version(existing_ver.id)
-                        if existing_exp:
-                            explanation.id = existing_exp.id
-
-                    # 9. Save Version, Evidence, and Explanation
-                    uow.logic_versions.save(version)
-                    uow.logic_evidence.save_batch(evidence_list)
-                    uow.behavior_explanations.save(explanation)
-
-                # Commit transaction for this entity
+                # Commit once per file
                 uow.commit()
