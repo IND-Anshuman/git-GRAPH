@@ -262,3 +262,142 @@ domains:
         with pytest.raises(ConceptDomainException) as exc_info:
             engine.detect_concepts(uow, repo_id, "hash123")
         assert "concept explosion" in str(exc_info.value).lower()
+
+
+def test_concept_detection_prefix_fallback(db_session, tmp_path, caplog):
+    import logging
+    # Setup temporary concepts.yaml with empty required_patterns so any matched pattern resolves
+    valid_yaml = tmp_path / "concepts_fallback.yaml"
+    valid_yaml.write_text("""
+schema_version: "4.0"
+domains:
+  - id: security
+    name: Security
+    concepts:
+      - id: security.authentication
+        name: Authentication
+        required_patterns: []
+        min_base_confidence: 0.70
+""", encoding="utf-8")
+
+    registry = ConceptOntologyRegistry(yaml_path=str(valid_yaml))
+    engine = ConceptDetectionEngine(ontology_registry=registry)
+
+    # Resolve prefixes with varying dot-separated paths
+    assert registry.get_concept_by_ontology_node_id("security.authentication") == "security.authentication"
+    assert registry.get_concept_by_ontology_node_id("security.authentication.hash_comparison") == "security.authentication"
+    assert registry.get_concept_by_ontology_node_id("security.authentication.hash_comparison.sub") == "security.authentication"
+    assert registry.get_concept_by_ontology_node_id("security.authorization") is None
+    assert registry.get_concept_by_ontology_node_id("different.domain") is None
+
+    # Setup seed database logic records
+    uow = SQLAlchemyUnitOfWork(DummyEngine(db_session))
+    repo_id = RepositoryId.generate()
+    now = datetime.now(timezone.utc)
+
+    with uow:
+        repo = RepositoryEntity(
+            id=repo_id,
+            url="https://github.com/test/repo-fallback",
+            name="test-repo-fallback",
+            default_branch="main",
+            local_path="src/",
+            status=AnalysisStatus.COMPLETED,
+            created_at=now,
+            updated_at=now
+        )
+        uow.repositories.save(repo)
+
+        commit = Commit("hash_fallback", repo_id, "Author", "email", now, "Commit Fallback", [])
+        uow.commits.save(commit)
+
+        # 1. Entity and logic version for fallback prefix match
+        seid1 = SEID.generate()
+        entity1 = CodeEntity(
+            seid=seid1,
+            entity_type=EntityType.FUNCTION,
+            name="hash_password",
+            qualified_name="hash_password",
+            file_id=FileId(uuid.uuid4()),
+            repository_id=repo_id,
+            parent_seid=None,
+            language=SupportedLanguage.PYTHON,
+            location=CodeLocation("src/auth.py", 1, 10, 0, 0)
+        )
+        uow.code_entities.save(entity1)
+
+        sig1 = LogicSignature(
+            id=uuid.uuid4(),
+            repository_id=repo_id,
+            canonical_name="unregistered_pattern_fallback",
+            language=SupportedLanguage.PYTHON,
+            ontology_node_id="security.authentication.hash_comparison",
+            description="fallback match",
+            created_at=now
+        )
+        uow.logic_signatures.save(sig1)
+
+        l_ver1 = LogicVersion(
+            id=uuid.uuid4(),
+            logic_signature_id=sig1.id,
+            code_entity_seid=seid1,
+            commit_hash="hash_fallback",
+            version_ordinal=1,
+            fingerprint=LogicFingerprint("a", "b", "c", "abc"),
+            overall_confidence=0.80,
+            is_primary=True,
+            created_at=now
+        )
+        uow.logic_versions.save(l_ver1)
+
+        # 2. Entity and logic version for unmapped warning
+        seid2 = SEID.generate()
+        entity2 = CodeEntity(
+            seid=seid2,
+            entity_type=EntityType.FUNCTION,
+            name="authorize",
+            qualified_name="authorize",
+            file_id=FileId(uuid.uuid4()),
+            repository_id=repo_id,
+            parent_seid=None,
+            language=SupportedLanguage.PYTHON,
+            location=CodeLocation("src/auth.py", 12, 20, 0, 0)
+        )
+        uow.code_entities.save(entity2)
+
+        sig2 = LogicSignature(
+            id=uuid.uuid4(),
+            repository_id=repo_id,
+            canonical_name="unregistered_pattern_warning",
+            language=SupportedLanguage.PYTHON,
+            ontology_node_id="security.unmapped_node",
+            description="warning trigger",
+            created_at=now
+        )
+        uow.logic_signatures.save(sig2)
+
+        l_ver2 = LogicVersion(
+            id=uuid.uuid4(),
+            logic_signature_id=sig2.id,
+            code_entity_seid=seid2,
+            commit_hash="hash_fallback",
+            version_ordinal=1,
+            fingerprint=LogicFingerprint("x", "y", "z", "xyz"),
+            overall_confidence=0.80,
+            is_primary=True,
+            created_at=now
+        )
+        uow.logic_versions.save(l_ver2)
+        uow.commit()
+
+    with uow:
+        # Run detection and assert warnings are logged and fallback maps successfully
+        with caplog.at_level(logging.WARNING):
+            results = engine.detect_concepts(uow, repo_id, "hash_fallback")
+            # Should have exactly 1 matched concept (security.authentication) due to fallback
+            assert len(results) == 1
+            node, ver, evidences = results[0]
+            assert node.ontology_node_id == "security.authentication"
+            
+            # Check warning log message is captured for security.unmapped_node
+            assert any("could not map ontology node id" in record.message.lower() and "security.unmapped_node" in record.message.lower() for record in caplog.records)

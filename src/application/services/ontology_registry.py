@@ -221,6 +221,18 @@ class ConceptOntologyRegistry:
         """Look up a concept definition by its unique ID."""
         return self._concepts.get(concept_id)
 
+    def get_concept_by_ontology_node_id(self, node_id: str) -> Optional[str]:
+        """Resolve a concept ID from an ontology node ID by longest matching dot-prefix."""
+        if not node_id:
+            return None
+        parts = node_id.split(".")
+        # Try prefixes of decreasing length
+        for i in range(len(parts), 0, -1):
+            prefix = ".".join(parts[:i])
+            if prefix in self._concepts:
+                return prefix
+        return None
+
     def get_concept_by_pattern(self, pattern_id: str) -> Optional[str]:
         """Look up which concept ID matches the given pattern ID."""
         return self._pattern_to_concept.get(pattern_id)

@@ -1,5 +1,6 @@
 """Service engine for detecting high-level concepts from low-level behaviors."""
 
+import logging
 import uuid
 from typing import Dict, List, Tuple, Any
 
@@ -10,6 +11,8 @@ from src.domain.exceptions import ConceptDomainException
 from src.domain.value_objects.repository_id import RepositoryId
 from src.application.ports.unit_of_work import IUnitOfWork
 from src.application.services.ontology_registry import ConceptOntologyRegistry
+
+logger = logging.getLogger(__name__)
 
 
 class ConceptDetectionEngine:
@@ -64,12 +67,9 @@ class ConceptDetectionEngine:
             concept_id = self.ontology_registry.get_concept_by_pattern(sig.canonical_name)
             if not concept_id:
                 # Fallback to direct mapping from ontology_node_id prefix
-                # e.g., if ontology_node_id is 'security.authentication.hash_comparison', 
-                # we can strip the last segment to find the concept 'security.authentication'
-                parts = sig.ontology_node_id.split(".")
-                if len(parts) >= 2:
-                    concept_id = ".".join(parts[:2])
-                else:
+                concept_id = self.ontology_registry.get_concept_by_ontology_node_id(sig.ontology_node_id)
+                if not concept_id:
+                    logger.warning(f"Could not map ontology node id to a concept: {sig.ontology_node_id}")
                     continue
 
             # Check if concept is defined in registry
