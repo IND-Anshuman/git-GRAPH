@@ -76,11 +76,24 @@ class ConceptClusterEngine:
             cluster_key = f"static_{domain_id}"
             cluster_id = uuid.uuid5(namespace, cluster_key)
 
+            # Calculate average pairwise Jaccard cohesion for static clusters
+            total_jaccard = 0.0
+            pairs_count = 0
+            for x in range(len(concept_ids)):
+                for y in range(x + 1, len(concept_ids)):
+                    fx = concept_files[concept_ids[x]]
+                    fy = concept_files[concept_ids[y]]
+                    inter = fx.intersection(fy)
+                    uni = fx.union(fy)
+                    total_jaccard += (len(inter) / len(uni)) if uni else 0.0
+                    pairs_count += 1
+            cohesion = (total_jaccard / pairs_count) if pairs_count > 0 else 1.0
+
             cluster = ConceptCluster(
                 id=cluster_id,
                 cluster_key=cluster_key,
                 cluster_label=label,
-                cohesion_score=1.0, # Static clusters have perfect default cohesion
+                cohesion_score=cohesion,
                 member_count=len(concept_ids),
             )
             clusters.append((cluster, concept_ids))
