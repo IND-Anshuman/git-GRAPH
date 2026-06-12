@@ -72,7 +72,8 @@ def test_concepts_api_endpoints(api_client):
             local_path="src/",
             status=AnalysisStatus.COMPLETED,
             created_at=now,
-            updated_at=now
+            updated_at=now,
+            metadata={"last_analyzed_commit": "hash2"}
         )
         uow.repositories.save(repo)
 
@@ -80,10 +81,6 @@ def test_concepts_api_endpoints(api_client):
         commit2 = Commit("hash2", repo_id, "Auth", "email", now, "C2", ["hash1"])
         uow.commits.save(commit1)
         uow.commits.save(commit2)
-
-        # Update metadata for last analyzed commit
-        repo.metadata["last_analyzed_commit"] = "hash2"
-        uow.repositories.save(repo)
 
         c_node = ConceptNode(
             id=concept_id,

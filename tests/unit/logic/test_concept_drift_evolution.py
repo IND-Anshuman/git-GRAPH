@@ -87,7 +87,7 @@ def test_concept_evolution_split_and_merge():
         @property
         def commits(self):
             class MockCommitRepo:
-                def get_by_hash(sub_self, r_id, h):
+                def get_by_hash(sub_self, h):
                     class CommitMock:
                         hash = "hash2"
                         parent_hashes = ["hash1"]
@@ -97,7 +97,7 @@ def test_concept_evolution_split_and_merge():
         @property
         def concept_versions(self):
             class MockVerRepo:
-                def list_by_commit(sub_self, r_id, h):
+                def list_by_commit(sub_self, h):
                     return [prev_ver]
             return MockVerRepo()
 

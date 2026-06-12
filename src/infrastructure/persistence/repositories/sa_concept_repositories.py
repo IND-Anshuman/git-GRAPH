@@ -117,16 +117,9 @@ class SAConceptVersionRepository(IConceptVersionRepository):
         models = self.session.execute(stmt).scalars().all()
         return [ConceptMapper.to_concept_version_entity(m) for m in models]
 
-    def list_by_commit(self, repository_id: RepositoryId, commit_hash: str) -> List[ConceptVersion]:
-        stmt = (
-            select(ConceptVersionModel)
-            .join(ConceptNodeModel, ConceptVersionModel.concept_id == ConceptNodeModel.id)
-            .where(
-                and_(
-                    ConceptNodeModel.repository_id == repository_id.value,
-                    ConceptVersionModel.commit_hash == commit_hash,
-                )
-            )
+    def list_by_commit(self, commit_hash: str) -> List[ConceptVersion]:
+        stmt = select(ConceptVersionModel).where(
+            ConceptVersionModel.commit_hash == commit_hash
         )
         models = self.session.execute(stmt).scalars().all()
         return [ConceptMapper.to_concept_version_entity(m) for m in models]
@@ -171,12 +164,9 @@ class SAConceptRelationshipRepository(IConceptRelationshipRepository):
         for r in relationships:
             self.save(r)
 
-    def list_by_commit(self, repository_id: RepositoryId, commit_hash: str) -> List[ConceptRelationship]:
+    def list_by_commit(self, commit_hash: str) -> List[ConceptRelationship]:
         stmt = select(ConceptRelationshipModel).where(
-            and_(
-                ConceptRelationshipModel.repository_id == repository_id.value,
-                ConceptRelationshipModel.commit_hash == commit_hash,
-            )
+            ConceptRelationshipModel.commit_hash == commit_hash
         )
         models = self.session.execute(stmt).scalars().all()
         return [ConceptMapper.to_concept_relationship_entity(m) for m in models]

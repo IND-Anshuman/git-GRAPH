@@ -55,7 +55,7 @@ class ConceptEvolutionEngine:
         # 2. Retrieve parent commit(s)
         # Search the commit database for the current commit's parent hashes
         parents = []
-        cmt = uow.commits.get_by_hash(repository_id, commit_hash)
+        cmt = uow.commits.get_by_hash(commit_hash)
         if cmt and cmt.parent_hashes:
             parents = cmt.parent_hashes
         else:
@@ -87,7 +87,7 @@ class ConceptEvolutionEngine:
         # 3. Retrieve all concept versions active at the parent commit(s)
         parent_versions: List[ConceptVersion] = []
         for p_hash in parents:
-            p_vers = uow.concept_versions.list_by_commit(repository_id, p_hash)
+            p_vers = uow.concept_versions.list_by_commit(p_hash)
             parent_versions.extend(p_vers)
 
         # Map parent concept IDs to their SEID sets

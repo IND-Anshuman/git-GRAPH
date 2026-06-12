@@ -35,7 +35,7 @@ class GetConceptsUseCase:
             if not target_commit:
                 return []
 
-            versions = uow.concept_versions.list_by_commit(repo_id, target_commit)
+            versions = uow.concept_versions.list_by_commit(target_commit)
             results = []
             for ver in versions:
                 node = uow.concept_nodes.get_by_id(ver.concept_id)

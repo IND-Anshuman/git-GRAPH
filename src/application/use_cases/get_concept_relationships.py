@@ -34,7 +34,7 @@ class GetConceptRelationshipsUseCase:
             if not target_commit:
                 return {"nodes": [], "edges": []}
 
-            versions = uow.concept_versions.list_by_commit(repo_id, target_commit)
+            versions = uow.concept_versions.list_by_commit(target_commit)
             nodes_data = []
             active_node_ids = set()
             for ver in versions:
@@ -44,7 +44,7 @@ class GetConceptRelationshipsUseCase:
                     active_node_ids.add(node.id)
 
             edges_data = []
-            relationships = uow.concept_relationships.list_by_commit(repo_id, target_commit)
+            relationships = uow.concept_relationships.list_by_commit(target_commit)
             for rel in relationships:
                 if rel.from_concept_id in active_node_ids and rel.to_concept_id in active_node_ids:
                     edges_data.append(

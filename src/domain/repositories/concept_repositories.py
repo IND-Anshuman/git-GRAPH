@@ -75,7 +75,7 @@ class IConceptVersionRepository(ABC):
         pass
 
     @abstractmethod
-    def list_by_commit(self, repository_id: RepositoryId, commit_hash: str) -> List[ConceptVersion]:
+    def list_by_commit(self, commit_hash: str) -> List[ConceptVersion]:
         """List all active ConceptVersions at a specific commit."""
         pass
 
@@ -113,7 +113,7 @@ class IConceptRelationshipRepository(ABC):
         pass
 
     @abstractmethod
-    def list_by_commit(self, repository_id: RepositoryId, commit_hash: str) -> List[ConceptRelationship]:
+    def list_by_commit(self, commit_hash: str) -> List[ConceptRelationship]:
         """List all ConceptRelationships at a specific commit."""
         pass
 
