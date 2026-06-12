@@ -101,19 +101,23 @@ class Container:
         self.config = config
         
         # Setup Database Engine
+        from src.infrastructure.persistence.database import DatabaseEngine
         db_url = config.database_url.replace("+asyncpg", "")  # Convert to sync driver for standard UoW
-        # Avoid async pg driver prefix if present
-        # In SQLite or Postgres, create engine:
+        self.db_engine = DatabaseEngine(db_url)
+        # For SQLite in testing, we configure check_same_thread=False
         if db_url.startswith("sqlite"):
             from sqlalchemy.pool import StaticPool
-            self.engine = create_engine(
+            self.db_engine.engine = create_engine(
                 db_url,
                 connect_args={"check_same_thread": False},
                 poolclass=StaticPool
             )
-        else:
-            self.engine = create_engine(db_url)
-        self.session_factory = sessionmaker(bind=self.engine)
+            self.db_engine.session_factory = sessionmaker(
+                bind=self.db_engine.engine,
+                autocommit=False,
+                autoflush=False,
+                expire_on_commit=False
+            )
         
         # Setup Infrastructure
         self.git_adapter = GitPythonAdapter()
@@ -258,24 +262,7 @@ class Container:
 
 
     def get_uow_factory(self) -> Callable:
-        # Resolve class using lambda and create database connection wrapper
-        # To avoid class instantiation, we use self.engine wrapper or pass self directly.
-        # But SqlAlchemyUnitOfWork was the typo, we use SQLAlchemyUnitOfWork.
-        # However, unit_of_work expects a DatabaseEngine instance, not sessionmaker!
-        # Let's check how the DatabaseEngine is structured. Let's look at database.py or unit_of_work.__init__
-        # In unit_of_work.py:
-        #   def __init__(self, db_engine: DatabaseEngine) -> None:
-        # Wait! DatabaseEngine is imported from: src.infrastructure.persistence.database
-        # Let's instantiate DatabaseEngine or just pass an object that matches it.
-        # In unit_of_work.py line 27:
-        #   self._session = self._db_engine.session_factory()
-        # So db_engine must have a session_factory property!
-        # Let's see what is inside src/infrastructure/persistence/database.py. Let's pass a mock DatabaseEngine.
-        # Let's inspect database.py first.
-        class DatabaseEngineMock:
-            def __init__(self, session_factory):
-                self.session_factory = session_factory
-        return lambda: SQLAlchemyUnitOfWork(DatabaseEngineMock(self.session_factory))
+        return lambda: SQLAlchemyUnitOfWork(self.db_engine)
 
     def get_ingest_repository_use_case(self) -> IngestRepositoryUseCase:
         return IngestRepositoryUseCase(
@@ -427,6 +414,14 @@ class Container:
 
     def get_semantic_evolution_engine(self) -> SemanticEvolutionEngine:
         return self.semantic_evolution_engine
+
+    @property
+    def engine(self) -> Any:
+        return self.db_engine.engine
+
+    @property
+    def session_factory(self) -> Any:
+        return self.db_engine.session_factory
 
 
 

@@ -107,6 +107,8 @@ class SQLAlchemyUnitOfWork(IUnitOfWork):
     def __exit__(self, exc_type: Any, exc_val: Any, exc_tb: Any) -> None:
         try:
             if exc_type is not None:
+                import logging
+                logging.getLogger(__name__).error(f"Unit of Work exception occurred, rolling back transaction: {exc_val}", exc_info=(exc_type, exc_val, exc_tb))
                 self.rollback()
         finally:
             self._session.close()
