@@ -2,7 +2,7 @@
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from typing import Dict, List, Optional, Any
+from typing import Dict, List, Optional, Any, Tuple
 from src.domain.enums.entity_type import EntityType
 from src.domain.enums.relationship_type import RelationshipType
 
@@ -39,11 +39,11 @@ class IExtractionStrategy(ABC):
     """Strategy interface for extracting entities and relationships."""
     
     @abstractmethod
-    def extract_entities(self, tree: Any, source_code: str, file_path: str, module_name: str) -> List[RawEntity]:
+    def extract_entities(self, tree: Any, source_code: str, file_path: str, module_name: str) -> Tuple[List[RawEntity], Optional[Any]]:
         """Extract entities from the parsed tree."""
         pass
         
     @abstractmethod
-    def extract_relationships(self, tree: Any, source_code: str, entities: List[RawEntity]) -> List[RawRelationship]:
+    def extract_relationships(self, tree: Any, source_code: str, entities: List[RawEntity], extraction_result: Optional[Any] = None) -> List[RawRelationship]:
         """Extract relationships from the parsed tree."""
         pass

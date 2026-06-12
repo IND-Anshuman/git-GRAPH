@@ -1,6 +1,6 @@
 """Service for extracting CodeEntity objects."""
 
-from typing import List, Any
+from typing import List, Any, Tuple, Optional
 from src.domain.entities.code_entity import CodeEntity
 from src.domain.entities.source_file import SourceFile
 from src.domain.value_objects.repository_id import RepositoryId
@@ -17,7 +17,7 @@ class EntityExtractorService:
         self._identity_service = identity_service
         self._strategy_registry = ExtractionStrategyRegistry()
         
-    def extract(self, parsed_tree: Any, source_code: str, source_file: SourceFile, repository_id: RepositoryId) -> List[CodeEntity]:
+    def extract(self, parsed_tree: Any, source_code: str, source_file: SourceFile, repository_id: RepositoryId) -> Tuple[List[CodeEntity], Optional[Any]]:
         """Extracts code entities from a parsed AST.
         
         Args:
@@ -27,15 +27,15 @@ class EntityExtractorService:
             repository_id: The repository ID
             
         Returns:
-            List of domain CodeEntity objects
+            Tuple of [List of domain CodeEntity objects, Optional extraction result]
         """
         strategy = self._strategy_registry.get(source_file.language)
         
         if not strategy:
-            return []
+            return [], None
             
         module_name = source_file.file_path.replace("/", ".").replace("\\", ".").replace(".py", "")
-        raw_entities = strategy.extract_entities(parsed_tree, source_code, source_file.file_path, module_name)
+        raw_entities, ext_result = strategy.extract_entities(parsed_tree, source_code, source_file.file_path, module_name)
         
         # We need two passes. Pass 1: create entities without parents to generate SEIDs.
         # Wait, if we use identity service, SEID depends on qualified name, which depends on parent.
@@ -66,6 +66,19 @@ class EntityExtractorService:
             
             content_hash = self._identity_service.compute_content_hash(raw.source_text)
             
+            # Preserve span metadata for downstream reconstruction
+            metadata = dict(raw.metadata or {})
+            metadata.update({
+                "start_byte": raw.span.start_byte if hasattr(raw, 'span') and raw.span else None,
+                "end_byte": raw.span.end_byte if hasattr(raw, 'span') and raw.span else None,
+                "start_line": raw.start_line,
+                "end_line": raw.end_line,
+                "start_column": raw.start_column,
+                "end_column": raw.end_column,
+                "file_path": source_file.file_path,
+                "source_text": raw.source_text,
+            })
+            
             entity = CodeEntity(
                 seid=seid,
                 entity_type=raw.entity_type,
@@ -85,8 +98,8 @@ class EntityExtractorService:
                 content_hash=content_hash,
                 structural_fingerprint=None, # TBD by structural hasher
                 source_text=raw.source_text,
-                metadata=raw.metadata
+                metadata=metadata
             )
             domain_entities.append(entity)
             
-        return domain_entities
+        return domain_entities, ext_result

@@ -147,7 +147,7 @@ def test_reconstruction_validation_accuracy_calculation(db_session):
         language=SupportedLanguage.PYTHON,
         location=CodeLocation("src/file.py", 20, 25, 0, 0)
     )
-    entity_extractor.extract.return_value = [entity_match, entity_extra]
+    entity_extractor.extract.return_value = ([entity_match, entity_extra], None)
     relationship_extractor.extract.return_value = []
     
     identity_service = MagicMock()

@@ -16,10 +16,10 @@ def test_entity_extractor_returns_empty_for_declared_without_strategy():
         id=FileId(uuid.uuid4()),
         repository_id=RepositoryId.generate(),
         file_path="index.js",
-        language=SupportedLanguage.JAVASCRIPT,
+        language=SupportedLanguage.UNKNOWN,
     )
 
-    assert service.extract(None, "const value = 1;", source_file, source_file.repository_id) == []
+    assert service.extract(None, "const value = 1;", source_file, source_file.repository_id) == ([], None)
 
 
 def test_relationship_extractor_returns_empty_for_declared_without_strategy():
@@ -28,7 +28,7 @@ def test_relationship_extractor_returns_empty_for_declared_without_strategy():
         id=FileId(uuid.uuid4()),
         repository_id=RepositoryId.generate(),
         file_path="index.js",
-        language=SupportedLanguage.JAVASCRIPT,
+        language=SupportedLanguage.UNKNOWN,
     )
 
     assert service.extract(None, "const value = 1;", [], source_file) == []

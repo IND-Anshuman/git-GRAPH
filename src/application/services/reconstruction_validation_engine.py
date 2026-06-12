@@ -87,7 +87,7 @@ class ReconstructionValidationEngine:
 
                     parse_result = self.parser.parse_file(scanned.absolute_path, content, scanned.language)
                     
-                    file_entities = self.entity_extractor.extract(
+                    file_entities, ext_result = self.entity_extractor.extract(
                         parsed_tree=parse_result.tree,
                         source_code=content,
                         source_file=source_file,
@@ -99,7 +99,8 @@ class ReconstructionValidationEngine:
                         parsed_tree=parse_result.tree,
                         source_code=content,
                         entities=file_entities,
-                        source_file=source_file
+                        source_file=source_file,
+                        extraction_result=ext_result
                     )
                     actual_relationships.extend(file_relationships)
 

@@ -1,6 +1,6 @@
 """Python specific extraction strategy."""
 
-from typing import Any, List, Dict, Optional
+from typing import Any, List, Dict, Optional, Tuple
 from src.domain.enums.entity_type import EntityType
 from src.domain.enums.relationship_type import RelationshipType
 from src.infrastructure.extraction.strategies.base import IExtractionStrategy, RawEntity, RawRelationship
@@ -8,7 +8,7 @@ from src.infrastructure.extraction.strategies.base import IExtractionStrategy, R
 class PythonExtractionStrategy(IExtractionStrategy):
     """Strategy for extracting Python entities and relationships from tree-sitter AST."""
     
-    def extract_entities(self, tree: Any, source_code: str, file_path: str, module_name: str) -> List[RawEntity]:
+    def extract_entities(self, tree: Any, source_code: str, file_path: str, module_name: str) -> Tuple[List[RawEntity], Optional[Any]]:
         entities = []
         source_bytes = source_code.encode("utf8")
         
@@ -67,9 +67,9 @@ class PythonExtractionStrategy(IExtractionStrategy):
                     walk(child, parent_class)
                     
         walk(tree.root_node)
-        return entities
+        return entities, None
         
-    def extract_relationships(self, tree: Any, source_code: str, entities: List[RawEntity]) -> List[RawRelationship]:
+    def extract_relationships(self, tree: Any, source_code: str, entities: List[RawEntity], extraction_result: Optional[Any] = None) -> List[RawRelationship]:
         relationships = []
         source_bytes = source_code.encode("utf8")
         

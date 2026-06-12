@@ -1,7 +1,7 @@
 """Service for extracting Relationship objects."""
 
 import uuid
-from typing import List, Any, Dict
+from typing import List, Any, Dict, Optional
 from src.domain.entities.relationship import Relationship
 from src.domain.entities.code_entity import CodeEntity
 from src.domain.entities.source_file import SourceFile
@@ -16,7 +16,7 @@ class RelationshipExtractorService:
         self._registry = registry
         self._strategy_registry = ExtractionStrategyRegistry()
         
-    def extract(self, parsed_tree: Any, source_code: str, entities: List[CodeEntity], source_file: SourceFile) -> List[Relationship]:
+    def extract(self, parsed_tree: Any, source_code: str, entities: List[CodeEntity], source_file: SourceFile, extraction_result: Optional[Any] = None) -> List[Relationship]:
         """Extracts relationships from a parsed AST.
         
         Args:
@@ -24,6 +24,7 @@ class RelationshipExtractorService:
             source_code: The file's source code
             entities: List of CodeEntity objects previously extracted
             source_file: The domain SourceFile object
+            extraction_result: Optional cached extraction result
             
         Returns:
             List of domain Relationship objects
@@ -33,15 +34,42 @@ class RelationshipExtractorService:
         if not strategy:
             return []
             
-        # We need raw entities to feed the strategy
-        # Let's map CodeEntity back to something like RawEntity, but strategy just needs the AST and source
-        # wait, strategy.extract_relationships needs entities to resolve names
-        # Actually strategy signature: extract_relationships(tree, source_code, entities)
-        # Let's just create mock RawEntities with names
+        # Reconstruct RawEntity objects with accurate span coordinates, source text, and SourceSpan
         from src.infrastructure.extraction.strategies.base import RawEntity
-        raw_entities = [RawEntity(name=e.name, entity_type=e.entity_type, start_line=0, end_line=0, start_column=0, end_column=0, source_text="") for e in entities]
+        from src.infrastructure.extraction.semantic_evidence_engine.source_span import SourceSpan
         
-        raw_rels = strategy.extract_relationships(parsed_tree, source_code, raw_entities)
+        raw_entities = []
+        for e in entities:
+            metadata = e.metadata or {}
+            start_byte = metadata.get("start_byte")
+            end_byte = metadata.get("end_byte")
+            span = None
+            if start_byte is not None and end_byte is not None:
+                span = SourceSpan(
+                    start_byte=start_byte,
+                    end_byte=end_byte,
+                    start_line=metadata.get("start_line", e.location.start_line),
+                    end_line=metadata.get("end_line", e.location.end_line),
+                    start_column=metadata.get("start_column", e.location.start_column),
+                    end_column=metadata.get("end_column", e.location.end_column),
+                    file_path=e.location.file_path,
+                )
+            
+            raw_ent = RawEntity(
+                name=e.name,
+                entity_type=e.entity_type,
+                start_line=metadata.get("start_line", e.location.start_line),
+                end_line=metadata.get("end_line", e.location.end_line),
+                start_column=metadata.get("start_column", e.location.start_column),
+                end_column=metadata.get("end_column", e.location.end_column),
+                source_text=metadata.get("source_text", e.source_text or ""),
+                parent_name=metadata.get("parent_name"),
+                metadata=metadata,
+                span=span,
+            )
+            raw_entities.append(raw_ent)
+        
+        raw_rels = strategy.extract_relationships(parsed_tree, source_code, raw_entities, extraction_result)
         
         # Build map for fast resolution
         name_to_seid: Dict[str, SEID] = {e.name: e.seid for e in entities}
