@@ -34,6 +34,11 @@ nodes:
         parent_id: reliability.circuit_breaker
         is_leaf: true
         description: "Checking whether circuit is OPEN, CLOSED, or HALF-OPEN."
+      - id: reliability.circuit_breaker.fallback
+        name: Circuit Breaker Fallback
+        parent_id: reliability.circuit_breaker
+        is_leaf: true
+        description: "Fallback handler invoked when circuit is OPEN"
   - id: reliability.rate_limiting
     name: Rate Limiting
     parent_id: null
@@ -55,3 +60,19 @@ nodes:
         parent_id: reliability.rate_limiting
         is_leaf: true
         description: "Rate limiting via fixed time window counter."
+  - id: reliability.timeout
+    name: Timeout Management
+    parent_id: null
+    is_leaf: false
+    description: "Timeouts and deadlines to abort stalled operations."
+    children:
+      - id: reliability.timeout.deadline
+        name: Hard Deadline Timeout
+        parent_id: reliability.timeout
+        is_leaf: true
+        description: "Hard deadline timeout on blocking operation"
+      - id: reliability.timeout.async_timeout
+        name: Async Timeout
+        parent_id: reliability.timeout
+        is_leaf: true
+        description: "Async operation timeout via asyncio.wait_for or equivalent"

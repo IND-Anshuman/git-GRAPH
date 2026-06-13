@@ -31,6 +31,21 @@ domains:
         optional_patterns: []
         min_base_confidence: 0.75
 
+      - id: security.cryptography
+        name: Cryptography
+        description: "Encryption, decryption, and cryptographic signing operations."
+        required_patterns:
+          - aes_encrypt
+          - aes_decrypt
+          - fernet_encrypt
+          - hmac_sign
+          - rsa_sign
+        optional_patterns:
+          - rsa_encrypt
+          - ec_sign
+          - ed25519_sign
+        min_base_confidence: 0.80
+
   - id: data_management
     name: Data Management
     description: "Data lifecycle, transactions, and retrieval mechanisms."
@@ -59,6 +74,19 @@ domains:
         optional_patterns: []
         min_base_confidence: 0.70
 
+      - id: data_management.serialization
+        name: Serialization
+        description: "Data serialization and deserialization formats."
+        required_patterns:
+          - json_serialize
+          - json_deserialize
+        optional_patterns:
+          - pydantic_serialize
+          - marshmallow_serialize
+          - protobuf_serialize
+          - msgpack_serialize
+        min_base_confidence: 0.65
+
   - id: reliability
     name: Reliability
     description: "System recovery, backoff retries, and network circuit breakers."
@@ -82,6 +110,19 @@ domains:
         optional_patterns: []
         min_base_confidence: 0.80
 
+      - id: reliability.rate_limiting
+        name: Rate Limiting
+        description: "Rate limiting rules and middleware checks."
+        required_patterns:
+          - token_bucket_check
+          - fixed_window_check
+          - sliding_window_check
+          - slowapi_limit
+        optional_patterns:
+          - django_ratelimit_decorator
+          - redis_sliding_window
+        min_base_confidence: 0.75
+
   - id: communication
     name: Communication
     description: "API integrations, messaging, and publisher/subscriber event patterns."
@@ -103,7 +144,37 @@ domains:
           - api_requests_call
           - api_httpx_call
           - api_endpoint_handler
-          - api_gemini_client
+          - ai_model_invoke_gemini
           - tts_parler_generation
         optional_patterns: []
         min_base_confidence: 0.70
+
+  - id: presentation
+    name: Presentation
+    description: "API request routing, input validation, and middleware handling."
+    concepts:
+      - id: presentation.api_handling
+        name: API Request Handling
+        description: "Inbound HTTP/API routing, endpoint handlers, and middleware interceptors."
+        required_patterns:
+          - api_endpoint_handler
+        optional_patterns:
+          - fastapi_middleware
+          - django_middleware_class
+          - pydantic_field_validator
+        min_base_confidence: 0.70
+
+  - id: integration
+    name: Integration
+    description: "Third-party services, LLM integrations, and external client adapters."
+    concepts:
+      - id: integration.ai_model
+        name: AI Model Integration
+        description: "Generative AI models, vector embeddings, and streaming text completions."
+        required_patterns:
+          - ai_model_invoke_gemini
+        optional_patterns:
+          - ai_model_invoke_openai
+          - ai_model_streaming
+          - ai_model_embedding
+        min_base_confidence: 0.80

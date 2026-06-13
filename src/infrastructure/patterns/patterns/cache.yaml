@@ -10,7 +10,8 @@ patterns:
     rules:
       ast_features:
         - match_type: subscript
-          description: "Dictionary subscript access pattern"
+          key_pattern: "(\\b_?cache|\\bcache_\\w*|\\b\\w*_cache)\\["
+          description: "Dictionary subscript access pattern on variables named cache, _cache or starting with cache_"
       negative_indicators:
         - symbol: redis
         - symbol: memcache
@@ -89,3 +90,51 @@ patterns:
       ast_features:
         - match_type: call
           target_method_pattern: "(delete|invalidate|clear|expire|evict)"
+
+  - pattern_id: memcached_get
+    name: Memcached Get
+    pattern_version: "1.0.0"
+    ontology_node_id: data_management.caching.memcached
+    base_confidence: 0.90
+    index_keys:
+      - "call:Client.get"
+      - "import:pymemcache"
+    rules:
+      ast_features:
+        - match_type: call
+          target_method: get
+          target_class_pattern: "(Client|ClientPool)"
+        - match_type: import
+          target_module_pattern: "(pymemcache|pylibmc|memcache)"
+
+  - pattern_id: memcached_set
+    name: Memcached Set
+    pattern_version: "1.0.0"
+    ontology_node_id: data_management.caching.memcached
+    base_confidence: 0.90
+    index_keys:
+      - "call:Client.set"
+      - "import:pymemcache"
+    rules:
+      ast_features:
+        - match_type: call
+          target_method: set
+          target_class_pattern: "(Client|ClientPool)"
+        - match_type: import
+          target_module_pattern: "(pymemcache|pylibmc|memcache)"
+
+  - pattern_id: memcached_delete
+    name: Memcached Delete
+    pattern_version: "1.0.0"
+    ontology_node_id: data_management.caching.memcached
+    base_confidence: 0.90
+    index_keys:
+      - "call:Client.delete"
+      - "import:pymemcache"
+    rules:
+      ast_features:
+        - match_type: call
+          target_method: delete
+          target_class_pattern: "(Client|ClientPool)"
+        - match_type: import
+          target_module_pattern: "(pymemcache|pylibmc|memcache)"

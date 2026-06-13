@@ -17,8 +17,9 @@ patterns:
         - symbol: bcrypt
         - symbol: passlib
         - symbol: jwt
-      required_params:
-        - name_pattern: "(password|passwd|pwd|credential|secret|token)"
+      data_flow:
+        - source_param_pattern: "(password|passwd|pwd|credential|secret|token)"
+          sink_call: "comparison"
 
   - pattern_id: auth_sha256_verification
     name: SHA256 Password Verification
@@ -139,3 +140,63 @@ patterns:
           target_module: argon2
         - match_type: call
           target_function: verify
+
+  - pattern_id: oauth2_authorization_code
+    name: OAuth2 Authorization Code Flow
+    pattern_version: "1.0.0"
+    ontology_node_id: security.authentication.oauth
+    base_confidence: 0.90
+    index_keys:
+      - "call:authorization_url"
+      - "import:authlib"
+    rules:
+      ast_features:
+        - match_type: call
+          target_method: authorization_url
+        - match_type: import
+          target_module_pattern: "(authlib|oauthlib|requests_oauthlib)"
+
+  - pattern_id: oauth2_token_refresh
+    name: OAuth2 Token Refresh
+    pattern_version: "1.0.0"
+    ontology_node_id: security.authentication.oauth
+    base_confidence: 0.88
+    index_keys:
+      - "call:refresh_token"
+      - "import:authlib"
+    rules:
+      ast_features:
+        - match_type: call
+          target_method_pattern: "(refresh_token|refresh)"
+        - match_type: import
+          target_module_pattern: "(authlib|oauthlib)"
+
+  - pattern_id: oauth2_client_credentials
+    name: OAuth2 Client Credentials Flow
+    pattern_version: "1.0.0"
+    ontology_node_id: security.authentication.oauth
+    base_confidence: 0.89
+    index_keys:
+      - "call:fetch_token"
+      - "import:authlib"
+    rules:
+      ast_features:
+        - match_type: call
+          target_method: fetch_token
+        - match_type: import
+          target_module_pattern: "(authlib|oauthlib)"
+
+  - pattern_id: sso_redirect
+    name: SSO Provider Redirect
+    pattern_version: "1.0.0"
+    ontology_node_id: security.authentication.oauth
+    base_confidence: 0.85
+    index_keys:
+      - "call:redirect"
+      - "import:allauth"
+    rules:
+      ast_features:
+        - match_type: call
+          target_function_pattern: "(redirect|login_redirect)"
+        - match_type: import
+          target_module_pattern: "(allauth|social_django)"

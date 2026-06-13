@@ -50,3 +50,40 @@ nodes:
         parent_id: integration.event
         is_leaf: true
         description: "Handling or processing received domain events."
+  - id: integration.ai_model
+    name: AI Model
+    parent_id: null
+    is_leaf: false
+    description: "Artificial Intelligence and Large Language Model integrations."
+    children:
+      - id: integration.ai_model.invoke
+        name: AI Model Invoke
+        parent_id: integration.ai_model
+        is_leaf: true
+        description: "LLM inference call via provider SDK (OpenAI, Gemini, Anthropic)"
+      - id: integration.ai_model.streaming
+        name: AI Model Streaming
+        parent_id: integration.ai_model
+        is_leaf: true
+        description: "Streaming token generation from LLM"
+      - id: integration.ai_model.embedding
+        name: AI Model Embedding
+        parent_id: integration.ai_model
+        is_leaf: true
+        description: "Vector embedding generation via embedding model API"
+  - id: integration.audio
+    name: Audio Processing
+    parent_id: null
+    is_leaf: false
+    description: "Audio processing, transcription, and synthesis."
+    children:
+      - id: integration.audio.tts
+        name: Text-to-Speech
+        parent_id: integration.audio
+        is_leaf: true
+        description: "Text-to-speech audio synthesis"
+      - id: integration.audio.stt
+        name: Speech-to-Text
+        parent_id: integration.audio
+        is_leaf: true
+        description: "Speech-to-text transcription"

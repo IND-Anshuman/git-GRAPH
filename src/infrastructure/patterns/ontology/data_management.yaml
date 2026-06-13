@@ -70,3 +70,14 @@ nodes:
         parent_id: data_management.serialization
         is_leaf: true
         description: "Protobuf, MessagePack, pickle, or similar binary serialization."
+  - id: data_management.migration
+    name: Database Migration
+    parent_id: null
+    is_leaf: false
+    description: "Database schema migration operations."
+    children:
+      - id: data_management.migration.schema_migration
+        name: Schema Migration
+        parent_id: data_management.migration
+        is_leaf: true
+        description: "Database schema migration (Alembic, Flyway, Liquibase)"
