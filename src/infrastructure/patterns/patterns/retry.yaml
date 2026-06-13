@@ -26,8 +26,11 @@ patterns:
       ast_features:
         - match_type: while_loop
           description: "While loop with attempt counter"
-        - match_type: variable_pattern
-          name_pattern: "(attempt|retry|retries|max_retries)"
+        - match_type: attribute_access
+          target_attribute_pattern: "(attempt|retry|retries|max_retries)"
+        - match_type: comparison
+          operators: ["<", "<=", ">", ">="]
+          description: "Max retries threshold check"
 
   - pattern_id: retry_backoff
     name: Exponential Backoff Retry
@@ -45,3 +48,50 @@ patterns:
         - match_type: binary_op
           operators: ["**", "*"]
           description: "Exponential or multiplicative delay computation"
+
+  - pattern_id: fixed_interval_retry
+    name: Fixed Interval Retry Loop
+    pattern_version: "1.0.0"
+    ontology_node_id: reliability.retry.fixed_interval
+    base_confidence: 0.80
+    index_keys:
+      - "call:sleep"
+      - "import:time"
+    rules:
+      ast_features:
+        - match_type: call
+          target_function: sleep
+        - match_type: while_loop
+          description: "Retry loop with fixed sleep delay"
+      negative_indicators:
+        - symbol: "**"
+        - symbol: "backoff"
+
+  - pattern_id: timeout_deadline
+    name: Timeout Deadline
+    pattern_version: "1.0.0"
+    ontology_node_id: reliability.timeout.deadline
+    base_confidence: 0.90
+    index_keys:
+      - "call:settimeout"
+      - "call:timeout"
+    rules:
+      ast_features:
+        - match_type: call
+          target_method_pattern: "(settimeout|timeout|with_timeout)"
+
+  - pattern_id: timeout_async
+    name: Async Timeout
+    pattern_version: "1.0.0"
+    ontology_node_id: reliability.timeout.async_timeout
+    base_confidence: 0.92
+    index_keys:
+      - "call:asyncio.wait_for"
+      - "import:asyncio"
+      - "call:wait_for"
+    rules:
+      ast_features:
+        - match_type: call
+          target_function_pattern: "wait_for"
+        - match_type: import
+          target_module: "asyncio"
