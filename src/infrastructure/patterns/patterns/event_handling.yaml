@@ -1,0 +1,90 @@
+schema_version: "1.0"
+patterns:
+  - pattern_id: event_emit
+    name: Domain Event Emission
+    pattern_version: "1.0.0"
+    ontology_node_id: integration.event.emit
+    base_confidence: 0.85
+    index_keys:
+      - "call:publish"
+      - "call:emit"
+      - "import:blinker"
+    rules:
+      ast_features:
+        - match_type: call
+          target_method_pattern: "(publish|emit|dispatch|send)"
+          target_class_pattern: "(EventBus|EventEmitter|Dispatcher|Signal)"
+
+  - pattern_id: django_signal_send
+    name: Django Signal Send
+    pattern_version: "1.0.0"
+    ontology_node_id: integration.event.emit
+    base_confidence: 0.92
+    index_keys:
+      - "call:send"
+      - "import:django.dispatch"
+    rules:
+      ast_features:
+        - match_type: call
+          target_method: send
+          target_class_pattern: "Signal"
+        - match_type: import
+          target_module: django.dispatch
+
+  - pattern_id: node_event_emitter_emit
+    name: Node EventEmitter Emit
+    pattern_version: "1.0.0"
+    ontology_node_id: integration.event.emit
+    base_confidence: 0.88
+    index_keys:
+      - "call:emit"
+      - "import:events"
+    rules:
+      ast_features:
+        - match_type: call
+          target_method: emit
+          target_class: EventEmitter
+
+  - pattern_id: django_signal_receiver
+    name: Django Signal Receiver
+    pattern_version: "1.0.0"
+    ontology_node_id: integration.event.handler
+    base_confidence: 0.93
+    index_keys:
+      - "decorator:receiver"
+      - "import:django.dispatch"
+    rules:
+      ast_features:
+        - match_type: decorator
+          target_function: receiver
+        - match_type: import
+          target_module: django.dispatch
+
+  - pattern_id: blinker_connect
+    name: Blinker Signal Connection
+    pattern_version: "1.0.0"
+    ontology_node_id: integration.event.handler
+    base_confidence: 0.90
+    index_keys:
+      - "call:connect"
+      - "import:blinker"
+    rules:
+      ast_features:
+        - match_type: call
+          target_method: connect
+          target_class: Signal
+        - match_type: import
+          target_module: blinker
+
+  - pattern_id: event_handler_decorator
+    name: Event Handler Decorator
+    pattern_version: "1.0.0"
+    ontology_node_id: integration.event.handler
+    base_confidence: 0.85
+    index_keys:
+      - "decorator:event_handler"
+      - "decorator:on_event"
+    rules:
+      ast_features:
+        - match_type: decorator
+          target_function_pattern: "(event_handler|on_event|subscribe|listen)"

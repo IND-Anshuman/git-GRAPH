@@ -1,0 +1,50 @@
+schema_version: "1.0"
+patterns:
+  - pattern_id: ai_model_invoke_openai
+    name: OpenAI API Invoke
+    pattern_version: "1.0.0"
+    ontology_node_id: integration.ai_model.invoke
+    base_confidence: 0.94
+    index_keys:
+      - "call:chat.completions.create"
+      - "import:openai"
+    rules:
+      ast_features:
+        - match_type: call
+          target_method: create
+          target_class_pattern: "chat.completions"
+        - match_type: import
+          target_module: openai
+
+  - pattern_id: ai_model_streaming
+    name: LLM Streaming Tokens
+    pattern_version: "1.0.0"
+    ontology_node_id: integration.ai_model.streaming
+    base_confidence: 0.92
+    index_keys:
+      - "call:stream"
+      - "import:openai"
+    rules:
+      ast_features:
+        - match_type: call
+          target_method: create
+        - match_type: import
+          target_module_pattern: "(openai|google.genai)"
+      string_literals:
+        - pattern: "stream"
+
+  - pattern_id: ai_model_embedding
+    name: LLM Vector Embedding Generation
+    pattern_version: "1.0.0"
+    ontology_node_id: integration.ai_model.embedding
+    base_confidence: 0.94
+    index_keys:
+      - "call:embeddings.create"
+      - "import:openai"
+    rules:
+      ast_features:
+        - match_type: call
+          target_method: create
+          target_class_pattern: "embeddings"
+        - match_type: import
+          target_module: openai

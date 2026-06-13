@@ -1,0 +1,193 @@
+schema_version: "1.0"
+patterns:
+  - pattern_id: aes_encrypt
+    name: AES Symmetric Encryption
+    pattern_version: "1.0.0"
+    ontology_node_id: security.cryptography.symmetric
+    base_confidence: 0.92
+    index_keys:
+      - "call:AES.new"
+      - "call:encryptor"
+      - "import:cryptography"
+    rules:
+      ast_features:
+        - match_type: call
+          target_method: new
+          target_class: AES
+        - match_type: call
+          target_method: encryptor
+        - match_type: import
+          target_module_pattern: "(cryptography|Crypto)"
+
+  - pattern_id: aes_decrypt
+    name: AES Symmetric Decryption
+    pattern_version: "1.0.0"
+    ontology_node_id: security.cryptography.symmetric
+    base_confidence: 0.92
+    index_keys:
+      - "call:AES.new"
+      - "call:decryptor"
+      - "import:cryptography"
+    rules:
+      ast_features:
+        - match_type: call
+          target_method: new
+          target_class: AES
+        - match_type: call
+          target_method: decryptor
+        - match_type: import
+          target_module_pattern: "(cryptography|Crypto)"
+
+  - pattern_id: fernet_encrypt
+    name: Fernet Symmetric Encryption
+    pattern_version: "1.0.0"
+    ontology_node_id: security.cryptography.symmetric
+    base_confidence: 0.95
+    index_keys:
+      - "call:Fernet.encrypt"
+      - "import:cryptography.fernet"
+    rules:
+      ast_features:
+        - match_type: call
+          target_method: encrypt
+          target_class: Fernet
+        - match_type: import
+          target_module: cryptography.fernet
+
+  - pattern_id: fernet_decrypt
+    name: Fernet Symmetric Decryption
+    pattern_version: "1.0.0"
+    ontology_node_id: security.cryptography.symmetric
+    base_confidence: 0.95
+    index_keys:
+      - "call:Fernet.decrypt"
+      - "import:cryptography.fernet"
+    rules:
+      ast_features:
+        - match_type: call
+          target_method: decrypt
+          target_class: Fernet
+        - match_type: import
+          target_module: cryptography.fernet
+
+  - pattern_id: rsa_encrypt
+    name: RSA Asymmetric Encryption
+    pattern_version: "1.0.0"
+    ontology_node_id: security.cryptography.asymmetric
+    base_confidence: 0.93
+    index_keys:
+      - "call:rsa.encrypt"
+      - "call:public_key.encrypt"
+      - "import:cryptography"
+    rules:
+      ast_features:
+        - match_type: call
+          target_method: encrypt
+        - match_type: import
+          target_module_pattern: "(cryptography|rsa)"
+
+  - pattern_id: rsa_decrypt
+    name: RSA Asymmetric Decryption
+    pattern_version: "1.0.0"
+    ontology_node_id: security.cryptography.asymmetric
+    base_confidence: 0.93
+    index_keys:
+      - "call:rsa.decrypt"
+      - "call:private_key.decrypt"
+      - "import:cryptography"
+    rules:
+      ast_features:
+        - match_type: call
+          target_method: decrypt
+        - match_type: import
+          target_module_pattern: "(cryptography|rsa)"
+
+  - pattern_id: ec_sign
+    name: Elliptic Curve Signature Creation
+    pattern_version: "1.0.0"
+    ontology_node_id: security.cryptography.asymmetric
+    base_confidence: 0.94
+    index_keys:
+      - "call:private_key.sign"
+      - "import:cryptography"
+    rules:
+      ast_features:
+        - match_type: call
+          target_method: sign
+        - match_type: import
+          target_module_pattern: "(cryptography|ecdsa)"
+
+  - pattern_id: ec_verify
+    name: Elliptic Curve Signature Verification
+    pattern_version: "1.0.0"
+    ontology_node_id: security.cryptography.asymmetric
+    base_confidence: 0.94
+    index_keys:
+      - "call:public_key.verify"
+      - "import:cryptography"
+    rules:
+      ast_features:
+        - match_type: call
+          target_method: verify
+        - match_type: import
+          target_module_pattern: "(cryptography|ecdsa)"
+
+  - pattern_id: hmac_sign
+    name: HMAC Signature Creation
+    pattern_version: "1.0.0"
+    ontology_node_id: security.cryptography.signing
+    base_confidence: 0.90
+    index_keys:
+      - "call:hmac.new"
+      - "import:hmac"
+    rules:
+      ast_features:
+        - match_type: call
+          target_module: hmac
+          target_function: new
+        - match_type: import
+          target_module: hmac
+
+  - pattern_id: hmac_verify
+    name: HMAC Signature Verification
+    pattern_version: "1.0.0"
+    ontology_node_id: security.cryptography.signing
+    base_confidence: 0.91
+    index_keys:
+      - "call:compare_digest"
+      - "import:hmac"
+    rules:
+      ast_features:
+        - match_type: call
+          target_function: compare_digest
+        - match_type: import
+          target_module: hmac
+
+  - pattern_id: rsa_sign
+    name: RSA Signature Creation
+    pattern_version: "1.0.0"
+    ontology_node_id: security.cryptography.signing
+    base_confidence: 0.92
+    index_keys:
+      - "call:rsa.sign"
+      - "call:private_key.sign"
+    rules:
+      ast_features:
+        - match_type: call
+          target_method: sign
+          target_class_pattern: "(private_key|PrivateKey)"
+
+  - pattern_id: ed25519_sign
+    name: Ed25519 Signature Creation
+    pattern_version: "1.0.0"
+    ontology_node_id: security.cryptography.signing
+    base_confidence: 0.94
+    index_keys:
+      - "call:SigningKey"
+      - "import:nacl"
+    rules:
+      ast_features:
+        - match_type: call
+          target_class: SigningKey
+        - match_type: import
+          target_module_pattern: "(nacl|cryptography.hazmat.primitives.asymmetric.ed25519)"

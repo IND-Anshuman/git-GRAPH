@@ -1,0 +1,107 @@
+schema_version: "1.0"
+patterns:
+  - pattern_id: token_bucket_check
+    name: Token Bucket Rate Limiting
+    pattern_version: "1.0.0"
+    ontology_node_id: reliability.rate_limiting.token_bucket
+    base_confidence: 0.88
+    index_keys:
+      - "call:consume"
+      - "import:limits"
+    rules:
+      ast_features:
+        - match_type: call
+          target_method: consume
+          target_class_pattern: "(TokenBucket|TokenBucketLimiter)"
+        - match_type: import
+          target_module: limits
+
+  - pattern_id: slowapi_limit
+    name: SlowAPI Rate Limit Decorator
+    pattern_version: "1.0.0"
+    ontology_node_id: reliability.rate_limiting.token_bucket
+    base_confidence: 0.95
+    index_keys:
+      - "decorator:limit"
+      - "import:slowapi"
+    rules:
+      ast_features:
+        - match_type: decorator
+          target_function_pattern: "limit"
+        - match_type: import
+          target_module: slowapi
+
+  - pattern_id: rate_limiter_acquire
+    name: Rate Limiter Acquire
+    pattern_version: "1.0.0"
+    ontology_node_id: reliability.rate_limiting.token_bucket
+    base_confidence: 0.86
+    index_keys:
+      - "call:acquire"
+      - "import:ratelimiter"
+    rules:
+      ast_features:
+        - match_type: call
+          target_method: acquire
+        - match_type: import
+          target_module: ratelimiter
+
+  - pattern_id: sliding_window_check
+    name: Sliding Window Rate Limit
+    pattern_version: "1.0.0"
+    ontology_node_id: reliability.rate_limiting.sliding_window
+    base_confidence: 0.90
+    index_keys:
+      - "import:limits"
+      - "call:hit"
+    rules:
+      ast_features:
+        - match_type: import
+          target_module: limits
+        - match_type: call
+          target_method: hit
+
+  - pattern_id: redis_sliding_window
+    name: Redis-Backed Sliding Window Rate Limit
+    pattern_version: "1.0.0"
+    ontology_node_id: reliability.rate_limiting.sliding_window
+    base_confidence: 0.85
+    index_keys:
+      - "call:zadd"
+      - "call:zremrangebyscore"
+    rules:
+      ast_features:
+        - match_type: call
+          target_method: zadd
+        - match_type: call
+          target_method: zremrangebyscore
+
+  - pattern_id: fixed_window_check
+    name: Fixed Window Rate Limit
+    pattern_version: "1.0.0"
+    ontology_node_id: reliability.rate_limiting.fixed_window
+    base_confidence: 0.90
+    index_keys:
+      - "import:flask_limiter"
+      - "decorator:limit"
+    rules:
+      ast_features:
+        - match_type: import
+          target_module_pattern: "(flask_limiter|limits)"
+        - match_type: decorator
+          target_function_pattern: "limit"
+
+  - pattern_id: django_ratelimit_decorator
+    name: Django Ratelimit Decorator
+    pattern_version: "1.0.0"
+    ontology_node_id: reliability.rate_limiting.fixed_window
+    base_confidence: 0.92
+    index_keys:
+      - "decorator:ratelimit"
+      - "import:django_ratelimit"
+    rules:
+      ast_features:
+        - match_type: decorator
+          target_function: ratelimit
+        - match_type: import
+          target_module: django_ratelimit

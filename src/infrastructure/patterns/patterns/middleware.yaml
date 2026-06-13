@@ -1,0 +1,55 @@
+schema_version: "1.0"
+patterns:
+  - pattern_id: fastapi_middleware
+    name: FastAPI/Starlette Middleware Registration
+    pattern_version: "1.0.0"
+    ontology_node_id: presentation.api_handling.middleware
+    base_confidence: 0.93
+    index_keys:
+      - "call:add_middleware"
+    rules:
+      ast_features:
+        - match_type: call
+          target_method: add_middleware
+          target_class_pattern: "FastAPI"
+
+  - pattern_id: django_middleware_class
+    name: Django Middleware Class
+    pattern_version: "1.0.0"
+    ontology_node_id: presentation.api_handling.middleware
+    base_confidence: 0.90
+    index_keys:
+      - "call:__call__"
+      - "import:django.utils.deprecation"
+    rules:
+      ast_features:
+        - match_type: call
+          target_method: __call__
+          target_class_pattern: ".*Middleware.*"
+        - match_type: import
+          target_module_pattern: "django"
+
+  - pattern_id: express_middleware
+    name: Express Middleware Usage
+    pattern_version: "1.0.0"
+    ontology_node_id: presentation.api_handling.middleware
+    base_confidence: 0.88
+    index_keys:
+      - "call:use"
+    rules:
+      ast_features:
+        - match_type: call
+          target_method: use
+          target_class_pattern: "(app|express)"
+
+  - pattern_id: flask_before_request
+    name: Flask Before Request Interceptor
+    pattern_version: "1.0.0"
+    ontology_node_id: presentation.api_handling.middleware
+    base_confidence: 0.92
+    index_keys:
+      - "decorator:before_request"
+    rules:
+      ast_features:
+        - match_type: decorator
+          target_function: before_request
