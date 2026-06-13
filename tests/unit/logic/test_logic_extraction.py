@@ -158,3 +158,128 @@ def test_extract_logic_negative_indicator_disqualifies():
     
     # Assert
     assert len(results) == 0 # Disqualified due to negative indicator
+
+
+def test_extract_logic_subscript_cache_match():
+    # Arrange
+    extractor = MagicMock()
+    fingerprinter = MagicMock()
+    registry = MagicMock()
+    
+    engine = LogicExtractionEngine(extractor, fingerprinter, registry)
+    
+    repo_id = RepositoryId.generate()
+    entity = CodeEntity(
+        seid=SEID.generate(),
+        entity_type=EntityType.FUNCTION,
+        name="get_cached_user",
+        qualified_name="auth.get_cached_user",
+        file_id=FileId(uuid.uuid4()),
+        repository_id=repo_id,
+        parent_seid=None,
+        language=SupportedLanguage.PYTHON,
+        location=CodeLocation("src/auth.py", 10, 20, 0, 0)
+    )
+    
+    features = ASTFeatures(
+        subscripts=[
+            ExtractedFeature(feature_type="subscript", symbol="struct:subscript", line_number=15, metadata={"raw": "user_cache[id]"}),
+        ]
+    )
+    extractor.extract_features.return_value = features
+    
+    fingerprint = LogicFingerprint.compute("struct_hash", "dep_hash", "beh_hash")
+    fingerprinter.compute_fingerprint.return_value = fingerprint
+    
+    pattern = BehaviorPattern(
+        id=uuid.uuid4(),
+        pattern_id="cache_memory_dict",
+        name="In-Memory Dictionary Cache",
+        ontology_node_id="data_management.caching.memory",
+        base_confidence=0.78,
+        pattern_version="1.0.0",
+        schema_version="1.0",
+        rules={
+            "ast_features": [
+                {"match_type": "subscript", "key_pattern": "(\\b_?cache|\\bcache_\\w*|\\b\\w*_cache)\\["}
+            ]
+        },
+        index_keys=["struct:dict_lookup"],
+        is_active=True
+    )
+    registry.get_candidate_patterns.return_value = [pattern]
+    
+    # Act
+    results = engine.extract_logic(entity, MagicMock(), "source_code", "commit_123")
+    
+    # Assert
+    assert len(results) == 1
+    sig, ver, evs, exp = results[0]
+    assert sig.canonical_name == "cache_memory_dict"
+    assert len(evs) == 1
+    assert evs[0].ast_node_type == "Subscript"
+
+
+def test_extract_logic_gql_query_negative_indicator_string():
+    # Arrange
+    extractor = MagicMock()
+    fingerprinter = MagicMock()
+    registry = MagicMock()
+    
+    engine = LogicExtractionEngine(extractor, fingerprinter, registry)
+    
+    repo_id = RepositoryId.generate()
+    entity = CodeEntity(
+        seid=SEID.generate(),
+        entity_type=EntityType.FUNCTION,
+        name="run_gql",
+        qualified_name="api.run_gql",
+        file_id=FileId(uuid.uuid4()),
+        repository_id=repo_id,
+        parent_seid=None,
+        language=SupportedLanguage.PYTHON,
+        location=CodeLocation("src/api.py", 10, 20, 0, 0)
+    )
+    
+    features = ASTFeatures(
+        calls=[
+            ExtractedFeature(feature_type="call", symbol="call:execute", line_number=15),
+        ],
+        imports=[
+            ExtractedFeature(feature_type="import", symbol="import:gql", line_number=1),
+        ],
+        strings=[
+            ExtractedFeature(feature_type="string", symbol="string:literal", line_number=15, metadata={"raw": "mutation update { ... }"}),
+        ]
+    )
+    extractor.extract_features.return_value = features
+    
+    fingerprint = LogicFingerprint.compute("struct_hash", "dep_hash", "beh_hash")
+    fingerprinter.compute_fingerprint.return_value = fingerprint
+    
+    # GQL Query has negative indicator "mutation"
+    query_pattern = BehaviorPattern(
+        id=uuid.uuid4(),
+        pattern_id="gql_query",
+        name="GraphQL Client Query",
+        ontology_node_id="integration.http_client.graphql_call",
+        base_confidence=0.93,
+        pattern_version="1.0.0",
+        schema_version="1.0",
+        rules={
+            "ast_features": [
+                {"match_type": "call", "target_method": "execute"},
+                {"match_type": "import", "target_module": "gql"}
+            ],
+            "negative_indicators": [{"symbol": "mutation"}]
+        },
+        index_keys=["call:execute", "import:gql"],
+        is_active=True
+    )
+    registry.get_candidate_patterns.return_value = [query_pattern]
+    
+    # Act
+    results = engine.extract_logic(entity, MagicMock(), "source_code", "commit_123")
+    
+    # Assert
+    assert len(results) == 0 # Disqualified because the string contains "mutation"
