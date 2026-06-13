@@ -90,6 +90,13 @@ class LogicExtractionEngine:
                 index_keys.append(dec.symbol)
             for comp in features.comparisons:
                 index_keys.append(comp.symbol)
+            for sub in features.subscripts:
+                index_keys.append(sub.symbol)
+                raw_text = sub.metadata.get("raw", "") if sub.metadata else ""
+                if "cache" in raw_text.lower():
+                    index_keys.append("struct:dict_lookup")
+                if "session" in raw_text.lower():
+                    index_keys.append("subscript:session")
 
             candidates = self._registry.get_candidate_patterns(index_keys)
             print(f"  [ExtractionEngine] Entity: {entity.qualified_name}")
@@ -194,10 +201,11 @@ class LogicExtractionEngine:
             neg_sym = neg.get("symbol")
             if not neg_sym:
                 continue
-            # If any call or import contains the negative indicator symbol
+            # If any call, import, or string contains the negative indicator symbol
             call_hit = any(neg_sym in c.symbol for c in features.calls)
             imp_hit = any(neg_sym in i.symbol for i in features.imports)
-            if call_hit or imp_hit:
+            str_hit = any(neg_sym in s.metadata.get("raw", "") for s in features.strings if s.metadata)
+            if call_hit or imp_hit or str_hit:
                 # Disqualify this pattern entirely
                 return None
 
@@ -476,6 +484,60 @@ class LogicExtractionEngine:
 
         if df_count > 0:
             data_flow_score = df_passed / df_count
+
+        # Evaluate string literals
+        sl_rules = rules.get("string_literals", [])
+        sl_passed = 0
+        sl_count = len(sl_rules)
+
+        for i, r in enumerate(sl_rules):
+            pat = r.get("pattern")
+            desc = r.get("description", f"String literal matching '{pat}'")
+            passed = False
+            ev_id = None
+            for s in features.strings:
+                raw_text = s.metadata.get("raw", "") if s.metadata else ""
+                if re.search(pat, raw_text, re.IGNORECASE):
+                    passed = True
+                    ev = LogicEvidence(
+                        id=uuid.uuid4(),
+                        logic_version_id=uuid.UUID(int=0),
+                        evidence_type=EvidenceType.STRUCTURAL,
+                        file_path=entity.location.file_path,
+                        start_line=s.line_number,
+                        end_line=s.line_number,
+                        ast_node_type="String",
+                        matched_symbol=s.symbol,
+                        matched_rule_id=f"{pattern.pattern_id}_sl_{i}",
+                        confidence_contribution=0.05,
+                    )
+                    evidence_list.append(ev)
+                    ev_id = ev.id
+                    break
+
+            if passed:
+                sl_passed += 1
+
+            verdicts.append(
+                RuleVerdict(
+                    rule_id=f"sl_{i}",
+                    rule_description=desc,
+                    passed=passed,
+                    contribution=0.10 if passed else 0.0,
+                    evidence_ref=ev_id,
+                )
+            )
+
+        # Fail pattern entirely if string literals are required but not all matched
+        if sl_count > 0 and sl_passed < sl_count:
+            return None
+
+        if sl_count > 0:
+            sl_score = sl_passed / sl_count
+            if ast_count > 0:
+                struct_score = (ast_score + sl_score) / 2
+            else:
+                struct_score = sl_score
 
         # Evaluate required parameters
         rp_rules = rules.get("required_params", [])

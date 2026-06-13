@@ -47,7 +47,18 @@ class RelationshipExtractor(IBaseExtractor):
             # EXTENDS / IMPLEMENTS
             if node_type in {"class_declaration", "class_definition"} and scope:
                 for child in node.children:
+                    # JS/TS: class_heritage / extends_clause / superclass
                     if child.type in {"class_heritage", "extends_clause", "superclass"}:
+                        for target in self._collect_identifiers(child, source_bytes):
+                            rel = RawRelationship(
+                                source_name=scope,
+                                target_name=target,
+                                relationship_type=RelationshipType.EXTENDS,
+                                span=make_span(child)
+                            )
+                            ir.relationships.append(rel)
+                    # Python: class X(A, B, C) — base classes live in argument_list
+                    elif child.type == "argument_list":
                         for target in self._collect_identifiers(child, source_bytes):
                             rel = RawRelationship(
                                 source_name=scope,
@@ -89,7 +100,16 @@ class RelationshipExtractor(IBaseExtractor):
                     target = text(module_node)
                 else:
                     for child in getattr(node, "children", []):
-                        if child.type in {"dotted_name", "aliased_import"}:
+                        if child.type == "aliased_import":
+                            # Python: 'import redis as r' → extract dotted_name child
+                            for sub in child.children:
+                                if sub.type == "dotted_name":
+                                    target = text(sub)
+                                    break
+                            if target is None:
+                                target = text(child)  # fallback
+                            break
+                        if child.type in {"dotted_name"}:
                             target = text(child)
                             break
                         if child.type in {"string", "string_literal", "interpreted_string_literal", "raw_string_literal"}:

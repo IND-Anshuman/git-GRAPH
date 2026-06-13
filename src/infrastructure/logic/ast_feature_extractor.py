@@ -49,10 +49,25 @@ class TreeSitterASTFeatureExtractor(IASTFeatureExtractor):
             text = source_bytes[node.start_byte : node.end_byte].decode("utf-8")
 
             if node.type == "import_statement":
-                # import bcrypt, hashlib
-                # children might contain dotted_name
+                # import bcrypt / import redis as r / import os, sys
                 for child in node.children:
-                    if child.type == "dotted_name":
+                    if child.type == "aliased_import":
+                        # e.g. 'redis as r' — extract dotted_name (the module name)
+                        for sub in child.children:
+                            if sub.type == "dotted_name":
+                                symbol = source_bytes[
+                                    sub.start_byte : sub.end_byte
+                                ].decode("utf-8")
+                                features.imports.append(
+                                    ExtractedFeature(
+                                        feature_type="import",
+                                        symbol=f"import:{symbol}",
+                                        line_number=line,
+                                        metadata={"raw": text},
+                                    )
+                                )
+                                break
+                    elif child.type == "dotted_name":
                         symbol = source_bytes[
                             child.start_byte : child.end_byte
                         ].decode("utf-8")
@@ -96,12 +111,9 @@ class TreeSitterASTFeatureExtractor(IASTFeatureExtractor):
                                     metadata={"raw": text},
                                 )
                             )
-        # JS/TS imports
-        elif node.type == "import_statement":
-            line = node.start_point[0] + 1
-            text = source_bytes[node.start_byte : node.end_byte].decode("utf-8")
-            source_node = node.child_by_field_name("source")
-            if source_node:
+            elif node.child_by_field_name("source"):
+                # JS/TS import ... from '...'
+                source_node = node.child_by_field_name("source")
                 module_name = source_bytes[
                     source_node.start_byte : source_node.end_byte
                 ].decode("utf-8").strip("'\" ")
@@ -321,17 +333,14 @@ class TreeSitterASTFeatureExtractor(IASTFeatureExtractor):
         # Strip outer quotes
         clean_text = text.strip("'\" \r\n\t")
 
-        # Check for SQL keywords
-        sql_keywords = r"^(SELECT|INSERT|UPDATE|DELETE|CREATE|DROP|ALTER)\b"
-        if re.search(sql_keywords, clean_text, re.IGNORECASE):
-            features.strings.append(
-                ExtractedFeature(
-                    feature_type="string",
-                    symbol="string:sql_keyword",
-                    line_number=line,
-                    metadata={"raw": clean_text},
-                )
+        features.strings.append(
+            ExtractedFeature(
+                feature_type="string",
+                symbol="string:literal",
+                line_number=line,
+                metadata={"raw": clean_text},
             )
+        )
 
     def _extract_subscript(
         self, node: Any, source_bytes: bytes, features: ASTFeatures
