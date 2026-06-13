@@ -97,7 +97,9 @@ class ScanRepositoryHistoryUseCase:
         identity_service: Any,
         reconstruction_service: Any = None,
         logic_orchestrator: Any = None,
-        detect_concepts_use_case: Any = None
+        detect_concepts_use_case: Any = None,
+        calibration_engine: Any = None,
+        concept_discovery_engine: Any = None
     ) -> None:
         self.git_adapter = git_adapter
         self.file_scanner = file_scanner
@@ -110,6 +112,8 @@ class ScanRepositoryHistoryUseCase:
         self.reconstruction_service = reconstruction_service
         self.logic_orchestrator = logic_orchestrator
         self.detect_concepts_use_case = detect_concepts_use_case
+        self.calibration_engine = calibration_engine
+        self.concept_discovery_engine = concept_discovery_engine
 
     def execute(self, repository_id: uuid.UUID | str, branch: str = "main", snapshot_interval: int = 100) -> dict:
         """Walks the commit history and ingests the repository temporally."""
@@ -343,7 +347,13 @@ class ScanRepositoryHistoryUseCase:
                             commit_hash=commit_hash,
                             entity_seids=active_seids,
                             snapshot_data=snapshot_data,
-                            created_at=datetime.datetime.now(datetime.timezone.utc)
+                            created_at=datetime.datetime.now(datetime.timezone.utc),
+                            entity_count=len(active_seids),
+                            relationship_count=len(active_rel_ids),
+                            behavior_count=0,
+                            concept_count=0,
+                            capability_count=0,
+                            dependency_graph_hash=None
                         )
                         uow.snapshots.save(snapshot_entity)
 
@@ -355,19 +365,7 @@ class ScanRepositoryHistoryUseCase:
 
                     uow.commit()
 
-                # Run Phase 3 logic extraction hook
-                if self.logic_orchestrator:
-                    try:
-                        self.logic_orchestrator.extract_repository_logic(repo_id, commit_hash)
-                    except Exception as le:
-                        logger.error(f"Error extracting logic for commit {commit_hash}: {le}", exc_info=True)
-
-                # Run Phase 4 concept detection hook
-                if self.detect_concepts_use_case:
-                    try:
-                        self.detect_concepts_use_case.execute(repo_id.value, commit_hash)
-                    except Exception as ce:
-                        logger.error(f"Error executing concept detection for commit {commit_hash}: {ce}", exc_info=True)
+                # Logic and Concept Discovery hooks are deferred to post-ingestion background jobs
 
                 # Post-commit benchmark telemetry collection
                 try:
@@ -420,6 +418,19 @@ class ScanRepositoryHistoryUseCase:
                     repo_db.status = AnalysisStatus.COMPLETED
                     uow.repositories.save(repo_db)
                     uow.commit()
+
+            # Trigger asynchronous post-ingestion job sequence
+            if self.calibration_engine and self.concept_discovery_engine:
+                from src.application.use_cases.ingest_repository import trigger_background_jobs
+                import os
+                storage_root = os.path.dirname(local_path) if local_path else "data"
+                trigger_background_jobs(
+                    repository_id=repo_id.value,
+                    uow_factory=self.uow_factory,
+                    calibration_engine=self.calibration_engine,
+                    concept_discovery_engine=self.concept_discovery_engine,
+                    storage_root=storage_root
+                )
 
         finally:
             # Checkout default branch back to ensure workspace is clean
