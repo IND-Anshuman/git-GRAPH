@@ -28,6 +28,8 @@ from .concept_explanation import ConceptExplanation
 from .concept_evolution import ConceptEvolution
 from .concept_metrics import ConceptMetrics
 from .concept_drift import ConceptDrift
+from .knowledge_artifact import KnowledgeArtifact
+from .organization import OrganizationEntity
 
 __all__ = [
     "RepositoryEntity",
@@ -63,4 +65,6 @@ __all__ = [
     "ConceptEvolution",
     "ConceptMetrics",
     "ConceptDrift",
+    "KnowledgeArtifact",
+    "OrganizationEntity",
 ]

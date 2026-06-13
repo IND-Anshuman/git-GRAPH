@@ -40,3 +40,10 @@ class RelationshipType(Enum):
     READS_MEMORY = auto()
     EVALUATES_OUTPUT = auto()
     REFLECTS_ON_RESULT = auto()
+
+    # Phase 5.6 Semantic & Configuration Relationships
+    EXPORTS = auto()
+    DEPLOYS = auto()
+    EXPOSES = auto()
+    CONNECTS_TO = auto()
+    USES_DATABASE = auto()

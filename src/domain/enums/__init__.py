@@ -8,6 +8,7 @@ from .transition_type import TransitionType
 from .drift_category import DriftCategory
 from .concept_relationship_type import ConceptRelationshipType
 from .concept_transition_type import ConceptTransitionType
+from .graph_layer import GraphLayer
 
 __all__ = [
     "EntityType",
@@ -20,4 +21,5 @@ __all__ = [
     "DriftCategory",
     "ConceptRelationshipType",
     "ConceptTransitionType",
+    "GraphLayer",
 ]

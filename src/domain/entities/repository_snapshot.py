@@ -15,3 +15,9 @@ class RepositorySnapshot:
     entity_seids: list[SEID]
     snapshot_data: dict[str, Any]
     created_at: datetime
+    entity_count: int = 0
+    relationship_count: int = 0
+    behavior_count: int = 0
+    concept_count: int = 0
+    capability_count: int = 0
+    dependency_graph_hash: str | None = None

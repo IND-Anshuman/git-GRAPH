@@ -29,12 +29,13 @@ from src.domain.repositories.concept_repositories import (
     IConceptEvolutionRepository,
     IConceptDriftRepository,
 )
-from src.domain.repositories.meta_ontology_repo import (
+from .meta_ontology_repo import (
     IMetaTypeRepository,
     IMetaDefinitionRepository,
     IEmbeddingModelRepository,
     IEmbeddingVersionRepository,
 )
+from .knowledge_artifact_repo import IKnowledgeArtifactRepository
 
 __all__ = [
     "IRepositoryRepository",
@@ -70,4 +71,5 @@ __all__ = [
     "IMetaDefinitionRepository",
     "IEmbeddingModelRepository",
     "IEmbeddingVersionRepository",
+    "IKnowledgeArtifactRepository",
 ]
