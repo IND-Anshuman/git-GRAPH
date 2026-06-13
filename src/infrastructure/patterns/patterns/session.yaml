@@ -1,0 +1,56 @@
+schema_version: "1.0"
+patterns:
+  - pattern_id: session_read
+    name: Server-Side Session Read
+    pattern_version: "1.0.0"
+    ontology_node_id: security.authentication.session
+    base_confidence: 0.80
+    index_keys:
+      - "subscript:session"
+      - "call:session.get"
+    rules:
+      ast_features:
+        - match_type: subscript
+          description: "Reading from session variable dictionary"
+        - match_type: call
+          target_method: get
+          target_class_pattern: "session"
+
+  - pattern_id: session_write
+    name: Server-Side Session Write
+    pattern_version: "1.0.0"
+    ontology_node_id: security.authentication.session
+    base_confidence: 0.80
+    index_keys:
+      - "subscript:session"
+      - "call:session.set"
+    rules:
+      ast_features:
+        - match_type: subscript
+          description: "Writing to session variable dictionary"
+
+  - pattern_id: session_invalidation
+    name: Session Invalidation
+    pattern_version: "1.0.0"
+    ontology_node_id: security.authentication.session
+    base_confidence: 0.85
+    index_keys:
+      - "call:session.clear"
+      - "call:session.destroy"
+      - "call:logout"
+    rules:
+      ast_features:
+        - match_type: call
+          target_method_pattern: "(clear|destroy|invalidate|logout)"
+
+  - pattern_id: login_required_guard
+    name: Login Required Guard
+    pattern_version: "1.0.0"
+    ontology_node_id: security.authentication.session
+    base_confidence: 0.90
+    index_keys:
+      - "decorator:login_required"
+    rules:
+      ast_features:
+        - match_type: decorator
+          target_function_pattern: "(login_required|require_login|auth)"

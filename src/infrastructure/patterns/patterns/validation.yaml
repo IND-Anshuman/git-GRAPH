@@ -1,0 +1,65 @@
+schema_version: "1.0"
+patterns:
+  - pattern_id: pydantic_field_validator
+    name: Pydantic Field Validator Decorator
+    pattern_version: "1.0.0"
+    ontology_node_id: presentation.validation.schema
+    base_confidence: 0.95
+    index_keys:
+      - "decorator:field_validator"
+      - "decorator:validator"
+      - "import:pydantic"
+    rules:
+      ast_features:
+        - match_type: decorator
+          target_function_pattern: "(field_validator|validator)"
+        - match_type: import
+          target_module: pydantic
+
+  - pattern_id: marshmallow_validate
+    name: Marshmallow Schema Validation
+    pattern_version: "1.0.0"
+    ontology_node_id: presentation.validation.schema
+    base_confidence: 0.92
+    index_keys:
+      - "call:Schema.validate"
+      - "import:marshmallow"
+    rules:
+      ast_features:
+        - match_type: call
+          target_method: validate
+          target_class: Schema
+        - match_type: import
+          target_module: marshmallow
+
+  - pattern_id: jsonschema_validate
+    name: JSONSchema Library Validation
+    pattern_version: "1.0.0"
+    ontology_node_id: presentation.validation.schema
+    base_confidence: 0.90
+    index_keys:
+      - "call:validate"
+      - "import:jsonschema"
+    rules:
+      ast_features:
+        - match_type: call
+          target_function: validate
+          target_module: jsonschema
+        - match_type: import
+          target_module: jsonschema
+
+  - pattern_id: zod_parse
+    name: Zod Schema Parse (TS)
+    pattern_version: "1.0.0"
+    ontology_node_id: presentation.validation.schema
+    base_confidence: 0.95
+    index_keys:
+      - "call:parse"
+      - "call:safeParse"
+      - "import:zod"
+    rules:
+      ast_features:
+        - match_type: call
+          target_method_pattern: "(parse|safeParse)"
+        - match_type: import
+          target_module: zod

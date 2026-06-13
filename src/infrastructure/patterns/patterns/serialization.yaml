@@ -1,0 +1,126 @@
+schema_version: "1.0"
+patterns:
+  - pattern_id: json_serialize
+    name: JSON Serialization
+    pattern_version: "1.0.0"
+    ontology_node_id: data_management.serialization.json
+    base_confidence: 0.85
+    index_keys:
+      - "call:json.dumps"
+      - "call:orjson.dumps"
+      - "import:json"
+    rules:
+      ast_features:
+        - match_type: call
+          target_function_pattern: "(dumps|dump|stringify)"
+        - match_type: import
+          target_module_pattern: "(json|orjson|ujson|simplejson)"
+
+  - pattern_id: json_deserialize
+    name: JSON Deserialization
+    pattern_version: "1.0.0"
+    ontology_node_id: data_management.serialization.json
+    base_confidence: 0.85
+    index_keys:
+      - "call:json.loads"
+      - "call:orjson.loads"
+      - "import:json"
+    rules:
+      ast_features:
+        - match_type: call
+          target_function_pattern: "(loads|load|parse)"
+        - match_type: import
+          target_module_pattern: "(json|orjson|ujson|simplejson)"
+
+  - pattern_id: pydantic_serialize
+    name: Pydantic Model Serialization
+    pattern_version: "1.0.0"
+    ontology_node_id: data_management.serialization.json
+    base_confidence: 0.90
+    index_keys:
+      - "call:model_dump"
+      - "call:dict"
+      - "import:pydantic"
+    rules:
+      ast_features:
+        - match_type: call
+          target_method_pattern: "(model_dump|model_dump_json|dict|json)"
+          target_class_pattern: "(BaseModel|Model)"
+
+  - pattern_id: marshmallow_serialize
+    name: Marshmallow Serialization
+    pattern_version: "1.0.0"
+    ontology_node_id: data_management.serialization.json
+    base_confidence: 0.92
+    index_keys:
+      - "call:Schema.dump"
+      - "import:marshmallow"
+    rules:
+      ast_features:
+        - match_type: call
+          target_method: dump
+          target_class: Schema
+        - match_type: import
+          target_module: marshmallow
+
+  - pattern_id: pickle_serialize
+    name: Pickle Serialization
+    pattern_version: "1.0.0"
+    ontology_node_id: data_management.serialization.binary
+    base_confidence: 0.90
+    index_keys:
+      - "call:pickle.dumps"
+      - "import:pickle"
+    rules:
+      ast_features:
+        - match_type: call
+          target_function: dumps
+          target_module: pickle
+        - match_type: import
+          target_module: pickle
+
+  - pattern_id: pickle_deserialize
+    name: Pickle Deserialization
+    pattern_version: "1.0.0"
+    ontology_node_id: data_management.serialization.binary
+    base_confidence: 0.90
+    index_keys:
+      - "call:pickle.loads"
+      - "import:pickle"
+    rules:
+      ast_features:
+        - match_type: call
+          target_function: loads
+          target_module: pickle
+        - match_type: import
+          target_module: pickle
+
+  - pattern_id: protobuf_serialize
+    name: Protobuf Serialization
+    pattern_version: "1.0.0"
+    ontology_node_id: data_management.serialization.binary
+    base_confidence: 0.94
+    index_keys:
+      - "call:SerializeToString"
+      - "import:google.protobuf"
+    rules:
+      ast_features:
+        - match_type: call
+          target_method: SerializeToString
+        - match_type: import
+          target_module_pattern: "google.protobuf"
+
+  - pattern_id: msgpack_serialize
+    name: MessagePack Serialization
+    pattern_version: "1.0.0"
+    ontology_node_id: data_management.serialization.binary
+    base_confidence: 0.91
+    index_keys:
+      - "call:msgpack.packb"
+      - "import:msgpack"
+    rules:
+      ast_features:
+        - match_type: call
+          target_function_pattern: "(packb|unpackb|pack|unpack)"
+        - match_type: import
+          target_module: msgpack
