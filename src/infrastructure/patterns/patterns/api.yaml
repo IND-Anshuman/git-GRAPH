@@ -50,10 +50,10 @@ patterns:
           target_method_pattern: "(get|post|put|delete|patch)"
           target_object_pattern: "(app|router|api|blueprint)"
 
-  - pattern_id: api_gemini_client
+  - pattern_id: ai_model_invoke_gemini
     name: Gemini GenAI Client Call
     pattern_version: "1.0.0"
-    ontology_node_id: integration.http_client.rest_call
+    ontology_node_id: integration.ai_model.invoke
     base_confidence: 0.95
     index_keys:
       - "import:google.genai"
@@ -68,7 +68,7 @@ patterns:
   - pattern_id: tts_parler_generation
     name: Parler TTS Audio Generation
     pattern_version: "1.0.0"
-    ontology_node_id: integration.http_client.rest_call
+    ontology_node_id: integration.audio.tts
     base_confidence: 0.90
     index_keys:
       - "import:parler_tts"
@@ -108,3 +108,71 @@ patterns:
         - match_type: call
           target_function: axios
           description: "axios API request invocation"
+
+  - pattern_id: gql_query
+    name: GraphQL Client Query
+    pattern_version: "1.0.0"
+    ontology_node_id: integration.http_client.graphql_call
+    base_confidence: 0.93
+    index_keys:
+      - "call:execute"
+      - "import:gql"
+    rules:
+      ast_features:
+        - match_type: call
+          target_method: execute
+          target_class_pattern: "Client"
+        - match_type: import
+          target_module: gql
+      negative_indicators:
+        - symbol: "mutation"
+
+  - pattern_id: gql_mutation
+    name: GraphQL Client Mutation
+    pattern_version: "1.0.0"
+    ontology_node_id: integration.http_client.graphql_call
+    base_confidence: 0.93
+    index_keys:
+      - "call:execute"
+      - "import:gql"
+    rules:
+      ast_features:
+        - match_type: call
+          target_method: execute
+          target_class_pattern: "Client"
+        - match_type: import
+          target_module: gql
+      string_literals:
+        - pattern: "mutation"
+
+  - pattern_id: graphql_post_request
+    name: GraphQL Raw Post Request
+    pattern_version: "1.0.0"
+    ontology_node_id: integration.http_client.graphql_call
+    base_confidence: 0.85
+    index_keys:
+      - "call:post"
+    rules:
+      ast_features:
+        - match_type: call
+          target_function_pattern: "(post|request)"
+      string_literals:
+        - pattern: "query"
+
+  - pattern_id: stt_speech_to_text
+    name: Speech-to-Text Transcription
+    pattern_version: "1.0.0"
+    ontology_node_id: integration.audio.stt
+    base_confidence: 0.93
+    index_keys:
+      - "import:whisper"
+      - "import:speech_recognition"
+      - "call:transcribe"
+      - "call:speech_to_text"
+      - "call:recognize"
+    rules:
+      ast_features:
+        - match_type: import
+          target_module_pattern: "(whisper|speech_recognition)"
+        - match_type: call
+          target_function_pattern: "(transcribe|speech_to_text|recognize)"

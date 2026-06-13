@@ -27,3 +27,50 @@ patterns:
       ast_features:
         - match_type: call
           target_function_pattern: "(has_role|check_role|is_in_role|require_role)"
+
+  - pattern_id: abac_policy_check
+    name: Attribute-Based Policy Check
+    pattern_version: "1.0.0"
+    ontology_node_id: security.authorization.abac
+    base_confidence: 0.80
+    index_keys:
+      - "call:evaluate"
+      - "import:pyabac"
+    rules:
+      ast_features:
+        - match_type: call
+          target_method: evaluate
+          target_class_pattern: "(PolicyEvaluator|abac)"
+        - match_type: import
+          target_module: pyabac
+
+  - pattern_id: casbin_enforce
+    name: Casbin Enforcement
+    pattern_version: "1.0.0"
+    ontology_node_id: security.authorization.abac
+    base_confidence: 0.93
+    index_keys:
+      - "call:enforce"
+      - "import:casbin"
+    rules:
+      ast_features:
+        - match_type: call
+          target_method: enforce
+          target_class_pattern: "(Enforcer|casbin)"
+        - match_type: import
+          target_module: casbin
+
+  - pattern_id: opa_query
+    name: OPA Policy Query
+    pattern_version: "1.0.0"
+    ontology_node_id: security.authorization.abac
+    base_confidence: 0.90
+    index_keys:
+      - "call:check"
+      - "import:opa"
+    rules:
+      ast_features:
+        - match_type: call
+          target_method: check
+        - match_type: import
+          target_module_pattern: "(opa|openpolicyagent)"

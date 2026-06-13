@@ -25,6 +25,22 @@ patterns:
     rules:
       ast_features:
         - match_type: attribute_access
-          attribute_pattern: "(state|is_open|is_closed|circuit_state)"
-        - match_type: string_literal_pattern
-          pattern: "(OPEN|CLOSED|HALF_OPEN|HALF-OPEN)"
+          target_attribute_pattern: "(state|is_open|is_closed|circuit_state)"
+        - match_type: comparison
+          operators: ["==", "!="]
+          description: "Circuit state comparison against OPEN/CLOSED constants"
+
+  - pattern_id: circuit_breaker_fallback
+    name: Circuit Breaker Fallback
+    pattern_version: "1.0.0"
+    ontology_node_id: reliability.circuit_breaker.fallback
+    base_confidence: 0.88
+    index_keys:
+      - "decorator:fallback"
+      - "decorator:on_fallback"
+      - "decorator:handle_fallback"
+      - "call:fallback"
+    rules:
+      ast_features:
+        - match_type: decorator
+          target_function_pattern: "(fallback|on_fallback|handle_fallback)"

@@ -41,13 +41,22 @@ patterns:
     ontology_node_id: data_management.database.repository_pattern
     base_confidence: 0.82
     index_keys:
-      - "struct:class_repository"
+      - "call:find"
+      - "call:save"
+      - "call:delete"
+      - "call:get_by"
+      - "import:sqlalchemy"
     rules:
       ast_features:
-        - match_type: class_name_pattern
-          pattern: "(Repository|Repo|Store|DAO|DataAccessObject)"
-        - match_type: method_pattern
-          patterns: ["find", "save", "delete", "get_by"]
+        - match_type: call
+          target_method_pattern: "(find|save|delete|get_by)"
+          target_class_pattern: "(Repository|Repo|Store|DAO|DataAccessObject)"
+        - match_type: import
+          target_module_pattern: "(sqlalchemy|peewee|django.db|tortoise)"
+      negative_indicators:
+        - symbol: "Controller"
+        - symbol: "Service"
+        - symbol: "Middleware"
 
   - pattern_id: db_transaction
     name: Database Transaction
@@ -62,3 +71,22 @@ patterns:
       ast_features:
         - match_type: call
           target_method_pattern: "(commit|rollback|begin_transaction|start_transaction)"
+
+  - pattern_id: db_schema_migration
+    name: Database Schema Migration
+    pattern_version: "1.0.0"
+    ontology_node_id: data_management.migration.schema_migration
+    base_confidence: 0.94
+    index_keys:
+      - "import:alembic"
+      - "import:flyway"
+      - "import:liquibase"
+      - "call:create_table"
+      - "call:alter_table"
+      - "call:add_column"
+    rules:
+      ast_features:
+        - match_type: import
+          target_module_pattern: "(alembic|flyway|liquibase)"
+        - match_type: call
+          target_method_pattern: "(create_table|alter_table|add_column|create_index)"
