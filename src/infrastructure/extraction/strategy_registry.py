@@ -18,7 +18,7 @@ class ExtractionStrategyRegistry:
         self._register_default_strategies()
 
     def _register_default_strategies(self) -> None:
-        self.register(SupportedLanguage.PYTHON, PythonExtractionStrategy())
+        self.register(SupportedLanguage.PYTHON, Wave1ExtractionStrategy("python"))
         self.register(
             SupportedLanguage.JAVASCRIPT,
             Wave1ExtractionStrategy("javascript"),

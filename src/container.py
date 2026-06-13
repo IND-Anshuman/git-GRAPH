@@ -274,6 +274,8 @@ class Container:
             uow_factory=self.get_uow_factory(),
             storage_root=self.config.storage_root,
             identity_service=self.identity_service,
+            calibration_engine=self.calibration_engine,
+            concept_discovery_engine=self.concept_discovery_engine,
             reconstruction_service=self.reconstruction_service
         )
 
@@ -298,7 +300,9 @@ class Container:
             identity_service=self.identity_service,
             reconstruction_service=self.reconstruction_service,
             logic_orchestrator=self.logic_extraction_orchestrator,
-            detect_concepts_use_case=self.detect_concepts_use_case
+            detect_concepts_use_case=self.detect_concepts_use_case,
+            calibration_engine=self.calibration_engine,
+            concept_discovery_engine=self.concept_discovery_engine
         )
 
     def get_get_commits_use_case(self) -> GetCommitsUseCase:
