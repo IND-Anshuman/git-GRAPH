@@ -34,6 +34,7 @@ from src.domain.repositories import (
     IMetaDefinitionRepository,
     IEmbeddingModelRepository,
     IEmbeddingVersionRepository,
+    IKnowledgeArtifactRepository,
 )
 
 class IUnitOfWork(ABC):
@@ -217,5 +218,11 @@ class IUnitOfWork(ABC):
     @abstractmethod
     def embedding_versions(self) -> IEmbeddingVersionRepository:
         pass
+
+    @property
+    @abstractmethod
+    def knowledge_artifacts(self) -> IKnowledgeArtifactRepository:
+        pass
+
 
 

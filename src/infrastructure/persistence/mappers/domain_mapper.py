@@ -302,6 +302,12 @@ class DomainMapper:
             commit_hash=entity.commit_hash,
             entity_seids=[str(seid) for seid in entity.entity_seids],
             snapshot_data=entity.snapshot_data,
+            entity_count=entity.entity_count,
+            relationship_count=entity.relationship_count,
+            behavior_count=entity.behavior_count,
+            concept_count=entity.concept_count,
+            capability_count=entity.capability_count,
+            dependency_graph_hash=entity.dependency_graph_hash,
             created_at=entity.created_at
         )
 
@@ -313,7 +319,13 @@ class DomainMapper:
             commit_hash=model.commit_hash,
             entity_seids=[SEID.from_string(val) for val in model.entity_seids],
             snapshot_data=model.snapshot_data,
-            created_at=model.created_at
+            created_at=model.created_at,
+            entity_count=model.entity_count,
+            relationship_count=model.relationship_count,
+            behavior_count=model.behavior_count,
+            concept_count=model.concept_count,
+            capability_count=model.capability_count,
+            dependency_graph_hash=model.dependency_graph_hash
         )
 
     @staticmethod

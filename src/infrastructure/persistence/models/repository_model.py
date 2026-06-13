@@ -4,7 +4,7 @@ from datetime import datetime
 from typing import Any, Dict, Optional
 import uuid
 
-from sqlalchemy import String, Text, DateTime, JSON
+from sqlalchemy import String, Text, DateTime, JSON, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.sql import func
 
@@ -16,6 +16,7 @@ class RepositoryModel(Base):
     __tablename__ = "repositories"
     
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True)
+    organization_id: Mapped[Optional[uuid.UUID]] = mapped_column(ForeignKey("organizations.id", ondelete="SET NULL"), nullable=True)
     name: Mapped[str] = mapped_column(String(255))
     url: Mapped[str] = mapped_column(Text, unique=True)
     default_branch: Mapped[str] = mapped_column(String(100))

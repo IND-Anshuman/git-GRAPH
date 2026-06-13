@@ -35,6 +35,7 @@ class CodeEntityModel(Base):
     content_hash: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
     structural_fingerprint: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
     source_text: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    layer: Mapped[str] = mapped_column(String(30), default="STRUCTURAL", server_default="STRUCTURAL", nullable=False)
     
     metadata_: Mapped[Dict[str, Any]] = mapped_column("metadata", JSON, default=dict)
     

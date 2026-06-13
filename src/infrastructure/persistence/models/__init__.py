@@ -23,6 +23,9 @@ from src.infrastructure.persistence.models.logic_models import (
     LogicClusterMemberModel,
     LogicVersionPatternModel,
 )
+from src.infrastructure.persistence.models.evidence_models import SEEEEvidenceModel, CompilerOutputModel
+from src.infrastructure.persistence.models.knowledge_artifact_model import KnowledgeArtifactModel
+from src.infrastructure.persistence.models.organization_model import OrganizationModel
 from src.infrastructure.persistence.models.concept_models import (
     ConceptNodeModel,
     ConceptVersionModel,
@@ -41,6 +44,8 @@ from src.infrastructure.persistence.models.concept_models import (
     FrameworkVersionModel,
     FrameworkMappingModel,
     CanonicalFlowModel,
+    ConceptCandidateModel,
+    CapabilityCandidateModel,
 )
 from src.infrastructure.persistence.models.meta_models import (
     MetaTypeModel,
@@ -96,4 +101,10 @@ __all__ = [
     "MetaDefinitionModel",
     "EmbeddingModelModel",
     "EmbeddingVersionModel",
+    "SEEEEvidenceModel",
+    "CompilerOutputModel",
+    "KnowledgeArtifactModel",
+    "OrganizationModel",
+    "ConceptCandidateModel",
+    "CapabilityCandidateModel",
 ]

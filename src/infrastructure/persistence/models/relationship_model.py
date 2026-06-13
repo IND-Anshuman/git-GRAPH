@@ -19,6 +19,7 @@ class RelationshipModel(Base):
     source_seid: Mapped[uuid.UUID] = mapped_column(ForeignKey("code_entities.seid", ondelete="CASCADE"))
     target_seid: Mapped[uuid.UUID] = mapped_column(ForeignKey("code_entities.seid", ondelete="CASCADE"))
     confidence: Mapped[float] = mapped_column(Float, default=1.0)
+    layer: Mapped[str] = mapped_column(String(30), default="STRUCTURAL", server_default="STRUCTURAL", nullable=False)
     metadata_: Mapped[Dict[str, Any]] = mapped_column("metadata", JSON, default=dict)
     
     __table_args__ = (

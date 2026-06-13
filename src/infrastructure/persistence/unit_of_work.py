@@ -57,6 +57,7 @@ from src.infrastructure.persistence.repositories.sa_meta_repositories import (
     SAEmbeddingModelRepository,
     SAEmbeddingVersionRepository,
 )
+from src.infrastructure.persistence.repositories.sa_knowledge_artifact_repo import SAKnowledgeArtifactRepository
 from src.infrastructure.persistence.database import DatabaseEngine
 
 
@@ -102,6 +103,7 @@ class SQLAlchemyUnitOfWork(IUnitOfWork):
         self._meta_definitions = SAMetaDefinitionRepository(self._session)
         self._embedding_models = SAEmbeddingModelRepository(self._session)
         self._embedding_versions = SAEmbeddingVersionRepository(self._session)
+        self._knowledge_artifacts = SAKnowledgeArtifactRepository(self._session)
         return self
 
     def __exit__(self, exc_type: Any, exc_val: Any, exc_tb: Any) -> None:
@@ -250,5 +252,9 @@ class SQLAlchemyUnitOfWork(IUnitOfWork):
     @property
     def embedding_versions(self):
         return self._embedding_versions
+
+    @property
+    def knowledge_artifacts(self):
+        return self._knowledge_artifacts
 
 
