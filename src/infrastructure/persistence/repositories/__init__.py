@@ -37,6 +37,21 @@ from src.infrastructure.persistence.repositories.sa_meta_repositories import (
     SAEmbeddingModelRepository,
     SAEmbeddingVersionRepository,
 )
+from src.infrastructure.persistence.repositories.sa_resolution_repos import (
+    SASymbolGraphRepository,
+    SASymbolReferenceRepository,
+    SAVariableFlowRepository,
+    SACrossFileResolutionRepository,
+    SAExternalDependencyRepository,
+    SAAIEvidenceRepository,
+    SARepositoryArchitectureGraphRepository,
+    SAArchitectureRelationshipRepository,
+    SARepositoryStructureGraphRepository,
+    SACompilerOutputVersionRepository,
+    SAReasoningArtifactRepository,
+    SAKnowledgeDriftRepository,
+    SAExternalKnowledgeReferenceRepository,
+)
 
 __all__ = [
     "SARepositoryRepository",
@@ -72,4 +87,17 @@ __all__ = [
     "SAMetaDefinitionRepository",
     "SAEmbeddingModelRepository",
     "SAEmbeddingVersionRepository",
+    "SASymbolGraphRepository",
+    "SASymbolReferenceRepository",
+    "SAVariableFlowRepository",
+    "SACrossFileResolutionRepository",
+    "SAExternalDependencyRepository",
+    "SAAIEvidenceRepository",
+    "SARepositoryArchitectureGraphRepository",
+    "SAArchitectureRelationshipRepository",
+    "SARepositoryStructureGraphRepository",
+    "SACompilerOutputVersionRepository",
+    "SAReasoningArtifactRepository",
+    "SAKnowledgeDriftRepository",
+    "SAExternalKnowledgeReferenceRepository",
 ]

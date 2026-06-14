@@ -26,6 +26,21 @@ from src.infrastructure.persistence.models.logic_models import (
 from src.infrastructure.persistence.models.evidence_models import SEEEEvidenceModel, CompilerOutputModel
 from src.infrastructure.persistence.models.knowledge_artifact_model import KnowledgeArtifactModel
 from src.infrastructure.persistence.models.organization_model import OrganizationModel
+from src.infrastructure.persistence.models.resolution_models import (
+    SymbolGraphModel,
+    SymbolReferenceModel,
+    VariableFlowModel,
+    CrossFileResolutionModel,
+    ExternalDependencyModel,
+    AIEvidenceModel,
+    RepositoryArchitectureGraphModel,
+    ArchitectureRelationshipModel,
+    RepositoryStructureGraphModel,
+    CompilerOutputVersionModel,
+    ReasoningArtifactModel,
+    KnowledgeDriftModel,
+    ExternalKnowledgeReferenceModel,
+)
 from src.infrastructure.persistence.models.concept_models import (
     ConceptNodeModel,
     ConceptVersionModel,
@@ -107,4 +122,17 @@ __all__ = [
     "OrganizationModel",
     "ConceptCandidateModel",
     "CapabilityCandidateModel",
+    "SymbolGraphModel",
+    "SymbolReferenceModel",
+    "VariableFlowModel",
+    "CrossFileResolutionModel",
+    "ExternalDependencyModel",
+    "AIEvidenceModel",
+    "RepositoryArchitectureGraphModel",
+    "ArchitectureRelationshipModel",
+    "RepositoryStructureGraphModel",
+    "CompilerOutputVersionModel",
+    "ReasoningArtifactModel",
+    "KnowledgeDriftModel",
+    "ExternalKnowledgeReferenceModel",
 ]
