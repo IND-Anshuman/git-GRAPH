@@ -1,0 +1,120 @@
+schema_version: "1.0"
+ontology_version: "3.0.0"
+domain: AI
+nodes:
+  - id: ai.models
+    name: Models
+    parent_id: null
+    is_leaf: false
+    description: "LLM, Embeddings, and Reranking model calls."
+    children:
+      - id: ai.models.invoke
+        name: Model Invoke
+        parent_id: ai.models
+        is_leaf: true
+        description: "Standard model execution/generation calls."
+      - id: ai.models.embedding
+        name: Embedding Generate
+        parent_id: ai.models
+        is_leaf: true
+        description: "Vector embedding generation."
+      - id: ai.models.rerank
+        name: Rerank
+        parent_id: ai.models
+        is_leaf: true
+        description: "Re-ranking list of search results."
+  - id: ai.retrieval
+    name: Retrieval
+    parent_id: null
+    is_leaf: false
+    description: "Retrieving context from database or vector stores."
+    children:
+      - id: ai.retrieval.retrieve
+        name: Retrieve
+        parent_id: ai.retrieval
+        is_leaf: true
+        description: "Retrieve relevant context."
+      - id: ai.retrieval.vector_search
+        name: Vector Search
+        parent_id: ai.retrieval
+        is_leaf: true
+        description: "Vector database search."
+  - id: ai.memory
+    name: Memory
+    parent_id: null
+    is_leaf: false
+    description: "Agent memory storage operations."
+    children:
+      - id: ai.memory.read
+        name: Memory Read
+        parent_id: ai.memory
+        is_leaf: true
+        description: "Reading chat history or memories."
+      - id: ai.memory.write
+        name: Memory Write
+        parent_id: ai.memory
+        is_leaf: true
+        description: "Storing chat history or memories."
+  - id: ai.agent
+    name: Agent
+    parent_id: null
+    is_leaf: false
+    description: "Agent execution, planning, and evaluation."
+    children:
+      - id: ai.agent.plan
+        name: Agent Plan
+        parent_id: ai.agent
+        is_leaf: true
+        description: "Agent task decomposition and planning."
+      - id: ai.agent.execute
+        name: Agent Execute
+        parent_id: ai.agent
+        is_leaf: true
+        description: "Agent execution of tasks."
+      - id: ai.agent.route
+        name: Agent Route
+        parent_id: ai.agent
+        is_leaf: true
+        description: "Routing queries between subagents."
+      - id: ai.agent.reflect
+        name: Agent Reflect
+        parent_id: ai.agent
+        is_leaf: true
+        description: "Self-reflection or feedback loops."
+      - id: ai.agent.evaluate
+        name: Agent Evaluate
+        parent_id: ai.agent
+        is_leaf: true
+        description: "Evaluating outputs."
+  - id: ai.tool
+    name: Tool
+    parent_id: null
+    is_leaf: false
+    description: "Tools used by agents."
+    children:
+      - id: ai.tool.invoke
+        name: Tool Invoke
+        parent_id: ai.tool
+        is_leaf: true
+        description: "Invocation of a tool or function calling."
+  - id: ai.guardrails
+    name: Guardrails
+    parent_id: null
+    is_leaf: true
+    description: "Safety layers, prompt validation, and PII filters."
+  - id: ai.workflow
+    name: Workflow
+    parent_id: null
+    is_leaf: false
+    description: "Multi-agent coordination workflows."
+    children:
+      - id: ai.workflow.graph
+        name: Workflow Graph
+        parent_id: ai.workflow
+        is_leaf: true
+        description: "Workflow graph or state machine coordination (e.g. LangGraph)."
+      - id: ai.workflow.multi_agent
+        name: Multi-Agent Team
+        parent_id: ai.workflow
+        is_leaf: true
+        description: "Coordination of teams of agents (e.g. CrewAI, AutoGen)."

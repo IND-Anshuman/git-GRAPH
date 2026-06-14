@@ -1,0 +1,263 @@
+schema_version: "1.0"
+patterns:
+  # Model Invocations
+  - pattern_id: ai_model_invoke_anthropic
+    name: Anthropic Claude Invoke
+    pattern_version: "2.0.0"
+    ontology_node_id: ai.models.invoke
+    base_confidence: 0.95
+    index_keys:
+      - "call:messages.create"
+      - "import:anthropic"
+    rules:
+      required_imports:
+        - anthropic
+      ast_features:
+        - match_type: call
+          target_method: create
+          target_class_pattern: "messages"
+
+  - pattern_id: ai_model_invoke_langchain
+    name: LangChain Invoke
+    pattern_version: "2.0.0"
+    ontology_node_id: ai.models.invoke
+    base_confidence: 0.92
+    index_keys:
+      - "call:invoke"
+      - "import:langchain"
+    rules:
+      required_imports:
+        - langchain
+      ast_features:
+        - match_type: call
+          target_method: invoke
+
+  - pattern_id: ai_model_invoke_litellm
+    name: LiteLLM Invoke
+    pattern_version: "2.0.0"
+    ontology_node_id: ai.models.invoke
+    base_confidence: 0.94
+    index_keys:
+      - "call:completion"
+      - "import:litellm"
+    rules:
+      required_imports:
+        - litellm
+      ast_features:
+        - match_type: call
+          target_method: completion
+
+  - pattern_id: ai_model_invoke_ollama
+    name: Ollama Invoke
+    pattern_version: "2.0.0"
+    ontology_node_id: ai.models.invoke
+    base_confidence: 0.93
+    index_keys:
+      - "call:generate"
+      - "call:chat"
+      - "import:ollama"
+    rules:
+      required_imports:
+        - ollama
+      ast_features:
+        - match_type: call
+          target_method_pattern: "(generate|chat)"
+
+  - pattern_id: ai_model_invoke_vllm
+    name: vLLM Invoke
+    pattern_version: "2.0.0"
+    ontology_node_id: ai.models.invoke
+    base_confidence: 0.95
+    index_keys:
+      - "call:generate"
+      - "import:vllm"
+    rules:
+      required_imports:
+        - vllm
+      ast_features:
+        - match_type: call
+          target_method: generate
+
+  # Embedding Generation
+  - pattern_id: ai_embedding_generate
+    name: Vector Embedding Generation
+    pattern_version: "2.0.0"
+    ontology_node_id: ai.models.embedding
+    base_confidence: 0.93
+    index_keys:
+      - "call:embed_query"
+      - "call:embed_documents"
+      - "call:get_text_embedding"
+    rules:
+      ast_features:
+        - match_type: call
+          target_method_pattern: "(embed_query|embed_documents|get_text_embedding)"
+
+  # Reranking
+  - pattern_id: ai_rerank
+    name: Document Reranking
+    pattern_version: "2.0.0"
+    ontology_node_id: ai.models.rerank
+    base_confidence: 0.94
+    index_keys:
+      - "call:rerank"
+    rules:
+      ast_features:
+        - match_type: call
+          target_method: rerank
+
+  # Retrieval
+  - pattern_id: ai_retrieve
+    name: Context Retrieval
+    pattern_version: "2.0.0"
+    ontology_node_id: ai.retrieval.retrieve
+    base_confidence: 0.90
+    index_keys:
+      - "call:retrieve"
+      - "call:get_relevant_documents"
+    rules:
+      ast_features:
+        - match_type: call
+          target_method_pattern: "(retrieve|get_relevant_documents)"
+
+  # Memory Operations
+  - pattern_id: ai_memory_read
+    name: Agent Memory Read
+    pattern_version: "2.0.0"
+    ontology_node_id: ai.memory.read
+    base_confidence: 0.92
+    index_keys:
+      - "call:load_memory_variables"
+      - "call:get_messages"
+    rules:
+      ast_features:
+        - match_type: call
+          target_method_pattern: "(load_memory_variables|get_messages|read)"
+
+  - pattern_id: ai_memory_write
+    name: Agent Memory Write
+    pattern_version: "2.0.0"
+    ontology_node_id: ai.memory.write
+    base_confidence: 0.92
+    index_keys:
+      - "call:save_context"
+      - "call:add_message"
+    rules:
+      ast_features:
+        - match_type: call
+          target_method_pattern: "(save_context|add_message|write)"
+
+  # Agent Actions
+  - pattern_id: ai_agent_plan
+    name: Agent Planning
+    pattern_version: "2.0.0"
+    ontology_node_id: ai.agent.plan
+    base_confidence: 0.94
+    index_keys:
+      - "call:plan"
+      - "call:create_plan"
+    rules:
+      ast_features:
+        - match_type: call
+          target_method_pattern: "(plan|create_plan)"
+
+  - pattern_id: ai_agent_execute
+    name: Agent Execution
+    pattern_version: "2.0.0"
+    ontology_node_id: ai.agent.execute
+    base_confidence: 0.93
+    index_keys:
+      - "call:execute"
+      - "call:run"
+    rules:
+      ast_features:
+        - match_type: call
+          target_method_pattern: "(execute|run)"
+
+  - pattern_id: ai_agent_reflect
+    name: Agent Reflection
+    pattern_version: "2.0.0"
+    ontology_node_id: ai.agent.reflect
+    base_confidence: 0.93
+    index_keys:
+      - "call:reflect"
+      - "call:self_reflect"
+    rules:
+      ast_features:
+        - match_type: call
+          target_method_pattern: "(reflect|self_reflect)"
+
+  - pattern_id: ai_agent_evaluate
+    name: Agent Evaluation
+    pattern_version: "2.0.0"
+    ontology_node_id: ai.agent.evaluate
+    base_confidence: 0.92
+    index_keys:
+      - "call:evaluate"
+      - "call:compute_metrics"
+    rules:
+      ast_features:
+        - match_type: call
+          target_method_pattern: "(evaluate|compute_metrics)"
+
+  # Tool Use
+  - pattern_id: ai_tool_invoke
+    name: Tool Invocation
+    pattern_version: "2.0.0"
+    ontology_node_id: ai.tool.invoke
+    base_confidence: 0.94
+    index_keys:
+      - "call:call_tool"
+      - "decorator:tool"
+    rules:
+      ast_features:
+        - match_type: call
+          target_method: call_tool
+        - match_type: decorator
+          target_decorator: tool
+
+  # Guardrails
+  - pattern_id: ai_guardrails
+    name: Agent Guardrails
+    pattern_version: "2.0.0"
+    ontology_node_id: ai.guardrails
+    base_confidence: 0.95
+    index_keys:
+      - "call:guard"
+      - "import:guardrails"
+    rules:
+      ast_features:
+        - match_type: call
+          target_method: guard
+        - match_type: import
+          target_module: guardrails
+
+  # Workflows
+  - pattern_id: ai_workflow_langgraph
+    name: LangGraph State Machine Workflow
+    pattern_version: "2.0.0"
+    ontology_node_id: ai.workflow.graph
+    base_confidence: 0.96
+    index_keys:
+      - "import:langgraph"
+      - "call:StateGraph"
+    rules:
+      required_imports:
+        - langgraph
+      ast_features:
+        - match_type: call
+          target_method: StateGraph
+
+  - pattern_id: ai_workflow_multi_agent
+    name: Multi-Agent Coordination Team
+    pattern_version: "2.0.0"
+    ontology_node_id: ai.workflow.multi_agent
+    base_confidence: 0.95
+    index_keys:
+      - "call:Crew"
+      - "import:crewai"
+      - "import:autogen"
+    rules:
+      ast_features:
+        - match_type: call
+          target_method: Crew
