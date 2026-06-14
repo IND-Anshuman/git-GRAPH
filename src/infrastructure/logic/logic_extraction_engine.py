@@ -195,18 +195,47 @@ class LogicExtractionEngine:
         verdicts: List[RuleVerdict] = []
         evidence_list: List[LogicEvidence] = []
 
-        # Check negative indicators first (fail-fast)
+        # 1. Enforce required_imports guard
+        req_imports = rules.get("required_imports", [])
+        for req in req_imports:
+            if not any(req in imp.symbol for imp in features.imports):
+                return None
+
+        # 2. Enforce required_frameworks guard
+        req_frameworks = rules.get("required_frameworks", [])
+        for req in req_frameworks:
+            if not any(req in imp.symbol for imp in features.imports):
+                return None
+
+        # 3. Enforce required_parent_types guard
+        req_parents = rules.get("required_parent_types", [])
+        if req_parents:
+            parent_name = entity.metadata.get("parent_name")
+            if not parent_name or not any(req in parent_name for req in req_parents):
+                return None
+
+        # 4. Enforce required_decorators guard
+        req_decorators = rules.get("required_decorators", [])
+        for req in req_decorators:
+            if not any(req in dec.symbol for dec in features.decorators):
+                return None
+
+        # 5. Enforce required_relationships guard
+        req_rels = rules.get("required_relationships", [])
+        for req in req_rels:
+            if not any(req in call.symbol for call in features.calls) and not any(req in imp.symbol for imp in features.imports):
+                return None
+
+        # 6. Check negative indicators (fail-fast)
         neg_indicators = rules.get("negative_indicators", [])
         for neg in neg_indicators:
             neg_sym = neg.get("symbol")
             if not neg_sym:
                 continue
-            # If any call, import, or string contains the negative indicator symbol
             call_hit = any(neg_sym in c.symbol for c in features.calls)
             imp_hit = any(neg_sym in i.symbol for i in features.imports)
             str_hit = any(neg_sym in s.metadata.get("raw", "") for s in features.strings if s.metadata)
             if call_hit or imp_hit or str_hit:
-                # Disqualify this pattern entirely
                 return None
 
         # Track category scores for ConfidenceBreakdown

@@ -67,7 +67,10 @@ class Pass9ISRGeneration(ICompilerPass):
             )
             
             src_id = str(uuid.uuid5(uuid.NAMESPACE_DNS, f"{context.file_path}:{rel.source_name}"))
-            tgt_id = str(uuid.uuid5(uuid.NAMESPACE_DNS, f"{context.file_path}:{rel.target_name}"))
+            if "." in rel.target_name:
+                tgt_id = rel.target_name
+            else:
+                tgt_id = str(uuid.uuid5(uuid.NAMESPACE_DNS, f"{context.file_path}:{rel.target_name}"))
             
             conf_obj = context.relationships_confidence.get((rel.source_name, rel.target_name, rel_type_name))
             confidence_val = conf_obj.final_score if conf_obj else 0.8

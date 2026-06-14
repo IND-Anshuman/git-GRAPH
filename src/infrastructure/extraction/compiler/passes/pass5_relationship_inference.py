@@ -12,7 +12,20 @@ class Pass5RelationshipInference(ICompilerPass):
     def execute(self, context: CompilerContext) -> None:
         packs = {f: self.registry.get_pack(f) for f in context.frameworks_detected}
         
+        cross_resolver = context.project_metadata.get("cross_file_call_resolver")
+        global_graph = context.project_metadata.get("global_semantic_graph")
+
         for rel in context.raw_relationships:
+            rel_type_name = getattr(rel.relationship_type, "name", str(rel.relationship_type))
+            if cross_resolver and rel_type_name == "CALLS":
+                resolved = cross_resolver.resolve_call(context.file_path, rel.target_name, rel.source_name)
+                if resolved:
+                    rel.target_name = resolved
+                    if global_graph:
+                        module_prefix = context.file_path.replace("/", ".").replace("\\", ".").replace(".py", "").replace(".ts", "").replace(".js", "")
+                        caller_qname = f"{module_prefix}.{rel.source_name}"
+                        global_graph.add_call(caller_qname, resolved)
+
             # 1. Structural score: based on AST type
             rel_type_name = getattr(rel.relationship_type, "name", str(rel.relationship_type))
             if rel_type_name in ("EXTENDS", "IMPLEMENTS", "BELONGS_TO"):

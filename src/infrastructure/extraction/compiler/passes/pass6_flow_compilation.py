@@ -7,12 +7,18 @@ class Pass6FlowCompilation(ICompilerPass):
     """Pass 6: Flow Compilation. Performs DFS multi-hop tracing across relationships to build execution flows."""
 
     def execute(self, context: CompilerContext) -> None:
-        # Build adjacency list from calls
+        global_graph = context.project_metadata.get("global_semantic_graph")
         adj = {}
-        for rel in context.raw_relationships:
-            rel_type_name = getattr(rel.relationship_type, "name", str(rel.relationship_type))
-            if rel_type_name == "CALLS":
-                adj.setdefault(rel.source_name, []).append(rel.target_name)
+        if global_graph and global_graph.call_graph:
+            # Use global call graph (which enables cross-file, cross-package, cross-service flows!)
+            for caller, callees in global_graph.call_graph.items():
+                adj[caller] = list(callees)
+        else:
+            # Fallback to local file relationships
+            for rel in context.raw_relationships:
+                rel_type_name = getattr(rel.relationship_type, "name", str(rel.relationship_type))
+                if rel_type_name == "CALLS":
+                    adj.setdefault(rel.source_name, []).append(rel.target_name)
                 
         # Find paths of length >= 2 (multi-hop)
         flows_found = []
