@@ -58,6 +58,21 @@ from src.infrastructure.persistence.repositories.sa_meta_repositories import (
     SAEmbeddingVersionRepository,
 )
 from src.infrastructure.persistence.repositories.sa_knowledge_artifact_repo import SAKnowledgeArtifactRepository
+from src.infrastructure.persistence.repositories.sa_resolution_repos import (
+    SASymbolGraphRepository,
+    SASymbolReferenceRepository,
+    SAVariableFlowRepository,
+    SACrossFileResolutionRepository,
+    SAExternalDependencyRepository,
+    SAAIEvidenceRepository,
+    SARepositoryArchitectureGraphRepository,
+    SAArchitectureRelationshipRepository,
+    SARepositoryStructureGraphRepository,
+    SACompilerOutputVersionRepository,
+    SAReasoningArtifactRepository,
+    SAKnowledgeDriftRepository,
+    SAExternalKnowledgeReferenceRepository,
+)
 from src.infrastructure.persistence.database import DatabaseEngine
 
 
@@ -104,6 +119,19 @@ class SQLAlchemyUnitOfWork(IUnitOfWork):
         self._embedding_models = SAEmbeddingModelRepository(self._session)
         self._embedding_versions = SAEmbeddingVersionRepository(self._session)
         self._knowledge_artifacts = SAKnowledgeArtifactRepository(self._session)
+        self._symbol_graph = SASymbolGraphRepository(self._session)
+        self._symbol_references = SASymbolReferenceRepository(self._session)
+        self._variable_flows = SAVariableFlowRepository(self._session)
+        self._cross_file_resolutions = SACrossFileResolutionRepository(self._session)
+        self._external_dependencies = SAExternalDependencyRepository(self._session)
+        self._ai_evidences = SAAIEvidenceRepository(self._session)
+        self._architecture_graphs = SARepositoryArchitectureGraphRepository(self._session)
+        self._architecture_relationships = SAArchitectureRelationshipRepository(self._session)
+        self._structure_graphs = SARepositoryStructureGraphRepository(self._session)
+        self._compiler_output_versions = SACompilerOutputVersionRepository(self._session)
+        self._reasoning_artifacts = SAReasoningArtifactRepository(self._session)
+        self._knowledge_drifts = SAKnowledgeDriftRepository(self._session)
+        self._external_knowledge_references = SAExternalKnowledgeReferenceRepository(self._session)
         return self
 
     def __exit__(self, exc_type: Any, exc_val: Any, exc_tb: Any) -> None:
@@ -256,5 +284,57 @@ class SQLAlchemyUnitOfWork(IUnitOfWork):
     @property
     def knowledge_artifacts(self):
         return self._knowledge_artifacts
+
+    @property
+    def symbol_graph(self):
+        return self._symbol_graph
+
+    @property
+    def symbol_references(self):
+        return self._symbol_references
+
+    @property
+    def variable_flows(self):
+        return self._variable_flows
+
+    @property
+    def cross_file_resolutions(self):
+        return self._cross_file_resolutions
+
+    @property
+    def external_dependencies(self):
+        return self._external_dependencies
+
+    @property
+    def ai_evidences(self):
+        return self._ai_evidences
+
+    @property
+    def architecture_graphs(self):
+        return self._architecture_graphs
+
+    @property
+    def architecture_relationships(self):
+        return self._architecture_relationships
+
+    @property
+    def structure_graphs(self):
+        return self._structure_graphs
+
+    @property
+    def compiler_output_versions(self):
+        return self._compiler_output_versions
+
+    @property
+    def reasoning_artifacts(self):
+        return self._reasoning_artifacts
+
+    @property
+    def knowledge_drifts(self):
+        return self._knowledge_drifts
+
+    @property
+    def external_knowledge_references(self):
+        return self._external_knowledge_references
 
 
