@@ -2,7 +2,7 @@ schema_version: "1.0"
 patterns:
   - pattern_id: cache_memory_dict
     name: In-Memory Dictionary Cache
-    pattern_version: "1.0.0"
+    pattern_version: "2.0.0"
     ontology_node_id: data_management.caching.memory
     base_confidence: 0.78
     index_keys:
@@ -18,7 +18,7 @@ patterns:
 
   - pattern_id: cache_lru_cache
     name: LRU Cache (functools)
-    pattern_version: "1.0.0"
+    pattern_version: "2.0.0"
     ontology_node_id: data_management.caching.memory
     base_confidence: 0.95
     index_keys:
@@ -33,7 +33,7 @@ patterns:
 
   - pattern_id: cache_redis_lookup
     name: Redis Cache Lookup
-    pattern_version: "1.0.0"
+    pattern_version: "2.0.0"
     ontology_node_id: data_management.caching.redis
     base_confidence: 0.90
     index_keys:
@@ -48,7 +48,7 @@ patterns:
 
   - pattern_id: cache_redis_set
     name: Redis Cache Write
-    pattern_version: "1.0.0"
+    pattern_version: "2.0.0"
     ontology_node_id: data_management.caching.redis
     base_confidence: 0.88
     index_keys:
@@ -63,7 +63,7 @@ patterns:
 
   - pattern_id: cache_redis_cluster
     name: Redis Cluster Cache
-    pattern_version: "1.0.0"
+    pattern_version: "2.0.0"
     ontology_node_id: data_management.caching.redis
     base_confidence: 0.91
     index_keys:
@@ -78,7 +78,7 @@ patterns:
 
   - pattern_id: cache_invalidation
     name: Cache Invalidation
-    pattern_version: "1.0.0"
+    pattern_version: "2.0.0"
     ontology_node_id: data_management.caching.invalidation
     base_confidence: 0.85
     index_keys:
@@ -87,13 +87,18 @@ patterns:
       - "call:cache.clear"
       - "call:delete"
     rules:
+      required_imports:
+        - redis
+        - cachetools
+        - django.cache
+        - pymemcache
       ast_features:
         - match_type: call
           target_method_pattern: "(delete|invalidate|clear|expire|evict)"
 
   - pattern_id: memcached_get
     name: Memcached Get
-    pattern_version: "1.0.0"
+    pattern_version: "2.0.0"
     ontology_node_id: data_management.caching.memcached
     base_confidence: 0.90
     index_keys:
@@ -109,7 +114,7 @@ patterns:
 
   - pattern_id: memcached_set
     name: Memcached Set
-    pattern_version: "1.0.0"
+    pattern_version: "2.0.0"
     ontology_node_id: data_management.caching.memcached
     base_confidence: 0.90
     index_keys:
@@ -125,7 +130,7 @@ patterns:
 
   - pattern_id: memcached_delete
     name: Memcached Delete
-    pattern_version: "1.0.0"
+    pattern_version: "2.0.0"
     ontology_node_id: data_management.caching.memcached
     base_confidence: 0.90
     index_keys:

@@ -2,7 +2,7 @@ schema_version: "1.0"
 patterns:
   - pattern_id: api_requests_call
     name: HTTP REST API Call (requests)
-    pattern_version: "1.0.0"
+    pattern_version: "2.0.0"
     ontology_node_id: integration.http_client.rest_call
     base_confidence: 0.88
     index_keys:
@@ -10,6 +10,8 @@ patterns:
       - "call:requests.get"
       - "call:requests.post"
     rules:
+      required_imports:
+        - requests
       ast_features:
         - match_type: import
           target_module: requests
@@ -19,7 +21,7 @@ patterns:
 
   - pattern_id: api_httpx_call
     name: HTTP REST API Call (httpx)
-    pattern_version: "1.0.0"
+    pattern_version: "2.0.0"
     ontology_node_id: integration.http_client.rest_call
     base_confidence: 0.88
     index_keys:
@@ -27,6 +29,8 @@ patterns:
       - "call:httpx.get"
       - "call:client.get"
     rules:
+      required_imports:
+        - httpx
       ast_features:
         - match_type: import
           target_module: httpx
@@ -34,9 +38,78 @@ patterns:
           target_module_pattern: "(httpx|client)"
           target_function_pattern: "(get|post|put|delete|patch)"
 
+  - pattern_id: api_aiohttp_call
+    name: HTTP REST API Call (aiohttp)
+    pattern_version: "2.0.0"
+    ontology_node_id: integration.http_client.rest_call
+    base_confidence: 0.90
+    index_keys:
+      - "import:aiohttp"
+      - "call:ClientSession"
+    rules:
+      required_imports:
+        - aiohttp
+      ast_features:
+        - match_type: import
+          target_module: aiohttp
+        - match_type: call
+          target_method: ClientSession
+
+  - pattern_id: api_urllib3_call
+    name: HTTP REST API Call (urllib3)
+    pattern_version: "2.0.0"
+    ontology_node_id: integration.http_client.rest_call
+    base_confidence: 0.90
+    index_keys:
+      - "import:urllib3"
+      - "call:PoolManager"
+    rules:
+      required_imports:
+        - urllib3
+      ast_features:
+        - match_type: import
+          target_module: urllib3
+        - match_type: call
+          target_method: PoolManager
+
+  - pattern_id: api_http_client_call
+    name: HTTP REST API Call (http.client)
+    pattern_version: "2.0.0"
+    ontology_node_id: integration.http_client.rest_call
+    base_confidence: 0.88
+    index_keys:
+      - "import:http.client"
+      - "call:HTTPConnection"
+    rules:
+      required_imports:
+        - http.client
+      ast_features:
+        - match_type: import
+          target_module: http.client
+        - match_type: call
+          target_method: HTTPConnection
+
+  - pattern_id: api_grpc_call
+    name: gRPC Client Call
+    pattern_version: "2.0.0"
+    ontology_node_id: integration.http_client.rest_call
+    base_confidence: 0.92
+    index_keys:
+      - "import:grpc"
+      - "call:insecure_channel"
+      - "call:secure_channel"
+    rules:
+      required_imports:
+        - grpc
+      ast_features:
+        - match_type: import
+          target_module_pattern: "(grpc|grpc\\.aio)"
+        - match_type: call
+          target_method_pattern: "(insecure_channel|secure_channel)"
+
   - pattern_id: api_endpoint_handler
     name: API Endpoint Handler
-    pattern_version: "1.0.0"
+    pattern_version: "2.0.0"
     ontology_node_id: presentation.api_handling.endpoint
     base_confidence: 0.87
     index_keys:
@@ -52,8 +125,8 @@ patterns:
 
   - pattern_id: ai_model_invoke_gemini
     name: Gemini GenAI Client Call
-    pattern_version: "1.0.0"
-    ontology_node_id: integration.ai_model.invoke
+    pattern_version: "2.0.0"
+    ontology_node_id: ai.models.invoke
     base_confidence: 0.95
     index_keys:
       - "import:google.genai"
@@ -67,7 +140,7 @@ patterns:
 
   - pattern_id: tts_parler_generation
     name: Parler TTS Audio Generation
-    pattern_version: "1.0.0"
+    pattern_version: "2.0.0"
     ontology_node_id: integration.audio.tts
     base_confidence: 0.90
     index_keys:
@@ -82,7 +155,7 @@ patterns:
 
   - pattern_id: api_fetch_call
     name: HTTP REST API Call (fetch)
-    pattern_version: "1.0.0"
+    pattern_version: "2.0.0"
     ontology_node_id: integration.http_client.rest_call
     base_confidence: 0.90
     index_keys:
@@ -92,10 +165,13 @@ patterns:
         - match_type: call
           target_function: fetch
           description: "fetch API request invocation"
+      string_literals:
+        - pattern: "https?://"
+        - pattern_pattern: "(GET|POST|PUT|DELETE|PATCH)"
 
   - pattern_id: api_axios_call
     name: HTTP REST API Call (axios)
-    pattern_version: "1.0.0"
+    pattern_version: "2.0.0"
     ontology_node_id: integration.http_client.rest_call
     base_confidence: 0.92
     index_keys:
@@ -111,7 +187,7 @@ patterns:
 
   - pattern_id: gql_query
     name: GraphQL Client Query
-    pattern_version: "1.0.0"
+    pattern_version: "2.0.0"
     ontology_node_id: integration.http_client.graphql_call
     base_confidence: 0.93
     index_keys:
@@ -129,7 +205,7 @@ patterns:
 
   - pattern_id: gql_mutation
     name: GraphQL Client Mutation
-    pattern_version: "1.0.0"
+    pattern_version: "2.0.0"
     ontology_node_id: integration.http_client.graphql_call
     base_confidence: 0.93
     index_keys:
@@ -147,7 +223,7 @@ patterns:
 
   - pattern_id: graphql_post_request
     name: GraphQL Raw Post Request
-    pattern_version: "1.0.0"
+    pattern_version: "2.0.0"
     ontology_node_id: integration.http_client.graphql_call
     base_confidence: 0.85
     index_keys:
@@ -161,7 +237,7 @@ patterns:
 
   - pattern_id: stt_speech_to_text
     name: Speech-to-Text Transcription
-    pattern_version: "1.0.0"
+    pattern_version: "2.0.0"
     ontology_node_id: integration.audio.stt
     base_confidence: 0.93
     index_keys:

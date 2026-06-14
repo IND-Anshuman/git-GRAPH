@@ -2,7 +2,7 @@ schema_version: "1.0"
 patterns:
   - pattern_id: aes_encrypt
     name: AES Symmetric Encryption
-    pattern_version: "1.0.0"
+    pattern_version: "2.0.0"
     ontology_node_id: security.cryptography.symmetric
     base_confidence: 0.92
     index_keys:
@@ -21,7 +21,7 @@ patterns:
 
   - pattern_id: aes_decrypt
     name: AES Symmetric Decryption
-    pattern_version: "1.0.0"
+    pattern_version: "2.0.0"
     ontology_node_id: security.cryptography.symmetric
     base_confidence: 0.92
     index_keys:
@@ -38,9 +38,25 @@ patterns:
         - match_type: import
           target_module_pattern: "(cryptography|Crypto)"
 
+  - pattern_id: chacha20_encrypt
+    name: ChaCha20 Symmetric Encryption
+    pattern_version: "2.0.0"
+    ontology_node_id: security.cryptography.symmetric
+    base_confidence: 0.94
+    index_keys:
+      - "call:ChaCha20"
+      - "import:cryptography"
+    rules:
+      ast_features:
+        - match_type: call
+          target_method_pattern: "(new|encrypt)"
+          target_class_pattern: "ChaCha20"
+        - match_type: import
+          target_module: cryptography
+
   - pattern_id: fernet_encrypt
     name: Fernet Symmetric Encryption
-    pattern_version: "1.0.0"
+    pattern_version: "2.0.0"
     ontology_node_id: security.cryptography.symmetric
     base_confidence: 0.95
     index_keys:
@@ -56,7 +72,7 @@ patterns:
 
   - pattern_id: fernet_decrypt
     name: Fernet Symmetric Decryption
-    pattern_version: "1.0.0"
+    pattern_version: "2.0.0"
     ontology_node_id: security.cryptography.symmetric
     base_confidence: 0.95
     index_keys:
@@ -72,7 +88,7 @@ patterns:
 
   - pattern_id: rsa_encrypt
     name: RSA Asymmetric Encryption
-    pattern_version: "1.0.0"
+    pattern_version: "2.0.0"
     ontology_node_id: security.cryptography.asymmetric
     base_confidence: 0.93
     index_keys:
@@ -88,7 +104,7 @@ patterns:
 
   - pattern_id: rsa_decrypt
     name: RSA Asymmetric Decryption
-    pattern_version: "1.0.0"
+    pattern_version: "2.0.0"
     ontology_node_id: security.cryptography.asymmetric
     base_confidence: 0.93
     index_keys:
@@ -102,9 +118,26 @@ patterns:
         - match_type: import
           target_module_pattern: "(cryptography|rsa)"
 
+  - pattern_id: ecdsa_asymmetric
+    name: ECDSA / EC Asymmetric Key Operations
+    pattern_version: "2.0.0"
+    ontology_node_id: security.cryptography.asymmetric
+    base_confidence: 0.94
+    index_keys:
+      - "call:ECDSA"
+      - "call:EC"
+      - "call:public_key"
+      - "call:private_key"
+    rules:
+      ast_features:
+        - match_type: call
+          target_method_pattern: "(public_key|private_key|generate_private_key)"
+        - match_type: import
+          target_module_pattern: "(cryptography|ecdsa)"
+
   - pattern_id: ec_sign
     name: Elliptic Curve Signature Creation
-    pattern_version: "1.0.0"
+    pattern_version: "2.0.0"
     ontology_node_id: security.cryptography.asymmetric
     base_confidence: 0.94
     index_keys:
@@ -119,7 +152,7 @@ patterns:
 
   - pattern_id: ec_verify
     name: Elliptic Curve Signature Verification
-    pattern_version: "1.0.0"
+    pattern_version: "2.0.0"
     ontology_node_id: security.cryptography.asymmetric
     base_confidence: 0.94
     index_keys:
@@ -134,7 +167,7 @@ patterns:
 
   - pattern_id: hmac_sign
     name: HMAC Signature Creation
-    pattern_version: "1.0.0"
+    pattern_version: "2.0.0"
     ontology_node_id: security.cryptography.signing
     base_confidence: 0.90
     index_keys:
@@ -150,7 +183,7 @@ patterns:
 
   - pattern_id: hmac_verify
     name: HMAC Signature Verification
-    pattern_version: "1.0.0"
+    pattern_version: "2.0.0"
     ontology_node_id: security.cryptography.signing
     base_confidence: 0.91
     index_keys:
@@ -163,31 +196,19 @@ patterns:
         - match_type: import
           target_module: hmac
 
-  - pattern_id: rsa_sign
-    name: RSA Signature Creation
-    pattern_version: "1.0.0"
-    ontology_node_id: security.cryptography.signing
-    base_confidence: 0.92
-    index_keys:
-      - "call:rsa.sign"
-      - "call:private_key.sign"
-    rules:
-      ast_features:
-        - match_type: call
-          target_method: sign
-          target_class_pattern: "(private_key|PrivateKey)"
-
-  - pattern_id: ed25519_sign
-    name: Ed25519 Signature Creation
-    pattern_version: "1.0.0"
+  - pattern_id: jwt_signing
+    name: JWT Token Sign and Verify
+    pattern_version: "2.0.0"
     ontology_node_id: security.cryptography.signing
     base_confidence: 0.94
     index_keys:
-      - "call:SigningKey"
-      - "import:nacl"
+      - "call:jwt.encode"
+      - "call:jwt.decode"
+      - "import:jwt"
     rules:
       ast_features:
         - match_type: call
-          target_class: SigningKey
+          target_method_pattern: "(encode|decode)"
+          target_class: jwt
         - match_type: import
-          target_module_pattern: "(nacl|cryptography.hazmat.primitives.asymmetric.ed25519)"
+          target_module: jwt

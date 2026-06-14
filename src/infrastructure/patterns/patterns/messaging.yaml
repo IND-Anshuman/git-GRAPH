@@ -2,7 +2,7 @@ schema_version: "1.0"
 patterns:
   - pattern_id: msg_publish_kafka
     name: Kafka Message Publishing
-    pattern_version: "1.0.0"
+    pattern_version: "2.0.0"
     ontology_node_id: integration.messaging.publish
     base_confidence: 0.92
     index_keys:
@@ -16,9 +16,24 @@ patterns:
         - match_type: call
           target_method_pattern: "(send|produce|publish)"
 
+  - pattern_id: msg_kafka_streams
+    name: Kafka Streams processing
+    pattern_version: "2.0.0"
+    ontology_node_id: integration.messaging.consume
+    base_confidence: 0.94
+    index_keys:
+      - "import:faust"
+      - "call:stream"
+    rules:
+      ast_features:
+        - match_type: import
+          target_module: faust
+        - match_type: call
+          target_method: stream
+
   - pattern_id: msg_publish_rabbitmq
     name: RabbitMQ Message Publishing
-    pattern_version: "1.0.0"
+    pattern_version: "2.0.0"
     ontology_node_id: integration.messaging.publish
     base_confidence: 0.91
     index_keys:
@@ -31,9 +46,88 @@ patterns:
         - match_type: call
           target_method: basic_publish
 
+  - pattern_id: msg_sqs
+    name: AWS SQS Queue Operations
+    pattern_version: "2.0.0"
+    ontology_node_id: integration.messaging.publish
+    base_confidence: 0.93
+    index_keys:
+      - "call:send_message"
+      - "call:receive_message"
+      - "import:boto3"
+    rules:
+      ast_features:
+        - match_type: call
+          target_method_pattern: "(send_message|receive_message|delete_message)"
+        - match_type: import
+          target_module: boto3
+
+  - pattern_id: msg_azure_servicebus
+    name: Azure Service Bus Operations
+    pattern_version: "2.0.0"
+    ontology_node_id: integration.messaging.publish
+    base_confidence: 0.94
+    index_keys:
+      - "import:azure.servicebus"
+      - "call:ServiceBusClient"
+    rules:
+      ast_features:
+        - match_type: import
+          target_module: azure.servicebus
+        - match_type: call
+          target_method: ServiceBusClient
+
+  - pattern_id: msg_gcp_pubsub
+    name: Google GCP PubSub Operations
+    pattern_version: "2.0.0"
+    ontology_node_id: integration.messaging.publish
+    base_confidence: 0.94
+    index_keys:
+      - "import:google.cloud.pubsub"
+      - "call:PublisherClient"
+      - "call:SubscriberClient"
+    rules:
+      ast_features:
+        - match_type: import
+          target_module: google.cloud.pubsub
+        - match_type: call
+          target_method_pattern: "(PublisherClient|SubscriberClient)"
+
+  - pattern_id: msg_celery
+    name: Celery Task Operations
+    pattern_version: "2.0.0"
+    ontology_node_id: integration.messaging.publish
+    base_confidence: 0.93
+    index_keys:
+      - "import:celery"
+      - "call:delay"
+      - "call:apply_async"
+    rules:
+      ast_features:
+        - match_type: import
+          target_module: celery
+        - match_type: call
+          target_method_pattern: "(delay|apply_async)"
+
+  - pattern_id: msg_nats
+    name: NATS Messaging Operations
+    pattern_version: "2.0.0"
+    ontology_node_id: integration.messaging.publish
+    base_confidence: 0.94
+    index_keys:
+      - "import:nats"
+      - "call:publish"
+      - "call:subscribe"
+    rules:
+      ast_features:
+        - match_type: import
+          target_module_pattern: "(nats|asyncio_nats)"
+        - match_type: call
+          target_method_pattern: "(publish|subscribe)"
+
   - pattern_id: msg_consume
     name: Message Consumption
-    pattern_version: "1.0.0"
+    pattern_version: "2.0.0"
     ontology_node_id: integration.messaging.consume
     base_confidence: 0.85
     index_keys:

@@ -2,7 +2,7 @@ schema_version: "1.0"
 patterns:
   - pattern_id: db_raw_sql_execute
     name: Raw SQL Execution
-    pattern_version: "1.0.0"
+    pattern_version: "2.0.0"
     ontology_node_id: data_management.database.raw_sql
     base_confidence: 0.88
     index_keys:
@@ -20,7 +20,7 @@ patterns:
 
   - pattern_id: db_orm_sqlalchemy_query
     name: SQLAlchemy ORM Query
-    pattern_version: "1.0.0"
+    pattern_version: "2.0.0"
     ontology_node_id: data_management.database.orm_query
     base_confidence: 0.92
     index_keys:
@@ -29,15 +29,119 @@ patterns:
       - "call:query"
       - "call:filter"
     rules:
+      required_imports:
+        - sqlalchemy
       ast_features:
         - match_type: import
           target_module_pattern: "sqlalchemy"
         - match_type: call
           target_method_pattern: "(query|filter|filter_by|select|execute)"
 
+  - pattern_id: db_orm_django_query
+    name: Django ORM Query
+    pattern_version: "2.0.0"
+    ontology_node_id: data_management.database.orm_query
+    base_confidence: 0.92
+    index_keys:
+      - "import:django.db"
+      - "call:objects.filter"
+      - "call:objects.all"
+    rules:
+      required_imports:
+        - django.db
+        - django.db.models
+      ast_features:
+        - match_type: import
+          target_module_pattern: "(django.db|django.db.models)"
+        - match_type: call
+          target_method_pattern: "(filter|all|get|exclude|create|update)"
+          target_class_pattern: "objects"
+
+  - pattern_id: db_orm_peewee_query
+    name: Peewee ORM Query
+    pattern_version: "2.0.0"
+    ontology_node_id: data_management.database.orm_query
+    base_confidence: 0.91
+    index_keys:
+      - "import:peewee"
+      - "call:select"
+    rules:
+      required_imports:
+        - peewee
+      ast_features:
+        - match_type: import
+          target_module: peewee
+        - match_type: call
+          target_method_pattern: "(select|filter|get|where)"
+
+  - pattern_id: db_orm_tortoise_query
+    name: Tortoise ORM Query
+    pattern_version: "2.0.0"
+    ontology_node_id: data_management.database.orm_query
+    base_confidence: 0.92
+    index_keys:
+      - "import:tortoise"
+      - "call:filter"
+    rules:
+      required_imports:
+        - tortoise
+      ast_features:
+        - match_type: import
+          target_module: tortoise
+        - match_type: call
+          target_method_pattern: "(filter|all|get|create|save)"
+
+  - pattern_id: db_orm_sqlmodel_query
+    name: SQLModel ORM Query
+    pattern_version: "2.0.0"
+    ontology_node_id: data_management.database.orm_query
+    base_confidence: 0.93
+    index_keys:
+      - "import:sqlmodel"
+      - "call:select"
+    rules:
+      required_imports:
+        - sqlmodel
+      ast_features:
+        - match_type: import
+          target_module: sqlmodel
+        - match_type: call
+          target_method_pattern: "(select|exec|where|add|commit)"
+
+  - pattern_id: db_orm_prisma_query
+    name: Prisma Query
+    pattern_version: "2.0.0"
+    ontology_node_id: data_management.database.orm_query
+    base_confidence: 0.94
+    index_keys:
+      - "import:@prisma/client"
+      - "call:prisma"
+    rules:
+      required_imports:
+        - "@prisma/client"
+      ast_features:
+        - match_type: call
+          target_method_pattern: "(findMany|findUnique|create|update|delete)"
+          target_class_pattern: "prisma"
+
+  - pattern_id: db_orm_drizzle_query
+    name: Drizzle Query
+    pattern_version: "2.0.0"
+    ontology_node_id: data_management.database.orm_query
+    base_confidence: 0.94
+    index_keys:
+      - "import:drizzle-orm"
+      - "call:select"
+    rules:
+      required_imports:
+        - drizzle-orm
+      ast_features:
+        - match_type: call
+          target_method_pattern: "(select|insert|update|delete|where)"
+
   - pattern_id: db_repository_pattern
     name: Repository Pattern
-    pattern_version: "1.0.0"
+    pattern_version: "2.0.0"
     ontology_node_id: data_management.database.repository_pattern
     base_confidence: 0.82
     index_keys:
@@ -60,7 +164,7 @@ patterns:
 
   - pattern_id: db_transaction
     name: Database Transaction
-    pattern_version: "1.0.0"
+    pattern_version: "2.0.0"
     ontology_node_id: data_management.database.transaction
     base_confidence: 0.87
     index_keys:
@@ -68,13 +172,19 @@ patterns:
       - "call:rollback"
       - "call:begin"
     rules:
+      required_imports:
+        - sqlalchemy
+        - django.db
+        - peewee
+        - tortoise
+        - sqlmodel
       ast_features:
         - match_type: call
           target_method_pattern: "(commit|rollback|begin_transaction|start_transaction)"
 
   - pattern_id: db_schema_migration
     name: Database Schema Migration
-    pattern_version: "1.0.0"
+    pattern_version: "2.0.0"
     ontology_node_id: data_management.migration.schema_migration
     base_confidence: 0.94
     index_keys:

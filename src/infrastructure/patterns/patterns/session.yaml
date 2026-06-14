@@ -2,36 +2,47 @@ schema_version: "1.0"
 patterns:
   - pattern_id: session_read
     name: Server-Side Session Read
-    pattern_version: "1.0.0"
+    pattern_version: "2.0.0"
     ontology_node_id: security.authentication.session
-    base_confidence: 0.80
+    base_confidence: 0.85
     index_keys:
       - "subscript:session"
       - "call:session.get"
+      - "call:request.session.get"
     rules:
+      required_imports:
+        - flask
+        - django
       ast_features:
         - match_type: subscript
           description: "Reading from session variable dictionary"
         - match_type: call
           target_method: get
-          target_class_pattern: "session"
+          target_class_pattern: "(session|request\\.session|flask\\.session|django\\.session)"
 
   - pattern_id: session_write
     name: Server-Side Session Write
-    pattern_version: "1.0.0"
+    pattern_version: "2.0.0"
     ontology_node_id: security.authentication.session
-    base_confidence: 0.80
+    base_confidence: 0.85
     index_keys:
       - "subscript:session"
       - "call:session.set"
+      - "call:request.session.set"
     rules:
+      required_imports:
+        - flask
+        - django
       ast_features:
         - match_type: subscript
           description: "Writing to session variable dictionary"
+        - match_type: call
+          target_method: set
+          target_class_pattern: "(session|request\\.session|flask\\.session|django\\.session)"
 
   - pattern_id: session_invalidation
     name: Session Invalidation
-    pattern_version: "1.0.0"
+    pattern_version: "2.0.0"
     ontology_node_id: security.authentication.session
     base_confidence: 0.85
     index_keys:
@@ -45,7 +56,7 @@ patterns:
 
   - pattern_id: login_required_guard
     name: Login Required Guard
-    pattern_version: "1.0.0"
+    pattern_version: "2.0.0"
     ontology_node_id: security.authentication.session
     base_confidence: 0.90
     index_keys:
