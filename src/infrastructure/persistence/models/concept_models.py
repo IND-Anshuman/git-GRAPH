@@ -350,15 +350,4 @@ class ConceptCandidateModel(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=datetime.utcnow, nullable=False)
 
 
-class CapabilityCandidateModel(Base):
-    """SQLAlchemy model representing a dynamically discovered capability candidate."""
-
-    __tablename__ = "capability_candidates"
-
-    id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid.uuid4)
-    name: Mapped[str] = mapped_column(String(256), nullable=False)
-    confidence: Mapped[float] = mapped_column(Numeric(4, 3), nullable=False)
-    evidence: Mapped[Dict[str, Any]] = mapped_column(JSON, default=dict, nullable=False)
-    status: Mapped[str] = mapped_column(String(32), default="CANDIDATE", nullable=False)
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=datetime.utcnow, nullable=False)
 
