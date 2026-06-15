@@ -67,7 +67,7 @@ class CapabilityJob:
 
         candidates = []
         with self.uow_factory() as uow:
-            from src.infrastructure.persistence.models.concept_models import CapabilityCandidateModel
+            from src.infrastructure.persistence.models.capability_models import CapabilityCandidateModel
             from src.application.services.ingestion_pipeline import to_json_ready
             
             for cap_name, entities in capabilities_found.items():
@@ -92,6 +92,7 @@ class CapabilityJob:
                 if not existing:
                     model = CapabilityCandidateModel(
                         id=cap_id,
+                        repository_id=repository_id,
                         name=cap_name,
                         confidence=confidence,
                         evidence=to_json_ready(evidence),

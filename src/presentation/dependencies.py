@@ -189,3 +189,89 @@ def get_semantic_evolution_engine(request: Request) -> SemanticEvolutionEngine:
     return request.app.state.container.get_semantic_evolution_engine()
 
 
+# Phase 6 Capability Intelligence Layer
+from src.application.capabilities import (
+    CapabilityDiscoveryEngine,
+    CapabilityConfidenceEngine,
+    CapabilityOverlapEngine,
+    CapabilityStabilityEngine,
+    CapabilityOwnershipEngine,
+    CapabilityDriftEngine,
+    CapabilityRiskEngine,
+    CapabilityPlacementEngine,
+    CapabilityGovernanceEngine,
+    CapabilityEvolutionEngine,
+    CapabilityDependencyGraph,
+    CapabilityHealthEngine,
+    BlastRadiusEngine,
+    CapabilityQueryEngine,
+    CapabilitySummary,
+    CapabilityBoundaryEngine,
+    CapabilityCohesionEngine,
+    CapabilityCouplingEngine,
+    TaxonomyLearningEngine,
+    CapabilityEmbedding,
+)
+
+def get_capability_discovery_engine(request: Request) -> CapabilityDiscoveryEngine:
+    return request.app.state.container.get_capability_discovery_engine()
+
+def get_capability_confidence_engine(request: Request) -> CapabilityConfidenceEngine:
+    return request.app.state.container.get_capability_confidence_engine()
+
+def get_capability_overlap_engine(request: Request) -> CapabilityOverlapEngine:
+    return request.app.state.container.get_capability_overlap_engine()
+
+def get_capability_stability_engine(request: Request) -> CapabilityStabilityEngine:
+    return request.app.state.container.get_capability_stability_engine()
+
+def get_capability_ownership_engine(request: Request) -> CapabilityOwnershipEngine:
+    return request.app.state.container.get_capability_ownership_engine()
+
+def get_capability_drift_engine(request: Request) -> CapabilityDriftEngine:
+    return request.app.state.container.get_capability_drift_engine()
+
+def get_capability_risk_engine(request: Request) -> CapabilityRiskEngine:
+    return request.app.state.container.get_capability_risk_engine()
+
+def get_capability_placement_engine(request: Request) -> CapabilityPlacementEngine:
+    return request.app.state.container.get_capability_placement_engine()
+
+def get_capability_governance_engine(request: Request) -> CapabilityGovernanceEngine:
+    return request.app.state.container.get_capability_governance_engine()
+
+def get_capability_evolution_engine(request: Request) -> CapabilityEvolutionEngine:
+    return request.app.state.container.get_capability_evolution_engine()
+
+def get_capability_dependency_graph(request: Request) -> CapabilityDependencyGraph:
+    return request.app.state.container.get_capability_dependency_graph()
+
+def get_capability_health_engine(request: Request) -> CapabilityHealthEngine:
+    return request.app.state.container.get_capability_health_engine()
+
+def get_blast_radius_engine(request: Request) -> BlastRadiusEngine:
+    return request.app.state.container.get_blast_radius_engine()
+
+def get_capability_query_engine(request: Request) -> CapabilityQueryEngine:
+    return request.app.state.container.get_capability_query_engine()
+
+def get_capability_summary(request: Request) -> CapabilitySummary:
+    return request.app.state.container.get_capability_summary()
+
+def get_capability_boundary_engine(request: Request) -> CapabilityBoundaryEngine:
+    return request.app.state.container.get_capability_boundary_engine()
+
+def get_capability_cohesion_engine(request: Request) -> CapabilityCohesionEngine:
+    return request.app.state.container.get_capability_cohesion_engine()
+
+def get_capability_coupling_engine(request: Request) -> CapabilityCouplingEngine:
+    return request.app.state.container.get_capability_coupling_engine()
+
+def get_taxonomy_learning_engine(request: Request) -> TaxonomyLearningEngine:
+    return request.app.state.container.get_taxonomy_learning_engine()
+
+def get_capability_embedding(request: Request) -> CapabilityEmbedding:
+    return request.app.state.container.get_capability_embedding()
+
+
+
