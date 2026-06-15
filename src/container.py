@@ -96,6 +96,29 @@ from src.application.services.temporal_explorer import TemporalExplorer
 from src.application.services.temporal_replay_service import TemporalReplayService
 from src.domain.services.identity_service import EntityIdentityService
 
+from src.application.capabilities import (
+    CapabilityDiscoveryEngine,
+    CapabilityConfidenceEngine,
+    CapabilityOverlapEngine,
+    CapabilityStabilityEngine,
+    CapabilityOwnershipEngine,
+    CapabilityDriftEngine,
+    CapabilityRiskEngine,
+    CapabilityPlacementEngine,
+    CapabilityGovernanceEngine,
+    CapabilityEvolutionEngine,
+    CapabilityDependencyGraph,
+    CapabilityHealthEngine,
+    BlastRadiusEngine,
+    CapabilityQueryEngine,
+    CapabilitySummary,
+    CapabilityBoundaryEngine,
+    CapabilityCohesionEngine,
+    CapabilityCouplingEngine,
+    TaxonomyLearningEngine,
+    CapabilityEmbedding,
+)
+
 class Container:
     def __init__(self, config: Settings):
         self.config = config
@@ -258,6 +281,29 @@ class Container:
             reconstructor=self.reconstruction_service,
         )
 
+        # Phase 6 Capability Intelligence Layer
+        self.capability_discovery_engine = CapabilityDiscoveryEngine()
+        self.capability_confidence_engine = CapabilityConfidenceEngine()
+        self.capability_overlap_engine = CapabilityOverlapEngine()
+        self.capability_stability_engine = CapabilityStabilityEngine()
+        self.capability_ownership_engine = CapabilityOwnershipEngine()
+        self.capability_drift_engine = CapabilityDriftEngine()
+        self.capability_risk_engine = CapabilityRiskEngine()
+        self.capability_placement_engine = CapabilityPlacementEngine()
+        self.capability_governance_engine = CapabilityGovernanceEngine()
+        self.capability_evolution_engine = CapabilityEvolutionEngine()
+        self.capability_dependency_graph = CapabilityDependencyGraph()
+        self.capability_health_engine = CapabilityHealthEngine()
+        self.blast_radius_engine = BlastRadiusEngine()
+        self.capability_query_engine = CapabilityQueryEngine()
+        self.capability_summary = CapabilitySummary()
+        self.capability_boundary_engine = CapabilityBoundaryEngine()
+        self.capability_cohesion_engine = CapabilityCohesionEngine()
+        self.capability_coupling_engine = CapabilityCouplingEngine()
+        self.taxonomy_learning_engine = TaxonomyLearningEngine()
+        self.capability_embedding = CapabilityEmbedding()
+
+
 
 
 
@@ -418,6 +464,66 @@ class Container:
 
     def get_semantic_evolution_engine(self) -> SemanticEvolutionEngine:
         return self.semantic_evolution_engine
+
+    def get_capability_discovery_engine(self) -> CapabilityDiscoveryEngine:
+        return self.capability_discovery_engine
+
+    def get_capability_confidence_engine(self) -> CapabilityConfidenceEngine:
+        return self.capability_confidence_engine
+
+    def get_capability_overlap_engine(self) -> CapabilityOverlapEngine:
+        return self.capability_overlap_engine
+
+    def get_capability_stability_engine(self) -> CapabilityStabilityEngine:
+        return self.capability_stability_engine
+
+    def get_capability_ownership_engine(self) -> CapabilityOwnershipEngine:
+        return self.capability_ownership_engine
+
+    def get_capability_drift_engine(self) -> CapabilityDriftEngine:
+        return self.capability_drift_engine
+
+    def get_capability_risk_engine(self) -> CapabilityRiskEngine:
+        return self.capability_risk_engine
+
+    def get_capability_placement_engine(self) -> CapabilityPlacementEngine:
+        return self.capability_placement_engine
+
+    def get_capability_governance_engine(self) -> CapabilityGovernanceEngine:
+        return self.capability_governance_engine
+
+    def get_capability_evolution_engine(self) -> CapabilityEvolutionEngine:
+        return self.capability_evolution_engine
+
+    def get_capability_dependency_graph(self) -> CapabilityDependencyGraph:
+        return self.capability_dependency_graph
+
+    def get_capability_health_engine(self) -> CapabilityHealthEngine:
+        return self.capability_health_engine
+
+    def get_blast_radius_engine(self) -> BlastRadiusEngine:
+        return self.blast_radius_engine
+
+    def get_capability_query_engine(self) -> CapabilityQueryEngine:
+        return self.capability_query_engine
+
+    def get_capability_summary(self) -> CapabilitySummary:
+        return self.capability_summary
+
+    def get_capability_boundary_engine(self) -> CapabilityBoundaryEngine:
+        return self.capability_boundary_engine
+
+    def get_capability_cohesion_engine(self) -> CapabilityCohesionEngine:
+        return self.capability_cohesion_engine
+
+    def get_capability_coupling_engine(self) -> CapabilityCouplingEngine:
+        return self.capability_coupling_engine
+
+    def get_taxonomy_learning_engine(self) -> TaxonomyLearningEngine:
+        return self.taxonomy_learning_engine
+
+    def get_capability_embedding(self) -> CapabilityEmbedding:
+        return self.capability_embedding
 
     @property
     def engine(self) -> Any:
