@@ -73,6 +73,27 @@ from src.infrastructure.persistence.repositories.sa_resolution_repos import (
     SAKnowledgeDriftRepository,
     SAExternalKnowledgeReferenceRepository,
 )
+from src.infrastructure.persistence.repositories.sa_capability_repos import (
+    SACapabilityRepository,
+    SACapabilityCandidateRepository,
+    SACapabilityRelationshipRepository,
+    SACapabilityFingerprintRepository,
+    SACapabilityEvolutionRepository,
+    SACapabilityTimelineRepository,
+    SACapabilityDependencyRepository,
+    SACapabilityHealthRepository,
+    SACapabilityBlastRadiusRepository,
+    SACapabilityProvenanceRepository,
+    SACapabilityConfidenceRepository,
+    SACapabilityOverlapRepository,
+    SACapabilityStabilityRepository,
+    SACapabilitySnapshotRepository,
+    SACapabilityBoundaryRepository,
+    SACapabilityCohesionRepository,
+    SACapabilityCouplingRepository,
+    SACapabilityEmbeddingRepository,
+    SACapabilityTaxonomyCandidateRepository,
+)
 from src.infrastructure.persistence.database import DatabaseEngine
 
 
@@ -132,6 +153,25 @@ class SQLAlchemyUnitOfWork(IUnitOfWork):
         self._reasoning_artifacts = SAReasoningArtifactRepository(self._session)
         self._knowledge_drifts = SAKnowledgeDriftRepository(self._session)
         self._external_knowledge_references = SAExternalKnowledgeReferenceRepository(self._session)
+        self._capabilities = SACapabilityRepository(self._session)
+        self._capability_candidates = SACapabilityCandidateRepository(self._session)
+        self._capability_relationships = SACapabilityRelationshipRepository(self._session)
+        self._capability_fingerprints = SACapabilityFingerprintRepository(self._session)
+        self._capability_evolution = SACapabilityEvolutionRepository(self._session)
+        self._capability_timelines = SACapabilityTimelineRepository(self._session)
+        self._capability_dependencies = SACapabilityDependencyRepository(self._session)
+        self._capability_health = SACapabilityHealthRepository(self._session)
+        self._capability_blast_radius = SACapabilityBlastRadiusRepository(self._session)
+        self._capability_provenance = SACapabilityProvenanceRepository(self._session)
+        self._capability_confidence = SACapabilityConfidenceRepository(self._session)
+        self._capability_overlap = SACapabilityOverlapRepository(self._session)
+        self._capability_stability = SACapabilityStabilityRepository(self._session)
+        self._capability_snapshots = SACapabilitySnapshotRepository(self._session)
+        self._capability_boundaries = SACapabilityBoundaryRepository(self._session)
+        self._capability_cohesion = SACapabilityCohesionRepository(self._session)
+        self._capability_coupling = SACapabilityCouplingRepository(self._session)
+        self._capability_embeddings = SACapabilityEmbeddingRepository(self._session)
+        self._capability_taxonomy_candidates = SACapabilityTaxonomyCandidateRepository(self._session)
         return self
 
     def __exit__(self, exc_type: Any, exc_val: Any, exc_tb: Any) -> None:
@@ -336,5 +376,82 @@ class SQLAlchemyUnitOfWork(IUnitOfWork):
     @property
     def external_knowledge_references(self):
         return self._external_knowledge_references
+
+    @property
+    def capabilities(self):
+        return self._capabilities
+
+    @property
+    def capability_candidates(self):
+        return self._capability_candidates
+
+    @property
+    def capability_relationships(self):
+        return self._capability_relationships
+
+    @property
+    def capability_fingerprints(self):
+        return self._capability_fingerprints
+
+    @property
+    def capability_evolution(self):
+        return self._capability_evolution
+
+    @property
+    def capability_timelines(self):
+        return self._capability_timelines
+
+    @property
+    def capability_dependencies(self):
+        return self._capability_dependencies
+
+    @property
+    def capability_health(self):
+        return self._capability_health
+
+    @property
+    def capability_blast_radius(self):
+        return self._capability_blast_radius
+
+    @property
+    def capability_provenance(self):
+        return self._capability_provenance
+
+    @property
+    def capability_confidence(self):
+        return self._capability_confidence
+
+    @property
+    def capability_overlap(self):
+        return self._capability_overlap
+
+    @property
+    def capability_stability(self):
+        return self._capability_stability
+
+    @property
+    def capability_snapshots(self):
+        return self._capability_snapshots
+
+    @property
+    def capability_boundaries(self):
+        return self._capability_boundaries
+
+    @property
+    def capability_cohesion(self):
+        return self._capability_cohesion
+
+    @property
+    def capability_coupling(self):
+        return self._capability_coupling
+
+    @property
+    def capability_embeddings(self):
+        return self._capability_embeddings
+
+    @property
+    def capability_taxonomy_candidates(self):
+        return self._capability_taxonomy_candidates
+
 
 
