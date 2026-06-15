@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Self
+from typing import Self, Any
 from src.domain.repositories import (
     IRepositoryRepository,
     ISourceFileRepository,
@@ -222,6 +222,101 @@ class IUnitOfWork(ABC):
     @property
     @abstractmethod
     def knowledge_artifacts(self) -> IKnowledgeArtifactRepository:
+        pass
+
+    @property
+    @abstractmethod
+    def capabilities(self) -> Any:
+        pass
+
+    @property
+    @abstractmethod
+    def capability_candidates(self) -> Any:
+        pass
+
+    @property
+    @abstractmethod
+    def capability_relationships(self) -> Any:
+        pass
+
+    @property
+    @abstractmethod
+    def capability_fingerprints(self) -> Any:
+        pass
+
+    @property
+    @abstractmethod
+    def capability_evolution(self) -> Any:
+        pass
+
+    @property
+    @abstractmethod
+    def capability_timelines(self) -> Any:
+        pass
+
+    @property
+    @abstractmethod
+    def capability_dependencies(self) -> Any:
+        pass
+
+    @property
+    @abstractmethod
+    def capability_health(self) -> Any:
+        pass
+
+    @property
+    @abstractmethod
+    def capability_blast_radius(self) -> Any:
+        pass
+
+    @property
+    @abstractmethod
+    def capability_provenance(self) -> Any:
+        pass
+
+    @property
+    @abstractmethod
+    def capability_confidence(self) -> Any:
+        pass
+
+    @property
+    @abstractmethod
+    def capability_overlap(self) -> Any:
+        pass
+
+    @property
+    @abstractmethod
+    def capability_stability(self) -> Any:
+        pass
+
+    @property
+    @abstractmethod
+    def capability_snapshots(self) -> Any:
+        pass
+
+    @property
+    @abstractmethod
+    def capability_boundaries(self) -> Any:
+        pass
+
+    @property
+    @abstractmethod
+    def capability_cohesion(self) -> Any:
+        pass
+
+    @property
+    @abstractmethod
+    def capability_coupling(self) -> Any:
+        pass
+
+    @property
+    @abstractmethod
+    def capability_embeddings(self) -> Any:
+        pass
+
+    @property
+    @abstractmethod
+    def capability_taxonomy_candidates(self) -> Any:
         pass
 
 
