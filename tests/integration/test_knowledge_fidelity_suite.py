@@ -287,7 +287,7 @@ def test_knowledge_fidelity_suite(db_engine, tmp_path):
     
     # Verify post-ingestion job candidates and artifacts
     with uow_factory() as uow:
-        from src.infrastructure.persistence.models.concept_models import ConceptCandidateModel, CapabilityCandidateModel
+        from src.infrastructure.persistence.models import ConceptCandidateModel, CapabilityCandidateModel
         from src.infrastructure.persistence.models.knowledge_artifact_model import KnowledgeArtifactModel
         
         concepts = uow._session.query(ConceptCandidateModel).all()
