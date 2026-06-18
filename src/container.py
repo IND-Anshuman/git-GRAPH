@@ -119,6 +119,12 @@ from src.application.capabilities import (
     CapabilityEmbedding,
 )
 
+# Phase 7A Reasoning Intelligence Layer
+from src.application.reasoning.reasoning_strategy_registry import ReasoningStrategyRegistry
+from src.application.reasoning.reasoning_cache import ReasoningCache
+from src.application.reasoning.reasoning_artifact_service import ReasoningArtifactService
+from src.application.reasoning.reasoning_query_engine import ReasoningQueryEngine
+
 class Container:
     def __init__(self, config: Settings):
         self.config = config
@@ -303,9 +309,17 @@ class Container:
         self.taxonomy_learning_engine = TaxonomyLearningEngine()
         self.capability_embedding = CapabilityEmbedding()
 
-
-
-
+        # Phase 7A Reasoning Intelligence Layer
+        self.reasoning_strategy_registry = ReasoningStrategyRegistry.default()
+        self.reasoning_cache = ReasoningCache(max_size=512)
+        self.reasoning_artifact_service = ReasoningArtifactService()
+        self.reasoning_query_engine = ReasoningQueryEngine(
+            strategy_registry=self.reasoning_strategy_registry,
+            cache=self.reasoning_cache,
+            uow_factory=self.get_uow_factory(),
+            artifact_service=self.reasoning_artifact_service,
+            persist_artifacts=True,
+        )
 
     def get_uow_factory(self) -> Callable:
         return lambda: SQLAlchemyUnitOfWork(self.db_engine)
@@ -524,6 +538,15 @@ class Container:
 
     def get_capability_embedding(self) -> CapabilityEmbedding:
         return self.capability_embedding
+
+    def get_reasoning_query_engine(self) -> ReasoningQueryEngine:
+        return self.reasoning_query_engine
+
+    def get_reasoning_cache(self) -> ReasoningCache:
+        return self.reasoning_cache
+
+    def get_reasoning_strategy_registry(self) -> ReasoningStrategyRegistry:
+        return self.reasoning_strategy_registry
 
     @property
     def engine(self) -> Any:

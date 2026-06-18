@@ -274,4 +274,19 @@ def get_capability_embedding(request: Request) -> CapabilityEmbedding:
     return request.app.state.container.get_capability_embedding()
 
 
+# Phase 7A Reasoning Intelligence Layer
+from src.application.reasoning.reasoning_query_engine import ReasoningQueryEngine
+from src.application.reasoning.reasoning_cache import ReasoningCache
+from src.application.reasoning.reasoning_strategy_registry import ReasoningStrategyRegistry
 
+
+def get_reasoning_query_engine(request: Request) -> ReasoningQueryEngine:
+    return request.app.state.container.get_reasoning_query_engine()
+
+
+def get_reasoning_cache(request: Request) -> ReasoningCache:
+    return request.app.state.container.get_reasoning_cache()
+
+
+def get_reasoning_strategy_registry(request: Request) -> ReasoningStrategyRegistry:
+    return request.app.state.container.get_reasoning_strategy_registry()

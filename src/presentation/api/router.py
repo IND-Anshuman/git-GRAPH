@@ -9,6 +9,7 @@ from src.presentation.api.logic import logic_router
 from src.presentation.api.concepts import concepts_router
 from src.presentation.api.meta_ontology import meta_router
 from src.presentation.api.capabilities import capabilities_router
+from src.presentation.api.reasoning import reasoning_router
 
 api_router = APIRouter(prefix="/api/v1")
 
@@ -22,4 +23,6 @@ api_router.include_router(logic_router)
 api_router.include_router(concepts_router)
 api_router.include_router(meta_router)
 api_router.include_router(capabilities_router)
+api_router.include_router(reasoning_router)
+
 
