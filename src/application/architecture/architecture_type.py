@@ -1,0 +1,26 @@
+"""Classification enum for Architecture types."""
+
+from enum import Enum
+
+class ArchitectureType(str, Enum):
+    """Enumeration representing different architectural styles and types."""
+    LAYERED = "LAYERED"
+    CLEAN = "CLEAN"
+    HEXAGONAL = "HEXAGONAL"
+    ONION = "ONION"
+    CQRS = "CQRS"
+    EVENT_DRIVEN = "EVENT_DRIVEN"
+    EVENT_SOURCED = "EVENT_SOURCED"
+    SAGA = "SAGA"
+    MICROSERVICE = "MICROSERVICE"
+    MODULAR_MONOLITH = "MODULAR_MONOLITH"
+    DOMAIN_DRIVEN_DESIGN = "DOMAIN_DRIVEN_DESIGN"
+    PIPELINE = "PIPELINE"
+    WORKFLOW = "WORKFLOW"
+    AGENTIC = "AGENTIC"
+    MULTI_AGENT = "MULTI_AGENT"
+    GRAPH_RAG = "GRAPH_RAG"
+    RAG = "RAG"
+    MCP = "MCP"
+    SERVICE_MESH = "SERVICE_MESH"
+    UNKNOWN = "UNKNOWN"
