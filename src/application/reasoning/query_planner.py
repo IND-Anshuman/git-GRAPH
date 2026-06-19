@@ -66,6 +66,17 @@ _COUNTERFACTUAL_KEYWORDS2 = {"counterfactual", "simulate"}
 _DECISION_KEYWORDS = {"why was", "decision", "adr", "decided", "trade-off", "chose"}
 _INTENT_KEYWORDS = {"business goal", "objective", "success metric", "kpi", "purpose of"}
 
+_ARCHITECTURE_STYLE_KEYWORDS = {"architectural style", "clean architecture", "hexagonal", "layered", "microservice", "cqrs", "modular monolith"}
+_FITNESS_KEYWORDS = {"fitness", "cohesion", "coupling", "distance from main sequence", "cyclicity", "instability"}
+_INVARIANT_KEYWORDS = {"invariant", "violation", "rule", "forbidden target", "must not"}
+_DRIFT_ARCH_KEYWORDS = {"architectural drift", "structural drift", "dependency drift"}
+_OWNERSHIP_ARCH_KEYWORDS = {"knowledge silo", "bus factor", "team ownership", "overloaded team"}
+_REFACTORING_KEYWORDS = {"refactor", "code smell", "god class", "shotgun surgery", "blob", "feature envy"}
+_RECOMMENDATION_KEYWORDS = {"recommend", "improve architecture", "split service", "merge"}
+_SIMILARITY_KEYWORDS = {"similar to", "comparable", "like", "similarity"}
+_BENCHMARK_KEYWORDS = {"benchmark", "compare with peers", "percentile"}
+_TIMELINE_KEYWORDS = {"architectural timeline", "evolution of architecture"}
+
 
 def _score_question_type(query_lower: str) -> ReasoningQuestionType:
     """Return the best matching question type for the lowercased query."""
@@ -92,10 +103,29 @@ def _score_question_type(query_lower: str) -> ReasoningQuestionType:
         return ReasoningQuestionType.DEPENDENCY
     if any(kw in query_lower for kw in _ARCHITECTURE_KEYWORDS):
         return ReasoningQuestionType.ARCHITECTURE
+    if any(kw in query_lower for kw in _ARCHITECTURE_STYLE_KEYWORDS):
+        return ReasoningQuestionType.ARCHITECTURE_STYLE
+    if any(kw in query_lower for kw in _FITNESS_KEYWORDS):
+        return ReasoningQuestionType.FITNESS
+    if any(kw in query_lower for kw in _INVARIANT_KEYWORDS):
+        return ReasoningQuestionType.INVARIANT
+    if any(kw in query_lower for kw in _DRIFT_ARCH_KEYWORDS):
+        return ReasoningQuestionType.DRIFT_ARCH
+    if any(kw in query_lower for kw in _OWNERSHIP_ARCH_KEYWORDS):
+        return ReasoningQuestionType.OWNERSHIP_ARCH
+    if any(kw in query_lower for kw in _REFACTORING_KEYWORDS):
+        return ReasoningQuestionType.REFACTORING
+    if any(kw in query_lower for kw in _RECOMMENDATION_KEYWORDS):
+        return ReasoningQuestionType.RECOMMENDATION
+    if any(kw in query_lower for kw in _SIMILARITY_KEYWORDS):
+        return ReasoningQuestionType.SIMILARITY
+    if any(kw in query_lower for kw in _BENCHMARK_KEYWORDS):
+        return ReasoningQuestionType.BENCHMARK
+    if any(kw in query_lower for kw in _TIMELINE_KEYWORDS):
+        return ReasoningQuestionType.TIMELINE
     if any(kw in query_lower for kw in _WHY_KEYWORDS):
         return ReasoningQuestionType.WHY
     return ReasoningQuestionType.GENERAL
-
 
 _SCOPE_MAP: dict[ReasoningQuestionType, list[str]] = {
     ReasoningQuestionType.WHY: ["entities", "capabilities", "concepts", "relationships"],
@@ -111,6 +141,16 @@ _SCOPE_MAP: dict[ReasoningQuestionType, list[str]] = {
     ReasoningQuestionType.INTENT: ["entities", "capabilities", "concepts"],
     ReasoningQuestionType.CAUSAL: ["entities", "relationships", "flows", "capabilities"],
     ReasoningQuestionType.RISK: ["entities", "capabilities", "relationships"],
+    ReasoningQuestionType.ARCHITECTURE_STYLE: ["entities", "relationships", "capabilities"],
+    ReasoningQuestionType.FITNESS: ["entities", "relationships", "capabilities"],
+    ReasoningQuestionType.INVARIANT: ["entities", "relationships", "capabilities"],
+    ReasoningQuestionType.DRIFT_ARCH: ["entities", "relationships", "capabilities", "artifacts"],
+    ReasoningQuestionType.OWNERSHIP_ARCH: ["entities", "capabilities", "ownership"],
+    ReasoningQuestionType.REFACTORING: ["entities", "relationships", "capabilities"],
+    ReasoningQuestionType.RECOMMENDATION: ["entities", "relationships", "capabilities"],
+    ReasoningQuestionType.SIMILARITY: ["entities", "relationships", "capabilities", "flows"],
+    ReasoningQuestionType.BENCHMARK: ["entities", "relationships", "capabilities"],
+    ReasoningQuestionType.TIMELINE: ["entities", "relationships", "timeline", "artifacts"],
     ReasoningQuestionType.GENERAL: ["entities", "relationships", "concepts", "capabilities"],
 }
 
@@ -120,6 +160,8 @@ _HOP_MAP: dict[ReasoningQuestionType, int] = {
     ReasoningQuestionType.DEPENDENCY: 2,
     ReasoningQuestionType.ARCHITECTURE: 2,
     ReasoningQuestionType.COUNTERFACTUAL: 2,
+    ReasoningQuestionType.ARCHITECTURE_STYLE: 3,
+    ReasoningQuestionType.SIMILARITY: 3,
 }
 
 

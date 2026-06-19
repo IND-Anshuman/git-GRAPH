@@ -61,6 +61,18 @@ class ReasoningQuestionType(str, Enum):
     INTENT = "intent"
     """What is the intended business purpose of X?"""
 
+    # ── Phase 7B Architectural Intelligence ───────────────────────────────────
+    ARCHITECTURE_STYLE = "architecture_style"
+    FITNESS = "fitness"
+    INVARIANT = "invariant"
+    DRIFT_ARCH = "drift_arch"
+    OWNERSHIP_ARCH = "ownership_arch"
+    REFACTORING = "refactoring"
+    RECOMMENDATION = "recommendation"
+    SIMILARITY = "similarity"
+    BENCHMARK = "benchmark"
+    TIMELINE = "timeline"
+
     # ── Catch-all ─────────────────────────────────────────────────────────────
     GENERAL = "general"
     """Unclassified question — handled by the default strategy."""

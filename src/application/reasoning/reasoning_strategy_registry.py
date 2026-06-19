@@ -463,4 +463,29 @@ class ReasoningStrategyRegistry:
         registry.register(BlastRadiusStrategy())
         registry.register(RootCauseStrategy())
         registry.register(WhyStrategy())
+        
+        # Local import to prevent circular dependency
+        from src.application.architecture.architecture_strategies import (
+            ArchitectureStyleStrategy,
+            FitnessStrategy,
+            InvariantStrategy,
+            DriftArchStrategy,
+            OwnershipArchStrategy,
+            RefactoringStrategy,
+            RecommendationStrategy,
+            SimilarityStrategy,
+            BenchmarkStrategy,
+            TimelineStrategy,
+        )
+        registry.register(ArchitectureStyleStrategy())
+        registry.register(FitnessStrategy())
+        registry.register(InvariantStrategy())
+        registry.register(DriftArchStrategy())
+        registry.register(OwnershipArchStrategy())
+        registry.register(RefactoringStrategy())
+        registry.register(RecommendationStrategy())
+        registry.register(SimilarityStrategy())
+        registry.register(BenchmarkStrategy())
+        registry.register(TimelineStrategy())
+
         return registry
