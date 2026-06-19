@@ -119,11 +119,41 @@ from src.application.capabilities import (
     CapabilityEmbedding,
 )
 
+# Phase 7B Architecture Intelligence Layer
+from src.application.architecture.architecture_cache import ArchitectureCache
+from src.application.architecture.architecture_projection_engine import ArchitectureProjectionEngine
+from src.application.architecture.fitness_function_engine import FitnessFunctionEngine
+from src.application.architecture.bounded_context_engine import BoundedContextEngine
+from src.application.architecture.architecture_pattern_registry import ArchitecturePatternRegistry
+from src.application.architecture.architecture_reasoning_engine import ArchitectureReasoningEngine
+from src.application.architecture.invariant_reasoning_engine import InvariantReasoningEngine
+from src.application.architecture.architecture_similarity_engine import ArchitectureSimilarityEngine
+from src.application.architecture.architecture_benchmark_engine import ArchitectureBenchmarkEngine
+from src.application.architecture.drift_reasoning_engine import DriftReasoningEngine
+from src.application.architecture.architecture_timeline_engine import ArchitectureTimelineEngine
+from src.application.architecture.ownership_reasoning_engine import OwnershipReasoningEngine
+from src.application.architecture.refactoring_reasoning_engine import RefactoringReasoningEngine
+from src.application.architecture.architecture_recommendation_engine import ArchitectureRecommendationEngine
+from src.application.architecture.architecture_artifact_service import ArchitectureArtifactService
+
 # Phase 7A Reasoning Intelligence Layer
 from src.application.reasoning.reasoning_strategy_registry import ReasoningStrategyRegistry
 from src.application.reasoning.reasoning_cache import ReasoningCache
 from src.application.reasoning.reasoning_artifact_service import ReasoningArtifactService
 from src.application.reasoning.reasoning_query_engine import ReasoningQueryEngine
+from src.application.architecture.architecture_strategies import (
+    ArchitectureStyleStrategy,
+    FitnessStrategy,
+    InvariantStrategy,
+    DriftArchStrategy,
+    OwnershipArchStrategy,
+    RefactoringStrategy,
+    RecommendationStrategy,
+    SimilarityStrategy,
+    BenchmarkStrategy,
+    TimelineStrategy,
+)
+
 
 class Container:
     def __init__(self, config: Settings):
@@ -311,6 +341,19 @@ class Container:
 
         # Phase 7A Reasoning Intelligence Layer
         self.reasoning_strategy_registry = ReasoningStrategyRegistry.default()
+        
+        # Register Phase 7B Architecture Strategies
+        self.reasoning_strategy_registry.register(ArchitectureStyleStrategy())
+        self.reasoning_strategy_registry.register(FitnessStrategy())
+        self.reasoning_strategy_registry.register(InvariantStrategy())
+        self.reasoning_strategy_registry.register(DriftArchStrategy())
+        self.reasoning_strategy_registry.register(OwnershipArchStrategy())
+        self.reasoning_strategy_registry.register(RefactoringStrategy())
+        self.reasoning_strategy_registry.register(RecommendationStrategy())
+        self.reasoning_strategy_registry.register(SimilarityStrategy())
+        self.reasoning_strategy_registry.register(BenchmarkStrategy())
+        self.reasoning_strategy_registry.register(TimelineStrategy())
+
         self.reasoning_cache = ReasoningCache(max_size=512)
         self.reasoning_artifact_service = ReasoningArtifactService()
         self.reasoning_query_engine = ReasoningQueryEngine(
@@ -320,6 +363,23 @@ class Container:
             artifact_service=self.reasoning_artifact_service,
             persist_artifacts=True,
         )
+
+        # Phase 7B Architecture Intelligence Layer
+        self.architecture_cache = ArchitectureCache()
+        self.architecture_projection_engine = ArchitectureProjectionEngine()
+        self.fitness_function_engine = FitnessFunctionEngine()
+        self.bounded_context_engine = BoundedContextEngine()
+        self.architecture_pattern_registry = ArchitecturePatternRegistry()
+        self.architecture_reasoning_engine = ArchitectureReasoningEngine()
+        self.invariant_reasoning_engine = InvariantReasoningEngine()
+        self.architecture_similarity_engine = ArchitectureSimilarityEngine()
+        self.architecture_benchmark_engine = ArchitectureBenchmarkEngine()
+        self.drift_reasoning_engine = DriftReasoningEngine()
+        self.architecture_timeline_engine = ArchitectureTimelineEngine()
+        self.ownership_reasoning_engine = OwnershipReasoningEngine()
+        self.refactoring_reasoning_engine = RefactoringReasoningEngine()
+        self.architecture_recommendation_engine = ArchitectureRecommendationEngine()
+        self.architecture_artifact_service = ArchitectureArtifactService(self.get_uow_factory()())
 
     def get_uow_factory(self) -> Callable:
         return lambda: SQLAlchemyUnitOfWork(self.db_engine)
@@ -548,6 +608,51 @@ class Container:
     def get_reasoning_strategy_registry(self) -> ReasoningStrategyRegistry:
         return self.reasoning_strategy_registry
 
+    def get_architecture_cache(self) -> ArchitectureCache:
+        return self.architecture_cache
+
+    def get_architecture_projection_engine(self) -> ArchitectureProjectionEngine:
+        return self.architecture_projection_engine
+
+    def get_fitness_function_engine(self) -> FitnessFunctionEngine:
+        return self.fitness_function_engine
+
+    def get_bounded_context_engine(self) -> BoundedContextEngine:
+        return self.bounded_context_engine
+
+    def get_architecture_pattern_registry(self) -> ArchitecturePatternRegistry:
+        return self.architecture_pattern_registry
+
+    def get_architecture_reasoning_engine(self) -> ArchitectureReasoningEngine:
+        return self.architecture_reasoning_engine
+
+    def get_invariant_reasoning_engine(self) -> InvariantReasoningEngine:
+        return self.invariant_reasoning_engine
+
+    def get_architecture_similarity_engine(self) -> ArchitectureSimilarityEngine:
+        return self.architecture_similarity_engine
+
+    def get_architecture_benchmark_engine(self) -> ArchitectureBenchmarkEngine:
+        return self.architecture_benchmark_engine
+
+    def get_drift_reasoning_engine(self) -> DriftReasoningEngine:
+        return self.drift_reasoning_engine
+
+    def get_architecture_timeline_engine(self) -> ArchitectureTimelineEngine:
+        return self.architecture_timeline_engine
+
+    def get_ownership_reasoning_engine(self) -> OwnershipReasoningEngine:
+        return self.ownership_reasoning_engine
+
+    def get_refactoring_reasoning_engine(self) -> RefactoringReasoningEngine:
+        return self.refactoring_reasoning_engine
+
+    def get_architecture_recommendation_engine(self) -> ArchitectureRecommendationEngine:
+        return self.architecture_recommendation_engine
+
+    def get_architecture_artifact_service(self) -> ArchitectureArtifactService:
+        return self.architecture_artifact_service
+
     @property
     def engine(self) -> Any:
         return self.db_engine.engine
@@ -555,6 +660,3 @@ class Container:
     @property
     def session_factory(self) -> Any:
         return self.db_engine.session_factory
-
-
-

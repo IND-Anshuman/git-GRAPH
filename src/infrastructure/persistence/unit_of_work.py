@@ -94,6 +94,20 @@ from src.infrastructure.persistence.repositories.sa_capability_repos import (
     SACapabilityEmbeddingRepository,
     SACapabilityTaxonomyCandidateRepository,
 )
+from src.infrastructure.persistence.repositories.sa_architecture_repos import (
+    SAArchitectureProfileRepository,
+    SAArchitectureSnapshotRepository,
+    SAArchitectureFitnessRepository,
+    SAArchitectureViolationRepository,
+    SAArchitectureInvariantRepository,
+    SAArchitectureDriftRepository,
+    SAArchitectureTimelineRepository,
+    SAArchitectureBenchmarkRepository,
+    SAArchitectureSimilarityRepository,
+    SAOwnershipProfileRepository,
+    SARefactoringCandidateRepository,
+    SAArchitectureRecommendationRepository,
+)
 from src.infrastructure.persistence.database import DatabaseEngine
 
 
@@ -172,6 +186,18 @@ class SQLAlchemyUnitOfWork(IUnitOfWork):
         self._capability_coupling = SACapabilityCouplingRepository(self._session)
         self._capability_embeddings = SACapabilityEmbeddingRepository(self._session)
         self._capability_taxonomy_candidates = SACapabilityTaxonomyCandidateRepository(self._session)
+        self._architecture_profiles = SAArchitectureProfileRepository(self._session)
+        self._architecture_snapshots = SAArchitectureSnapshotRepository(self._session)
+        self._architecture_fitness = SAArchitectureFitnessRepository(self._session)
+        self._architecture_violations = SAArchitectureViolationRepository(self._session)
+        self._architecture_invariants = SAArchitectureInvariantRepository(self._session)
+        self._architecture_drifts = SAArchitectureDriftRepository(self._session)
+        self._architecture_timelines = SAArchitectureTimelineRepository(self._session)
+        self._architecture_benchmarks = SAArchitectureBenchmarkRepository(self._session)
+        self._architecture_similarities = SAArchitectureSimilarityRepository(self._session)
+        self._ownership_profiles = SAOwnershipProfileRepository(self._session)
+        self._refactoring_candidates = SARefactoringCandidateRepository(self._session)
+        self._architecture_recommendations = SAArchitectureRecommendationRepository(self._session)
         return self
 
     def __exit__(self, exc_type: Any, exc_val: Any, exc_tb: Any) -> None:
@@ -453,5 +479,50 @@ class SQLAlchemyUnitOfWork(IUnitOfWork):
     def capability_taxonomy_candidates(self):
         return self._capability_taxonomy_candidates
 
+    @property
+    def architecture_profiles(self):
+        return self._architecture_profiles
 
+    @property
+    def architecture_snapshots(self):
+        return self._architecture_snapshots
 
+    @property
+    def architecture_fitness(self):
+        return self._architecture_fitness
+
+    @property
+    def architecture_violations(self):
+        return self._architecture_violations
+
+    @property
+    def architecture_invariants(self):
+        return self._architecture_invariants
+
+    @property
+    def architecture_drifts(self):
+        return self._architecture_drifts
+
+    @property
+    def architecture_timelines(self):
+        return self._architecture_timelines
+
+    @property
+    def architecture_benchmarks(self):
+        return self._architecture_benchmarks
+
+    @property
+    def architecture_similarities(self):
+        return self._architecture_similarities
+
+    @property
+    def ownership_profiles(self):
+        return self._ownership_profiles
+
+    @property
+    def refactoring_candidates(self):
+        return self._refactoring_candidates
+
+    @property
+    def architecture_recommendations(self):
+        return self._architecture_recommendations

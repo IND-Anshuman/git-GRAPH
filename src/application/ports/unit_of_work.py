@@ -319,5 +319,62 @@ class IUnitOfWork(ABC):
     def capability_taxonomy_candidates(self) -> Any:
         pass
 
+    @property
+    @abstractmethod
+    def architecture_profiles(self) -> Any:
+        pass
 
+    @property
+    @abstractmethod
+    def architecture_snapshots(self) -> Any:
+        pass
 
+    @property
+    @abstractmethod
+    def architecture_fitness(self) -> Any:
+        pass
+
+    @property
+    @abstractmethod
+    def architecture_violations(self) -> Any:
+        pass
+
+    @property
+    @abstractmethod
+    def architecture_invariants(self) -> Any:
+        pass
+
+    @property
+    @abstractmethod
+    def architecture_drifts(self) -> Any:
+        pass
+
+    @property
+    @abstractmethod
+    def architecture_timelines(self) -> Any:
+        pass
+
+    @property
+    @abstractmethod
+    def architecture_benchmarks(self) -> Any:
+        pass
+
+    @property
+    @abstractmethod
+    def architecture_similarities(self) -> Any:
+        pass
+
+    @property
+    @abstractmethod
+    def ownership_profiles(self) -> Any:
+        pass
+
+    @property
+    @abstractmethod
+    def refactoring_candidates(self) -> Any:
+        pass
+
+    @property
+    @abstractmethod
+    def architecture_recommendations(self) -> Any:
+        pass

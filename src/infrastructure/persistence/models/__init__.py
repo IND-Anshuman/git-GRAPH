@@ -88,6 +88,20 @@ from src.infrastructure.persistence.models.capability_models import (
     CapabilityEmbeddingModel,
     CapabilityTaxonomyCandidateModel,
 )
+from src.infrastructure.persistence.models.architecture_models import (
+    ArchitectureProfileModel,
+    ArchitectureSnapshotModel,
+    ArchitectureFitnessModel,
+    ArchitectureViolationModel,
+    ArchitectureInvariantModel,
+    ArchitectureDriftModel,
+    ArchitectureTimelineModel,
+    ArchitectureBenchmarkModel,
+    ArchitectureSimilarityModel,
+    OwnershipProfileModel,
+    RefactoringCandidateModel,
+    ArchitectureRecommendationModel,
+)
 
 __all__ = [
     "Base",
@@ -173,4 +187,16 @@ __all__ = [
     "CapabilityCouplingModel",
     "CapabilityEmbeddingModel",
     "CapabilityTaxonomyCandidateModel",
+    "ArchitectureProfileModel",
+    "ArchitectureSnapshotModel",
+    "ArchitectureFitnessModel",
+    "ArchitectureViolationModel",
+    "ArchitectureInvariantModel",
+    "ArchitectureDriftModel",
+    "ArchitectureTimelineModel",
+    "ArchitectureBenchmarkModel",
+    "ArchitectureSimilarityModel",
+    "OwnershipProfileModel",
+    "RefactoringCandidateModel",
+    "ArchitectureRecommendationModel",
 ]
