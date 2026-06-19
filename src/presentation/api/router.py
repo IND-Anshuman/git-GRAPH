@@ -25,4 +25,7 @@ api_router.include_router(meta_router)
 api_router.include_router(capabilities_router)
 api_router.include_router(reasoning_router)
 
+from src.presentation.api.architecture import router as architecture_router
+api_router.include_router(architecture_router)
+
 
