@@ -504,104 +504,179 @@ Execute a deterministic query planner logic query.
 
 ## 8. Decision Intelligence Layer (DIL)
 
-### `GET /decisions/{repository_id}`
-Lists all historical and current architectural, technology, and capability decisions.
+All DIL endpoints are mounted under `/api/v1`.
+
+### Repository-Scoped Endpoints
+
+#### `GET /api/v1/repositories/{repository_id}/decisions`
+Returns all architectural, technology, and capability decisions discovered for the given repository.
+*   **Parameters**: `repository_id` (path, string)
 *   **Response Status**: `200 OK`
 *   **Response Body**:
     ```json
     [
       {
         "id": "d81d4fae-7dec-11d0-a765-00a0c91e6bf6",
-        "name": "Adopt Apache Kafka for Event Streaming",
-        "description": "Introducing async messaging topology to decouple orders and inventory services.",
+        "name": "Adopt Apache Kafka",
+        "description": "Introduced dependency: kafka-python",
         "decision_type": "TECHNOLOGY_ADOPTION",
         "status": "ACTIVE",
-        "confidence_score": 0.91,
+        "confidence_score": 0.85,
         "first_seen_commit": "abcdef1234567890",
         "last_seen_commit": "abcdef1234567890",
-        "repository_id": "a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d",
-        "created_at": "2026-06-20T12:00:00Z"
+        "repository_id": "repo-123",
+        "created_at": "2026-06-20T12:00:00Z",
+        "updated_at": "2026-06-20T12:00:00Z"
       }
     ]
     ```
 
-### `GET /decisions/decision/{decision_id}`
-Retrieve complete history, snapshots, evidence, and impacts of a decision.
-*   **Response Status**: `200 OK` / `404 Not Found`
+#### `GET /api/v1/repositories/{repository_id}/decisions/summary`
+Returns a high-level portfolio summary including totals, average confidence, and type/status breakdowns.
+*   **Parameters**: `repository_id` (path, string)
+*   **Response Status**: `200 OK`
 *   **Response Body**:
     ```json
     {
-      "id": "d81d4fae-7dec-11d0-a765-00a0c91e6bf6",
-      "name": "Adopt Apache Kafka for Event Streaming",
-      "description": "Introducing async messaging topology to decouple orders and inventory services.",
-      "decision_type": "TECHNOLOGY_ADOPTION",
-      "status": "ACTIVE",
-      "confidence": {
-        "score": 0.91,
-        "evidence_weight": 0.95,
-        "historical_weight": 0.85,
-        "architectural_weight": 0.90,
-        "capability_weight": 0.92,
-        "artifact_weight": 0.95
+      "total_decisions": 12,
+      "total_intents": 4,
+      "average_confidence": 0.82,
+      "by_type": {
+        "TECHNOLOGY_ADOPTION": 8,
+        "TECHNOLOGY_REMOVAL": 2,
+        "ARCHITECTURAL": 2
       },
-      "versions": [
-        {
-          "version": 1,
-          "commit_hash": "abcdef1234567890",
-          "confidence": 0.91,
-          "supporting_evidence": ["Dependency added: kafka-python", "ADR: docs/adr/0021-kafka.md"],
-          "generated_at": "2026-06-20T12:00:00Z"
-        }
-      ],
-      "supporting_evidence": {
-        "supporting_commits": ["abcdef1234567890"],
-        "supporting_documents": ["docs/adr/0021-kafka.md"],
-        "supporting_repository_events": ["msg_publish_kafka dependency added"],
-        "supporting_architecture_changes": []
-      },
-      "affected_capabilities": ["order_processing", "inventory_updates"],
-      "affected_architectures": ["event_driven"],
-      "affected_services": ["orders_service", "inventory_service"],
-      "first_seen_commit": "abcdef1234567890",
-      "last_seen_commit": "abcdef1234567890",
-      "repository_id": "a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d",
-      "created_at": "2026-06-20T12:00:00Z"
+      "by_status": {
+        "ACTIVE": 10,
+        "SUPERSEDED": 2
+      }
     }
     ```
 
-### `GET /decisions/decision/{decision_id}/conflicts`
-Checks if the decision conflicts with other structural, boundary, or logic decisions.
+#### `GET /api/v1/repositories/{repository_id}/decisions/active`
+Returns only decisions currently in `ACTIVE` status (the current decision baseline).
+*   **Parameters**: `repository_id` (path, string)
+*   **Response Status**: `200 OK`
+
+#### `GET /api/v1/repositories/{repository_id}/decisions/search`
+Performs a search over decisions by matching text keywords or filtering by type/status.
+*   **Parameters**:
+    *   `repository_id` (path, string)
+    *   `q` (query, string, optional) — search keyword
+    *   `type` (query, string, optional) — filter by type
+    *   `status` (query, string, optional) — filter by status
+*   **Response Status**: `200 OK`
+
+#### `GET /api/v1/repositories/{repository_id}/decisions/timeline`
+Returns the historical decision snapshots (co-temporal active sets) across the commit history.
+*   **Parameters**: `repository_id` (path, string)
 *   **Response Status**: `200 OK`
 *   **Response Body**:
     ```json
     [
       {
-        "decision_a_id": "d81d4fae-7dec-11d0-a765-00a0c91e6bf6",
-        "decision_b_id": "f91d4fae-7dec-11d0-a765-00a0c91e6bf7",
-        "conflict_type": "ARCHITECTURAL_CONTRADICTION",
-        "description": "Conflict: 'Adopt Apache Kafka' introduces decoupled async events while 'Consolidate services' merges services back to a synchronous monolith architecture.",
-        "detected_at": "2026-06-20T12:15:00Z",
-        "severity": 0.75
+        "id": "a51d4fae-7dec-11d0-a765-00a0c91e6bf0",
+        "repository_id": "repo-123",
+        "commit_hash": "abcdef1234567890",
+        "decisions_json": ["d81d4fae-7dec-11d0-a765-00a0c91e6bf6"],
+        "generated_at": "2026-06-20T12:00:00Z"
       }
     ]
     ```
 
-### `GET /decisions/decision/{decision_id}/fitness`
-Evaluates longevity, stability, adoption rate, and success score.
+#### `GET /api/v1/repositories/{repository_id}/decisions/lifecycles`
+Returns technology lifecycle arcs pairing adoption and removal events.
+*   **Parameters**: `repository_id` (path, string)
+*   **Response Status**: `200 OK`
+*   **Response Body**:
+    ```json
+    [
+      {
+        "technology_key": "django",
+        "display_name": "Django",
+        "adoption_decision_id": "d81d4fae-7dec-11d0-a765-00a0c91e6bf6",
+        "removal_decision_id": "f81d4fae-7dec-11d0-a765-00a0c91e6bf8",
+        "adoption_commit": "c1",
+        "removal_commit": "c3",
+        "repository_id": "repo-123",
+        "status": "RETIRED",
+        "stability_index": 0.8,
+        "lifespan_days": 45,
+        "adoption_decision_name": "Adopt Django",
+        "removal_decision_name": "Remove Django"
+      }
+    ]
+    ```
+
+#### `GET /api/v1/repositories/{repository_id}/decisions/graph`
+Returns a directed dependency graph representation of all decisions.
+*   **Parameters**: `repository_id` (path, string)
 *   **Response Status**: `200 OK`
 *   **Response Body**:
     ```json
     {
-      "decision_id": "d81d4fae-7dec-11d0-a765-00a0c91e6bf6",
-      "longevity_score": 0.95,
-      "stability_score": 0.90,
-      "impact_score": 0.82,
-      "adoption_score": 0.75,
-      "success_rate": 0.88,
-      "overall_fitness": 0.86,
-      "evaluated_at": "2026-06-20T12:20:00Z"
+      "nodes": [
+        { "id": "d1", "label": "Adopt Django", "type": "TECHNOLOGY_ADOPTION" }
+      ],
+      "edges": [
+        { "source": "d1", "target": "d2", "relationship_type": "DEPENDS_ON", "confidence": 1.0 }
+      ]
     }
     ```
+
+#### `GET /api/v1/repositories/{repository_id}/decisions/conflicts`
+Lists all detected architectural or technology conflicts in the repository.
+*   **Parameters**: `repository_id` (path, string)
+*   **Response Status**: `200 OK`
+
+#### `GET /api/v1/repositories/{repository_id}/decisions/intents`
+Lists all strategic intents (motivations) mapped to decisions in the repository.
+*   **Parameters**: `repository_id` (path, string)
+*   **Response Status**: `200 OK`
+
+#### `GET /api/v1/repositories/{repository_id}/decisions/causal-chains`
+Lists multi-hop causal chains explaining "why" decisions were made.
+*   **Parameters**: `repository_id` (path, string)
+*   **Response Status**: `200 OK`
+
+---
+
+### Decision-Scoped Endpoints
+
+#### `GET /api/v1/decisions/{decision_id}`
+Returns complete details of a specific decision including evidence, history, and impacts.
+*   **Parameters**: `decision_id` (path, UUID)
+*   **Response Status**: `200 OK` / `404 Not Found`
+
+#### `GET /api/v1/decisions/{decision_id}/versions`
+Returns the historical version timeline of the decision.
+*   **Parameters**: `decision_id` (path, UUID)
+*   **Response Status**: `200 OK` / `404 Not Found`
+
+#### `GET /api/v1/decisions/{decision_id}/fitness`
+Evaluates and returns the multi-dimensional fitness metrics for the decision.
+*   **Parameters**: `decision_id` (path, UUID)
+*   **Response Status**: `200 OK` / `404 Not Found`
+
+#### `GET /api/v1/decisions/{decision_id}/conflicts`
+Returns any active conflicts involving this specific decision.
+*   **Parameters**: `decision_id` (path, UUID)
+*   **Response Status**: `200 OK` / `404 Not Found`
+
+#### `GET /api/v1/decisions/{decision_id}/causal`
+Returns causal relationships (causes and effects) involving this specific decision.
+*   **Parameters**: `decision_id` (path, UUID)
+*   **Response Status**: `200 OK` / `404 Not Found`
+
+---
+
+### Intent-Scoped Endpoints
+
+#### `GET /api/v1/intents/{intent_id}`
+Returns details of a strategic intent.
+*   **Parameters**: `intent_id` (path, UUID)
+*   **Response Status**: `200 OK` / `404 Not Found`
+
 
 ---
 
