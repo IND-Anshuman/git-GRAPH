@@ -100,6 +100,108 @@ from src.infrastructure.persistence.repositories.sa_architecture_repos import (
     SAArchitectureFitnessRepository,
     SAArchitectureViolationRepository,
     SAArchitectureInvariantRepository,
+"""SQLAlchemy implementation of Unit of Work."""
+
+from typing import Any
+from sqlalchemy.orm import Session
+
+from src.application.ports.unit_of_work import IUnitOfWork
+from src.domain.repositories import (
+    IRepositoryRepository,
+    ISourceFileRepository,
+    ICodeEntityRepository,
+    IRelationshipRepository,
+    ICommitRepository,
+    IEntityVersionRepository,
+    IRelationshipVersionRepository,
+    IChangeEventRepository,
+    IRepositorySnapshotRepository,
+    IMetricsRepository,
+    IIntegrityRepository
+)
+
+from src.infrastructure.persistence.repositories.sa_repository_repo import SARepositoryRepository
+from src.infrastructure.persistence.repositories.sa_source_file_repo import SASourceFileRepository
+from src.infrastructure.persistence.repositories.sa_code_entity_repo import SACodeEntityRepository
+from src.infrastructure.persistence.repositories.sa_relationship_repo import SARelationshipRepository
+from src.infrastructure.persistence.repositories.sa_commit_repo import SACommitRepository
+from src.infrastructure.persistence.repositories.sa_entity_version_repo import SAEntityVersionRepository
+from src.infrastructure.persistence.repositories.sa_relationship_version_repo import SARelationshipVersionRepository
+from src.infrastructure.persistence.repositories.sa_change_event_repo import SAChangeEventRepository
+from src.infrastructure.persistence.repositories.sa_snapshot_repo import SARepositorySnapshotRepository
+from src.infrastructure.persistence.repositories.sa_metrics_repo import SAMetricsRepository
+from src.infrastructure.persistence.repositories.sa_integrity_repo import SAIntegrityRepository
+from src.infrastructure.persistence.repositories.sa_logic_repositories import (
+    SALogicSignatureRepository,
+    SALogicVersionRepository,
+    SALogicTransitionRepository,
+    SALogicEvidenceRepository,
+    SABehaviorExplanationRepository,
+    SABehaviorDriftRepository,
+    SABehaviorPatternRepository,
+    SALogicClusterRepository,
+    SAOntologyNodeRepository,
+)
+from src.infrastructure.persistence.repositories.sa_concept_repositories import (
+    SAConceptNodeRepository,
+    SAConceptVersionRepository,
+    SAConceptEvidenceRepository,
+    SAConceptRelationshipRepository,
+    SAConceptClusterRepository,
+    SAConceptExplanationRepository,
+    SAConceptMetricsRepository,
+    SAConceptEvolutionRepository,
+    SAConceptDriftRepository,
+)
+from src.infrastructure.persistence.repositories.sa_meta_repositories import (
+    SAMetaTypeRepository,
+    SAMetaDefinitionRepository,
+    SAEmbeddingModelRepository,
+    SAEmbeddingVersionRepository,
+)
+from src.infrastructure.persistence.repositories.sa_knowledge_artifact_repo import SAKnowledgeArtifactRepository
+from src.infrastructure.persistence.repositories.sa_resolution_repos import (
+    SASymbolGraphRepository,
+    SASymbolReferenceRepository,
+    SAVariableFlowRepository,
+    SACrossFileResolutionRepository,
+    SAExternalDependencyRepository,
+    SAAIEvidenceRepository,
+    SARepositoryArchitectureGraphRepository,
+    SAArchitectureRelationshipRepository,
+    SARepositoryStructureGraphRepository,
+    SACompilerOutputVersionRepository,
+    SAReasoningArtifactRepository,
+    SAKnowledgeDriftRepository,
+    SAExternalKnowledgeReferenceRepository,
+)
+from src.infrastructure.persistence.repositories.sa_capability_repos import (
+    SACapabilityRepository,
+    SACapabilityCandidateRepository,
+    SACapabilityRelationshipRepository,
+    SACapabilityFingerprintRepository,
+    SACapabilityEvolutionRepository,
+    SACapabilityTimelineRepository,
+    SACapabilityDependencyRepository,
+    SACapabilityHealthRepository,
+    SACapabilityBlastRadiusRepository,
+    SACapabilityProvenanceRepository,
+    SACapabilityConfidenceRepository,
+    SACapabilityOverlapRepository,
+    SACapabilityStabilityRepository,
+    SACapabilitySnapshotRepository,
+    SACapabilityBoundaryRepository,
+    SACapabilityCohesionRepository,
+    SACapabilityCouplingRepository,
+    SACapabilityEmbeddingRepository,
+    SACapabilityTaxonomyCandidateRepository,
+)
+from src.infrastructure.persistence.repositories.sa_architecture_repos import (
+    SAArchitectureProfileRepository,
+    SAArchitectureSnapshotRepository,
+    SAArchitectureFitnessRepository,
+    SAArchitectureViolationRepository,
+    SAArchitectureInvariantRepository,
     SAArchitectureDriftRepository,
     SAArchitectureTimelineRepository,
     SAArchitectureBenchmarkRepository,
@@ -107,6 +209,21 @@ from src.infrastructure.persistence.repositories.sa_architecture_repos import (
     SAOwnershipProfileRepository,
     SARefactoringCandidateRepository,
     SAArchitectureRecommendationRepository,
+)
+from src.infrastructure.persistence.repositories.sa_decision_repos import (
+    SADecisionRepository,
+    SADecisionVersionRepository,
+    SADecisionEvidenceRepository,
+    SADecisionImpactRepository,
+    SADecisionImpactTimelineRepository,
+    SADecisionDependencyRepository,
+    SADecisionConflictRepository,
+    SADecisionFitnessRepository,
+    SADecisionSnapshotRepository,
+    SAIntentRepository,
+    SAIntentRelationshipRepository,
+    SARepositoryMemoryEventRepository,
+    SACausalRelationshipRepository
 )
 from src.infrastructure.persistence.database import DatabaseEngine
 
@@ -198,6 +315,19 @@ class SQLAlchemyUnitOfWork(IUnitOfWork):
         self._ownership_profiles = SAOwnershipProfileRepository(self._session)
         self._refactoring_candidates = SARefactoringCandidateRepository(self._session)
         self._architecture_recommendations = SAArchitectureRecommendationRepository(self._session)
+        self._decisions = SADecisionRepository(self._session)
+        self._decision_versions = SADecisionVersionRepository(self._session)
+        self._decision_evidence = SADecisionEvidenceRepository(self._session)
+        self._decision_impacts = SADecisionImpactRepository(self._session)
+        self._decision_impact_timelines = SADecisionImpactTimelineRepository(self._session)
+        self._decision_dependencies = SADecisionDependencyRepository(self._session)
+        self._decision_conflicts = SADecisionConflictRepository(self._session)
+        self._decision_fitness = SADecisionFitnessRepository(self._session)
+        self._decision_snapshots = SADecisionSnapshotRepository(self._session)
+        self._intents = SAIntentRepository(self._session)
+        self._intent_relationships = SAIntentRelationshipRepository(self._session)
+        self._repository_memory_events = SARepositoryMemoryEventRepository(self._session)
+        self._causal_relationships = SACausalRelationshipRepository(self._session)
         return self
 
     def __exit__(self, exc_type: Any, exc_val: Any, exc_tb: Any) -> None:
@@ -526,3 +656,55 @@ class SQLAlchemyUnitOfWork(IUnitOfWork):
     @property
     def architecture_recommendations(self):
         return self._architecture_recommendations
+
+    @property
+    def decisions(self):
+        return self._decisions
+
+    @property
+    def decision_versions(self):
+        return self._decision_versions
+
+    @property
+    def decision_evidence(self):
+        return self._decision_evidence
+
+    @property
+    def decision_impacts(self):
+        return self._decision_impacts
+
+    @property
+    def decision_impact_timelines(self):
+        return self._decision_impact_timelines
+
+    @property
+    def decision_dependencies(self):
+        return self._decision_dependencies
+
+    @property
+    def decision_conflicts(self):
+        return self._decision_conflicts
+
+    @property
+    def decision_fitness(self):
+        return self._decision_fitness
+
+    @property
+    def decision_snapshots(self):
+        return self._decision_snapshots
+
+    @property
+    def intents(self):
+        return self._intents
+
+    @property
+    def intent_relationships(self):
+        return self._intent_relationships
+
+    @property
+    def repository_memory_events(self):
+        return self._repository_memory_events
+
+    @property
+    def causal_relationships(self):
+        return self._causal_relationships

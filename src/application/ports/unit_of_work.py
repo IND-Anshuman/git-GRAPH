@@ -378,3 +378,68 @@ class IUnitOfWork(ABC):
     @abstractmethod
     def architecture_recommendations(self) -> Any:
         pass
+
+    @property
+    @abstractmethod
+    def decisions(self) -> Any:
+        pass
+
+    @property
+    @abstractmethod
+    def decision_versions(self) -> Any:
+        pass
+
+    @property
+    @abstractmethod
+    def decision_evidence(self) -> Any:
+        pass
+
+    @property
+    @abstractmethod
+    def decision_impacts(self) -> Any:
+        pass
+
+    @property
+    @abstractmethod
+    def decision_impact_timelines(self) -> Any:
+        pass
+
+    @property
+    @abstractmethod
+    def decision_dependencies(self) -> Any:
+        pass
+
+    @property
+    @abstractmethod
+    def decision_conflicts(self) -> Any:
+        pass
+
+    @property
+    @abstractmethod
+    def decision_fitness(self) -> Any:
+        pass
+
+    @property
+    @abstractmethod
+    def decision_snapshots(self) -> Any:
+        pass
+
+    @property
+    @abstractmethod
+    def intents(self) -> Any:
+        pass
+
+    @property
+    @abstractmethod
+    def intent_relationships(self) -> Any:
+        pass
+
+    @property
+    @abstractmethod
+    def repository_memory_events(self) -> Any:
+        pass
+
+    @property
+    @abstractmethod
+    def causal_relationships(self) -> Any:
+        pass
