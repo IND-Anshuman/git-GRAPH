@@ -1,6 +1,6 @@
 # Temporal Code Knowledge Graph Platform: Capabilities & Technical Reference
 
-This document serves as the comprehensive technical reference and capabilities catalog for the **Temporal Code Knowledge Graph Platform**. It details the supported languages, semantic entities, relationship edges, behavior logic types, concept classifications, and semantic discovery engines up to the Phase 5C implementation.
+This document serves as the comprehensive technical reference and capabilities catalog for the **Temporal Code Knowledge Graph Platform**. It details the supported languages, semantic entities, relationship edges, behavior logic types, concept classifications, and semantic discovery engines up to the Phase 7C implementation.
 
 ---
 
@@ -13,15 +13,19 @@ This document serves as the comprehensive technical reference and capabilities c
    * [D. Intermediate Semantic Representation (ISR Layer)](#d-intermediate-semantic-representation-isr-layer)
    * [E. Meta-Ontology & Embedding Registry Layer (Phase 5A)](#e-meta-ontology--embedding-registry-layer-phase-5a)
    * [F. Governance, Evolution, & Boundaries Layer (Phase 5A/5C)](#f-governance-evolution--boundaries-layer-phase-5a5c)
+   * [G. Capability Intelligence Layer (Phase 6)](#g-capability-intelligence-layer-phase-6)
+   * [H. Reasoning & Architectural Intelligence Layer (Phase 7A/7B)](#h-reasoning--architectural-intelligence-layer-phase-7a7b)
+   * [I. Decision Intelligence Layer (Phase 7C)](#i-decision-intelligence-layer-phase-7c)
 3. [Supported Relationship Edges](#3-supported-relationship-edges)
    * [A. AST / Structural Edges](#a-ast--structural-edges)
    * [B. Conceptual Edges](#b-conceptual-edges)
    * [C. Distributed & Messaging Edges (Phase 5B)](#c-distributed--messaging-edges-phase-5b)
    * [D. Frontend UI Edges (Phase 5B)](#d-frontend-ui-edges-phase-5b)
    * [E. AI-Native Agent Edges (Phase 5B)](#e-ai-native-agent-edges-phase-5b)
+   * [F. Causal & Decision Edges (Phase 7C)](#f-causal--decision-edges-phase-7c)
 4. [Supported Logic Types (Behavior Detection Patterns)](#4-supported-logic-types-behavior-detection-patterns)
 5. [Supported Concept Types (Ontology Registry Taxonomy)](#5-supported-concept-types-ontology-registry-taxonomy)
-6. [Advanced Semantics & Discovery Engines (Phase 5A, 5B, 5C)](#6-advanced-semantics--discovery-engines-phase-5a-5b-5c)
+6. [Advanced Semantics & Discovery Engines (Phase 5A through 7C)](#6-advanced-semantics--discovery-engines-phase-5a-through-7c)
    * [A. Dynamic Meta-Ontology & Schema Registry](#a-dynamic-meta-ontology--schema-registry)
    * [B. Embedding Registry & Similarity Search](#b-embedding-registry--similarity-search)
    * [C. Confidence Calibration Engine](#c-confidence-calibration-engine)
@@ -29,6 +33,10 @@ This document serves as the comprehensive technical reference and capabilities c
    * [E. Concept Discovery Engine & Placement Scores](#e-concept-discovery-engine--placement-scores)
    * [F. Flow Discovery Engine & Structural Path Tracing](#f-flow-discovery-engine--structural-path-tracing)
    * [G. Semantic Evolution & Bitemporal Query Engine](#g-semantic-evolution--bitemporal-query-engine)
+   * [H. Capability Intelligence & Coupling Discovery](#h-capability-intelligence--coupling-discovery)
+   * [I. Deterministic Reasoning Planner](#i-deterministic-reasoning-planner)
+   * [J. Architectural Pattern Registry & Invariant Validation](#j-architectural-pattern-registry--invariant-validation)
+   * [K. Decision Discovery & Causal Reasoning Engine](#k-decision-discovery--causal-reasoning-engine)
 
 ---
 
@@ -58,7 +66,7 @@ The platform parses codebase source trees and extracts entities using Tree-sitte
 
 ## 2. Platform Entities (Supported Nodes)
 
-Entities represent first-class node types within the Temporal Knowledge Graph, partitioned across six abstraction layers:
+Entities represent first-class node types within the Temporal Knowledge Graph, partitioned across nine abstraction layers:
 
 ### A. Structural Entities (Codebase AST Layer)
 * **`Repository`**: Represents a git codebase repository.
@@ -123,6 +131,33 @@ Entities represent first-class node types within the Temporal Knowledge Graph, p
 * **`ConceptLineage`**: Structural mutation timeline mapping concept splits, merges, and rename ancestry.
 * **`MicroserviceBoundary`**: Network and process boundaries separating distributed sub-systems (RPC/messaging queues).
 
+### G. Capability Intelligence Layer (Phase 6)
+* **`Capability`**: Represents a macro domain capability verified by developers.
+* **`CapabilityCandidate`**: Automatically discovered capability grouping from structural and flow analysis.
+* **`CapabilityRelationship`**: Represents dependency and coupling relationships between capabilities.
+* **`BlastRadius`**: Calculated impact model scoring operational risks of capability modification.
+* **`HealthRisk`**: Metrics representing cohesion, coupling, and boundary strength.
+
+### H. Reasoning & Architectural Intelligence Layer (Phase 7A/7B)
+* **`ReasoningQuery`**: Record of executed natural-language query and parsed graph directives.
+* **`ReasoningResult`**: Full auditable output from a deterministic query.
+* **`ReasoningChain`**: Provenance path sequence tracing evaluation steps.
+* **`ArchitectureProfile`**: Signature profile of matched architectural patterns (monolith, event-driven, microservices).
+* **`ArchitectureViolation`**: Active structural violation of architectural rules.
+* **`ArchitectureInvariant`**: Rules declaring constraints on entity roles and calls.
+* **`ArchitectureDrift`**: Comparison models tracking structural alignment shifts.
+* **`BoundedContext`**: Aggregated domain context representing sub-system boundaries.
+
+### I. Decision Intelligence Layer (Phase 7C)
+* **`Decision`**: Discovered or documented technical, architectural, or organizational decisions.
+* **`DecisionVersion`**: Point-in-time snapshot tracking mutations, commit hashes, and updated evidence of a decision.
+* **`DecisionConflict`**: Contradictory decisions detected within the same repository timeframe.
+* **`DecisionFitness`**: Quantitative rating of longevity, adoption, and overall success of a decision.
+* **`Intent`**: Motivating architectural constraints or drivers (e.g. scalability) that motivate specific decisions.
+* **`CausalRelationship`**: Causal linking tracking `CAUSE -> EFFECT` relations (e.g. Intent -> Decision).
+* **`CausalChain`**: Traceable paths propagating dependencies from root intentions to final outcomes.
+* **`RepositoryMemory`**: Consolidated chronological knowledge graph of repository events.
+
 ---
 
 ## 3. Supported Relationship Edges
@@ -175,6 +210,12 @@ The platform links nodes using semantic directed edges depending on the graph ab
 * **`READS_MEMORY`**: Accessing past context from storage.
 * **`EVALUATES_OUTPUT`**: Running evaluator checks on model output.
 * **`REFLECTS_ON_RESULT`**: Agent feedback reflection loop execution.
+
+### F. Causal & Decision Edges (Phase 7C)
+* **`MOTIVATES`**: An Intent node motivates a Decision node.
+* **`SUPERSEDES`**: A Decision node deprecates and replaces an older Decision.
+* **`ENABLES`**: A Decision node allows or supports a specific Architecture Pattern.
+* **`DOCUMENTS`**: An ADRNode links to the Decisions it records.
 
 ---
 
@@ -275,7 +316,7 @@ Concept types represent high-level ontology capabilities. The following categori
 
 ---
 
-## 6. Advanced Semantics & Discovery Engines (Phase 5A, 5B, 5C)
+## 6. Advanced Semantics & Discovery Engines (Phase 5A through 7C)
 
 ### A. Dynamic Meta-Ontology & Schema Registry
 Provides dynamic open-world meta-ontology discovery capabilities to the platform. It registers new semantic metadata types on the fly, manages SemVer schemas, and validates dynamic dictionary payloads using JSON Schema validation. A governance workflow coordinates the promotion lifecycle:
@@ -303,3 +344,18 @@ Traces multi-hop execution chains using Depth-First Search (DFS) algorithms. It 
 
 ### G. Semantic Evolution & Bitemporal Query Engine
 Executes historical reconstruction and diffing of code semantics over time. Supports querying a historic snapshot of concept hierarchies at any historic `commit_hash` / `as_of` timestamp, and calculates structural concept modifications, splits, and merges between any two commits.
+
+### H. Capability Intelligence & Coupling Discovery
+Phase 6 CIL analyzes how logic configurations map into capabilities, calculating cohesion, coupling, maturity, and blast radius of codebase units. It computes capability candidate groupings, tracks code boundary leakage where namespaces or contexts are bridged improperly, and evaluates blast radius scores:
+$$\text{Blast Radius} = \sum_{d \in D} \text{weight}(d) \times \text{dependency\_depth}$$
+
+### I. Deterministic Reasoning Planner
+Phase 7A RIL operates a deterministic logic engine. It parses natural-language queries (e.g. security-focused queries about unauthenticated endpoints) and maps them to structural path traversals without relying on LLM logic, utilizing strict provenance graph chains to guarantee zero hallucinations.
+
+### J. Architectural Pattern Registry & Invariant Validation
+Phase 7B AIL recognizes high-level codebase patterns (Monolith, Event-Driven, Microservices, Layered, Hexagonal) via dependency topology matching. It compiles invariant rules and validates constraints across boundaries, calculating structural architectural drift scores:
+$$\text{Architectural Drift} = 0.40 \times \text{Violation Rate} + 0.30 \times \text{Boundary Leakage} + 0.30 \times \text{Dependency Delta}$$
+
+### K. Decision Discovery & Causal Reasoning Engine
+Phase 7C DIL introduces historical reasoning. By extracting explicitly recorded decisions (ADR documents) and pairing them with implicit code change events (Repository Memory), it constructs a chronological Causal Chain linking developer intents to code modifications. Evaluates decision fitness:
+$$\text{Decision Fitness} = 0.30 \times \text{Longevity} + 0.30 \times \text{Stability} + 0.20 \times \text{Adoption} + 0.20 \times \text{Success Rate}$$
