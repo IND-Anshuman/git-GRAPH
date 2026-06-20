@@ -28,4 +28,5 @@ api_router.include_router(reasoning_router)
 from src.presentation.api.architecture import router as architecture_router
 api_router.include_router(architecture_router)
 
-
+from src.presentation.api.decisions import router as decisions_router
+api_router.include_router(decisions_router)
