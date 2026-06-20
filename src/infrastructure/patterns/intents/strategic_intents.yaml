@@ -1,0 +1,32 @@
+patterns:
+  - id: scalability
+    name: Scalability
+    keywords:
+      - scale
+      - load
+      - performance
+      - high volume
+      - throughput
+      - clusters
+
+  - id: reliability
+    name: Reliability
+    keywords:
+      - fault tolerance
+      - failover
+      - backup
+      - resilient
+      - robust
+      - uptime
+
+  - id: security
+    name: Security
+    keywords:
+      - auth
+      - encrypt
+      - decrypt
+      - jwt
+      - cert
+      - policy
+      - permission
+      - oauth

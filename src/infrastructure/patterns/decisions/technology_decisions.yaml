@@ -1,0 +1,36 @@
+patterns:
+  - id: postgresql
+    display_name: PostgreSQL Database
+    decision_type: TECHNOLOGY_ADOPTION
+    keywords:
+      - postgres
+      - postgresql
+      - psycopg2
+      - asyncpg
+    intent_hints:
+      - RELIABILITY
+      - DATA_CONSISTENCY
+
+  - id: mongodb
+    display_name: MongoDB Database
+    decision_type: TECHNOLOGY_ADOPTION
+    keywords:
+      - mongodb
+      - mongo
+      - pymongo
+      - motor
+    intent_hints:
+      - SCALABILITY
+      - DATA_FLEXIBILITY
+
+  - id: architecture-microservices
+    display_name: Microservices Migration
+    decision_type: ARCHITECTURAL
+    keywords:
+      - microservice
+      - split service
+      - separate service
+      - extract service
+    intent_hints:
+      - COUPLING_REDUCTION
+      - SCALABILITY
