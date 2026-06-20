@@ -38,6 +38,9 @@ def get_container(request: Request) -> Any:
 def get_uow_factory(request: Request) -> Callable:
     return request.app.state.container.get_uow_factory()
 
+def get_uow(request: Request) -> Any:
+    return request.app.state.container.get_uow_factory()()
+
 def get_ingest_use_case(request: Request) -> IngestRepositoryUseCase:
     return request.app.state.container.get_ingest_repository_use_case()
 
