@@ -25,18 +25,12 @@ This document serves as the comprehensive technical reference and capabilities c
    * [F. Causal & Decision Edges (Phase 7C)](#f-causal--decision-edges-phase-7c)
 4. [Supported Logic Types (Behavior Detection Patterns)](#4-supported-logic-types-behavior-detection-patterns)
 5. [Supported Concept Types (Ontology Registry Taxonomy)](#5-supported-concept-types-ontology-registry-taxonomy)
-6. [Advanced Semantics & Discovery Engines (Phase 5A through 7C)](#6-advanced-semantics--discovery-engines-phase-5a-through-7c)
-   * [A. Dynamic Meta-Ontology & Schema Registry](#a-dynamic-meta-ontology--schema-registry)
-   * [B. Embedding Registry & Similarity Search](#b-embedding-registry--similarity-search)
-   * [C. Confidence Calibration Engine](#c-confidence-calibration-engine)
-   * [D. Relationship & Interaction Discovery Engine](#d-relationship--interaction-discovery-engine)
-   * [E. Concept Discovery Engine & Placement Scores](#e-concept-discovery-engine--placement-scores)
-   * [F. Flow Discovery Engine & Structural Path Tracing](#f-flow-discovery-engine--structural-path-tracing)
-   * [G. Semantic Evolution & Bitemporal Query Engine](#g-semantic-evolution--bitemporal-query-engine)
-   * [H. Capability Intelligence & Coupling Discovery](#h-capability-intelligence--coupling-discovery)
-   * [I. Deterministic Reasoning Planner](#i-deterministic-reasoning-planner)
-   * [J. Architectural Pattern Registry & Invariant Validation](#j-architectural-pattern-registry--invariant-validation)
-   * [K. Decision Discovery & Causal Reasoning Engine](#k-decision-discovery--causal-reasoning-engine)
+6. [Advanced Semantics & Discovery Engines (Phase 5A through 5C)](#6-advanced-semantics--discovery-engines-phase-5a-through-5c)
+7. [Deep-Dive Implementation Details: Phase 6 & Phase 7 Systems](#7-deep-dive-implementation-details-phase-6--phase-7-systems)
+   * [A. Phase 6: Capability Intelligence Layer (CIL)](#a-phase-6-capability-intelligence-layer-cil)
+   * [B. Phase 7A: Reasoning Intelligence Layer (RIL)](#b-phase-7a-reasoning-intelligence-layer-ril)
+   * [C. Phase 7B: Architectural Intelligence Layer (AIL)](#c-phase-7b-architectural-intelligence-layer-ail)
+   * [D. Phase 7C: Decision Intelligence Layer (DIL)](#d-phase-7c-decision-intelligence-layer-dil)
 
 ---
 
@@ -316,7 +310,7 @@ Concept types represent high-level ontology capabilities. The following categori
 
 ---
 
-## 6. Advanced Semantics & Discovery Engines (Phase 5A through 7C)
+## 6. Advanced Semantics & Discovery Engines (Phase 5A through 5C)
 
 ### A. Dynamic Meta-Ontology & Schema Registry
 Provides dynamic open-world meta-ontology discovery capabilities to the platform. It registers new semantic metadata types on the fly, manages SemVer schemas, and validates dynamic dictionary payloads using JSON Schema validation. A governance workflow coordinates the promotion lifecycle:
@@ -345,17 +339,157 @@ Traces multi-hop execution chains using Depth-First Search (DFS) algorithms. It 
 ### G. Semantic Evolution & Bitemporal Query Engine
 Executes historical reconstruction and diffing of code semantics over time. Supports querying a historic snapshot of concept hierarchies at any historic `commit_hash` / `as_of` timestamp, and calculates structural concept modifications, splits, and merges between any two commits.
 
-### H. Capability Intelligence & Coupling Discovery
-Phase 6 CIL analyzes how logic configurations map into capabilities, calculating cohesion, coupling, maturity, and blast radius of codebase units. It computes capability candidate groupings, tracks code boundary leakage where namespaces or contexts are bridged improperly, and evaluates blast radius scores:
-$$\text{Blast Radius} = \sum_{d \in D} \text{weight}(d) \times \text{dependency\_depth}$$
+---
 
-### I. Deterministic Reasoning Planner
-Phase 7A RIL operates a deterministic logic engine. It parses natural-language queries (e.g. security-focused queries about unauthenticated endpoints) and maps them to structural path traversals without relying on LLM logic, utilizing strict provenance graph chains to guarantee zero hallucinations.
+## 7. Deep-Dive Implementation Details: Phase 6 & Phase 7 Systems
 
-### J. Architectural Pattern Registry & Invariant Validation
-Phase 7B AIL recognizes high-level codebase patterns (Monolith, Event-Driven, Microservices, Layered, Hexagonal) via dependency topology matching. It compiles invariant rules and validates constraints across boundaries, calculating structural architectural drift scores:
-$$\text{Architectural Drift} = 0.40 \times \text{Violation Rate} + 0.30 \times \text{Boundary Leakage} + 0.30 \times \text{Dependency Delta}$$
+### A. Phase 6: Capability Intelligence Layer (CIL)
 
-### K. Decision Discovery & Causal Reasoning Engine
-Phase 7C DIL introduces historical reasoning. By extracting explicitly recorded decisions (ADR documents) and pairing them with implicit code change events (Repository Memory), it constructs a chronological Causal Chain linking developer intents to code modifications. Evaluates decision fitness:
-$$\text{Decision Fitness} = 0.30 \times \text{Longevity} + 0.30 \times \text{Stability} + 0.20 \times \text{Adoption} + 0.20 \times \text{Success Rate}$$
+The **Capability Intelligence Layer (CIL)** analyzes the logical structures and traced execution flows to identify, monitor, and measure the architectural health of high-level functional units.
+
+```
+┌──────────────────────────────────────────────────────────┐
+│                   CAPABILITY PIPELINE                    │
+│                                                          │
+│  Concept Graph  ──┐                                      │
+│  Flow Traces    ──┼──► [CapabilityDiscoveryEngine] ─────►│
+│  AST Boundaries ──┘                 │                    │
+│                                     ▼                    │
+│                          [CapabilityCandidate]           │
+│                                     │                    │
+│                                     ▼                    │
+│                       [CapabilityGovernanceEngine]       │
+│                                     │                    │
+│                                     ▼                    │
+│                                [Capability]              │
+└──────────────────────────────────────────────────────────┘
+```
+
+#### 1. Capability Discovery Engine
+The `CapabilityDiscoveryEngine` cluster concepts and flows into unified capabilities:
+1.  **Agglomerative Clustering**: Synthesizes clusters using concept co-occurrence maps. Nodes that interact frequently via `CALLS` or `PASSES_STATE_TO` edges are grouped together.
+2.  **Structural Similarity Scoring**: Evaluates the semantic overlap between functions and concepts. If a structural unit implements security, database, and validation capabilities in a single context, it generates a candidate capability.
+3.  **Candidate Generation**: Produces a `CapabilityCandidate` carrying supporting entity lists, behaviors, and execution flows.
+
+#### 2. Metric Evaluation Engines
+The platform calculates quality scores to evaluate software boundaries:
+*   **Cohesion Engine (`CapabilityCohesionEngine`)**: Measures logical integration strength. Cohesion is the ratio of internal structural dependencies to overall connections within the capability scope. High cohesion indicates a tightly focused, modular context.
+*   **Coupling Engine (`CapabilityCouplingEngine`)**: Measures inter-capability coupling. Calculates incoming and outgoing dependencies between different capabilities. Lower coupling minimizes side effects during refactoring.
+*   **Blast Radius Engine (`BlastRadiusEngine`)**: Measures structural dependency chains. It traces transitive dependencies of classes and methods inside the capability. The blast radius score is calculated as:
+    $$\text{Blast Radius Score} = \sum_{d \in D} \text{weight}(d) \times \text{dependency\_depth}$$
+    where $d$ is a downstream dependent capability and depth represents the distance in the graph.
+*   **Boundary Engine (`CapabilityBoundaryEngine`)**: Detects context boundary violations. It evaluates if a class inside a capability accesses private internal symbols of another capability directly rather than through defined interface contracts.
+
+---
+
+### B. Phase 7A: Reasoning Intelligence Layer (RIL)
+
+The **Reasoning Intelligence Layer (RIL)** provides deterministic, auditable multi-hop path reasoning on top of the bitemporal graph. It answers structured architectural and capability questions without using probabilistic LLMs.
+
+```
+┌──────────────────────────────────────────────────────────────────┐
+│                    REASONING ENGINE PIPELINE                     │
+│                                                                  │
+│  User Query ──► [QueryPlanner]                                   │
+│                       │                                          │
+│                       ▼                                          │
+│             [EvidenceCollectionEngine]                           │
+│                       │                                          │
+│                       ▼                                          │
+│             [MultiHopReasoningEngine] (Graph Traversals)         │
+│                       │                                          │
+│                       ▼                                          │
+│             [HypothesisGenerationEngine]                         │
+│                       │                                          │
+│                       ▼                                          │
+│             [EvidenceValidationLayer] ──► [ReasoningResult]      │
+└──────────────────────────────────────────────────────────────────┘
+```
+
+#### 1. Query Planner & Strategy Registry
+*   `QueryPlanner`: Receives the natural language query, parses keywords, and maps the request to a specific `ReasoningQuestionType` (e.g. `SECURITY_COMPLIANCE`, `IMPACT_ANALYSIS`, `DRIFT_DETECTION`).
+*   `ReasoningStrategyRegistry`: Maintains registered execution strategies. Each strategy defines which graph queries to execute, what traversal paths to follow, and how to format the evidence nodes.
+
+#### 2. Multi-Hop Reasoning & Evidence Ingestion
+*   `MultiHopReasoningEngine`: Executes Depth-First Search (DFS) or Breadth-First Search (BFS) traversals across multiple graph layers. For a security compliance query, it traverses:
+    $$\text{CodeEntity} \longrightarrow \text{LogicEvidence} \longrightarrow \text{ConceptNode} \longrightarrow \text{OntologyNode}$$
+*   `EvidenceCollectionEngine`: Aggregates all structural and semantic entities matched during the traversal.
+*   `EvidenceWeightRegistry`: Assigns weights based on matching certainty (e.g., direct call = 1.0, embedding similarity = 0.4).
+
+#### 3. Hypothesis Generation & Scoring
+*   `HypothesisGenerationEngine`: Generates multiple candidate structural scenarios.
+*   `HypothesisScoringEngine`: Compares supporting evidence against contradicting evidence. For example:
+    $$\text{Hypothesis Score} = \frac{\sum \text{Weights of Supporting Evidence}}{\sum \text{Weights of Supporting} + \sum \text{Weights of Contradicting}}$$
+    The selected hypothesis represents the highest-scoring candidate.
+
+#### 4. Audit & Provenance Verification
+*   `EvidenceValidationLayer`: Validates code entities and commit states.
+*   `EvidenceProvenanceGraph`: Builds a Directed Acyclic Graph (DAG) detailing why a conclusion was made. The graph links final answers directly to raw source files and line numbers.
+*   `ReasoningCache`: Caches execution chains. Cache keys are generated from the query, repository ID, and HEAD commit hash. This ensures fast responses for repeated queries on unchanged codebases.
+
+---
+
+### C. Phase 7B: Architectural Intelligence Layer (AIL)
+
+The **Architectural Intelligence Layer (AIL)** analyzes codebase structure to identify structural profiles (e.g. event-driven or monolithic layered architecture) and validate constraints.
+
+#### 1. Architectural Pattern Matching & Snapshots
+*   `ArchitecturePatternRegistry`: Declares target patterns using YAML definitions.
+*   `ArchitectureProjectionEngine`: Reconstructs code dependency layers into a clean dependency graph.
+*   `ArchitectureReasoningEngine`: Matches the projected topology against patterns in the registry. If event handlers, Kafka dependencies, and message consumers are present, it records an `ArchitectureProfile` for `EVENT_DRIVEN`.
+
+#### 2. Invariants & Violations
+*   `InvariantReasoningEngine`: Validates architectural rules, such as:
+    *   **Layer Separation**: Web/presentation layer must not import persistence layers directly.
+    *   **Cycle Detection**: Detects circular dependency chains among structural packages.
+*   If a constraint fails, it produces an `ArchitectureViolation` record with a defined severity (`CRITICAL`, `WARNING`, `ADVISORY`).
+
+#### 3. Ownership & Refactoring Engines
+*   `OwnershipReasoningEngine`: Analyzes Git history and file blame metadata. It identifies developer ownership profiles for individual capabilities, highlighting code areas with single-developer bottleneck risks or high modification volatility.
+*   `RefactoringReasoningEngine`: Analyzes areas with high structural drift and frequent architectural violations. It proposes `RefactoringCandidate` changes, recommending decoupling strategies for tightly coupled components.
+
+---
+
+### D. Phase 7C: Decision Intelligence Layer (DIL)
+
+The **Decision Intelligence Layer (DIL)** manages decision history. It integrates explicit documentation (ADR Markdown records) with implicit development events (dependency introductions, capability splits) to reconstruct developer intent.
+
+```
+┌──────────────────────────────────────────────────────────────┐
+│                  DECISION INTELLIGENCE PIPELINE              │
+│                                                              │
+│  [ADRExtractor] ──► [ADRParser] ──► [ADRGraphBuilder]        │
+│                                             │                │
+│                                             ▼                │
+│  [RepositoryMemory] ◄── [MemoryService] ◄── [RepositoryEvent]│
+│            │                                                 │
+│            ▼                                                 │
+│  [DecisionDiscoveryEngine] ──► [DecisionValidationLayer]     │
+│            │                                                 │
+│            ▼                                                 │
+│  [CausalReasoningEngine] ──► [CausalChain]                   │
+└──────────────────────────────────────────────────────────────┘
+```
+
+#### 1. ADR Parser & Graph Builder
+*   `ADRExtractor`: Scans workspace directories (`adr/`, `docs/`, etc.) for architectural decision files.
+*   `ADRParser`: Parses Markdown structures. It extracts metadata tags (`Status`, `Date`, `Context`, `Decision`, `Consequences`) and normalizes status entries (`PROPOSED`, `ACCEPTED`, `SUPERSEDED`, `REJECTED`).
+*   `ADRGraphBuilder`: Generates `ADRNode` entities. It creates `DOCUMENTS` edges connecting the document to implicit `Decision` and `Intent` nodes, preserving clean provenance for structural changes.
+
+#### 2. Repository Memory Ingestion
+*   `MemoryService`: Collects events from multiple sources (`Commit`, `ADR`, `PR`, etc.) and compiles them into a unified chronological stream.
+*   `RepositoryMemory`: Holds the chronological history of structural changes, technology adoptions, and ownership transfers.
+
+#### 3. Causal reasoning Engine
+*   `CausalReasoningEngine`: Traces logical causal relationships. It connects code changes to developer intent:
+    $$\text{Intent (Scalability)} \xrightarrow{\text{MOTIVATES}} \text{Decision (Adopt Kafka)} \xrightarrow{\text{ENABLES}} \text{Architecture (Event-Driven)}$$
+    This creates an auditable causal trace.
+
+#### 4. Fitness Evaluation Engine
+The `DecisionFitnessEngine` evaluates the success and longevity of a decision over time:
+*   **Longevity Score**: Measures the duration (in commits or days) that a decision remains in `ACTIVE` status.
+*   **Stability Score**: Evaluates the modification frequency of related files after adoption.
+*   **Adoption Score**: The percentage of modules in the repository that integrate with the decision (e.g., modules adopting Kafka consumers).
+*   **Overall Fitness Score**: Computes a weighted average of longevity, stability, and adoption:
+    $$\text{Overall Fitness} = 0.30 \times \text{Longevity} + 0.30 \times \text{Stability} + 0.20 \times \text{Adoption} + 0.20 \times \text{Success Rate}$$
+    This evaluates if a decision has achieved its intended architectural goals.
