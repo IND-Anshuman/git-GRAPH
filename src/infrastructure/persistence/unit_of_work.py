@@ -94,12 +94,6 @@ from src.infrastructure.persistence.repositories.sa_capability_repos import (
     SACapabilityEmbeddingRepository,
     SACapabilityTaxonomyCandidateRepository,
 )
-from src.infrastructure.persistence.repositories.sa_architecture_repos import (
-    SAArchitectureProfileRepository,
-    SAArchitectureSnapshotRepository,
-    SAArchitectureFitnessRepository,
-    SAArchitectureViolationRepository,
-    SAArchitectureInvariantRepository,
 """SQLAlchemy implementation of Unit of Work."""
 
 from typing import Any
