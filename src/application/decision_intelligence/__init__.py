@@ -21,6 +21,31 @@ from .causal_chain import CausalChain
 from .decision_knowledge_artifact_template import DecisionKnowledgeArtifactTemplate
 from .decision_advisor_ports import IDecisionAdvisor, IIntentAdvisor, ICausalAdvisor
 
+# Engines, services, and registrars
+from .memory_artifact import MemoryArtifact
+from .memory_timeline import MemoryTimeline
+from .repository_memory import RepositoryMemory
+from .memory_service import MemoryService
+from .adr_extractor import ADRExtractor
+from .adr_parser import ADRParser
+from .adr_graph_builder import ADRGraphBuilder, ADRNode, ADREdge
+from .decision_pattern_registry import DecisionPatternRegistry
+from .intent_pattern_registry import IntentPatternRegistry
+from .decision_discovery_engine import DecisionDiscoveryEngine
+from .decision_validation_layer import DecisionValidationLayer
+from .decision_evolution_engine import DecisionEvolutionEngine
+from .intent_evolution_engine import IntentEvolutionEngine
+from .technology_lifecycle_engine import TechnologyLifecycleEngine
+from .causal_reasoning_engine import CausalReasoningEngine
+from .decision_impact_engine import DecisionImpactEngine
+from .decision_similarity_engine import DecisionSimilarityEngine
+from .decision_fitness_engine import DecisionFitnessEngine
+from .decision_graph import DecisionGraph
+from .intent_graph import IntentGraph
+from .decision_provenance_graph import DecisionProvenanceGraph
+from .decision_confidence_engine import DecisionConfidenceEngine
+from .decision_query_engine import DecisionQueryEngine
+
 __all__ = [
     "DecisionType", "DecisionStatus", "DecisionConfidence", "DecisionVersion",
     "DecisionEvidence", "DecisionImpact", "DecisionImpactEntry", "DecisionImpactTimeline",
@@ -28,6 +53,15 @@ __all__ = [
     "DecisionTimeline", "Decision", "RepositoryEventType", "RepositoryEventSource",
     "RepositoryEvent", "IntentType", "IntentConfidence", "IntentEvidence", "Intent",
     "CausalRelationship", "CausalChain", "DecisionKnowledgeArtifactTemplate",
-    "IDecisionAdvisor", "IIntentAdvisor", "ICausalAdvisor"
+    "IDecisionAdvisor", "IIntentAdvisor", "ICausalAdvisor",
+    
+    # Engines & services
+    "MemoryArtifact", "MemoryTimeline", "RepositoryMemory", "MemoryService",
+    "ADRExtractor", "ADRParser", "ADRGraphBuilder", "ADRNode", "ADREdge",
+    "DecisionPatternRegistry", "IntentPatternRegistry", "DecisionDiscoveryEngine",
+    "DecisionValidationLayer", "DecisionEvolutionEngine", "IntentEvolutionEngine",
+    "TechnologyLifecycleEngine", "CausalReasoningEngine", "DecisionImpactEngine",
+    "DecisionSimilarityEngine", "DecisionFitnessEngine", "DecisionGraph",
+    "IntentGraph", "DecisionProvenanceGraph", "DecisionConfidenceEngine",
+    "DecisionQueryEngine"
 ]
-\nfrom .memory_artifact import MemoryArtifact\nfrom .memory_timeline import MemoryTimeline\nfrom .repository_memory import RepositoryMemory\nfrom .memory_service import MemoryService\n\nfrom .adr_extractor import ADRExtractor\nfrom .adr_parser import ADRParser\nfrom .adr_graph_builder import ADRGraphBuilder, ADRNode, ADREdge\nfrom .decision_pattern_registry import DecisionPatternRegistry\nfrom .intent_pattern_registry import IntentPatternRegistry\nfrom .decision_discovery_engine import DecisionDiscoveryEngine\nfrom .decision_validation_layer import DecisionValidationLayer\n\nfrom .decision_evolution_engine import DecisionEvolutionEngine\nfrom .intent_evolution_engine import IntentEvolutionEngine\nfrom .technology_lifecycle_engine import TechnologyLifecycleEngine\nfrom .causal_reasoning_engine import CausalReasoningEngine\nfrom .decision_impact_engine import DecisionImpactEngine\nfrom .decision_similarity_engine import DecisionSimilarityEngine\nfrom .decision_fitness_engine import DecisionFitnessEngine\nfrom .decision_graph import DecisionGraph\nfrom .intent_graph import IntentGraph\nfrom .decision_provenance_graph import DecisionProvenanceGraph\nfrom .decision_confidence_engine import DecisionConfidenceEngine\nfrom .decision_query_engine import DecisionQueryEngine\n
