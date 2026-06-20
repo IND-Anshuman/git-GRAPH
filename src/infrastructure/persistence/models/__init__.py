@@ -26,6 +26,25 @@ from src.infrastructure.persistence.models.logic_models import (
 from src.infrastructure.persistence.models.evidence_models import SEEEEvidenceModel, CompilerOutputModel
 from src.infrastructure.persistence.models.knowledge_artifact_model import KnowledgeArtifactModel
 from src.infrastructure.persistence.models.organization_model import OrganizationModel
+from src.infrastructure.persistence.models.reasoning_models import (
+    SAReasoningSnapshot,
+    SAReasoningQuestionCache
+)
+from src.infrastructure.persistence.models.decision_models import (
+    SADecision,
+    SADecisionVersion,
+    SADecisionEvidence,
+    SADecisionImpact,
+    SADecisionImpactTimeline,
+    SADecisionDependency,
+    SADecisionConflict,
+    SADecisionFitness,
+    SADecisionSnapshot,
+    SAIntent,
+    SAIntentRelationship,
+    SARepositoryMemoryEvent,
+    SACausalRelationship
+)
 from src.infrastructure.persistence.models.resolution_models import (
     SymbolGraphModel,
     SymbolReferenceModel,
@@ -150,6 +169,21 @@ __all__ = [
     "MetaDefinitionModel",
     "EmbeddingModelModel",
     "EmbeddingVersionModel",
+    "SAReasoningSnapshot",
+    "SAReasoningQuestionCache",
+    "SADecision",
+    "SADecisionVersion",
+    "SADecisionEvidence",
+    "SADecisionImpact",
+    "SADecisionImpactTimeline",
+    "SADecisionDependency",
+    "SADecisionConflict",
+    "SADecisionFitness",
+    "SADecisionSnapshot",
+    "SAIntent",
+    "SAIntentRelationship",
+    "SARepositoryMemoryEvent",
+    "SACausalRelationship",
     "SEEEEvidenceModel",
     "CompilerOutputModel",
     "KnowledgeArtifactModel",
