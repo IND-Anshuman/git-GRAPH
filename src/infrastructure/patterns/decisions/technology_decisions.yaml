@@ -1,36 +1,506 @@
+# $schema: ../../../../schemas/technology_decisions.schema.json
+schema_version: "2.0"
+last_updated: "2026-06-21T00:00:00Z"
 patterns:
-  - id: postgresql
-    display_name: PostgreSQL Database
+  # ─── Message Brokers & Streaming ────────────────────────────────
+  - id: kafka
+    display_name: Apache Kafka Event Streaming
     decision_type: TECHNOLOGY_ADOPTION
+    description: "High-throughput distributed event streaming platform for real-time pipelines."
+    keywords:
+      - kafka
+      - confluent-kafka
+      - aiokafka
+      - faust
+      - message broker
+      - event stream
+    intent_hints:
+      - SCALABILITY
+      - COUPLING_REDUCTION
+
+  - id: rabbitmq
+    display_name: RabbitMQ Message Broker
+    decision_type: TECHNOLOGY_ADOPTION
+    description: "AMQP message broker for reliable task queuing and pub/sub messaging."
+    keywords:
+      - rabbitmq
+      - pika
+      - amqp
+      - exchange
+      - message queue
+    intent_hints:
+      - RELIABILITY
+      - COUPLING_REDUCTION
+
+  - id: celery
+    display_name: Celery Distributed Task Queue
+    decision_type: TECHNOLOGY_ADOPTION
+    description: "Distributed task queue for background job processing and scheduling."
+    keywords:
+      - celery
+      - task queue
+      - async tasks
+      - background job
+      - beat schedule
+    intent_hints:
+      - LATENCY
+      - SCALABILITY
+
+  - id: nats
+    display_name: NATS Messaging System
+    decision_type: TECHNOLOGY_ADOPTION
+    description: "Lightweight, cloud-native pub/sub messaging with JetStream persistence."
+    keywords:
+      - nats
+      - nats.io
+      - jetstream
+      - asyncio_nats
+    intent_hints:
+      - SCALABILITY
+      - LATENCY
+      - COUPLING_REDUCTION
+
+  # ─── Databases, Caches & Search ──────────────────────────────
+  - id: postgresql
+    display_name: PostgreSQL Relational Database
+    decision_type: TECHNOLOGY_ADOPTION
+    description: "ACID-compliant relational database with strong consistency and rich SQL support."
     keywords:
       - postgres
       - postgresql
       - psycopg2
       - asyncpg
+      - rdbms
     intent_hints:
       - RELIABILITY
       - DATA_CONSISTENCY
 
   - id: mongodb
-    display_name: MongoDB Database
+    display_name: MongoDB Document Database
     decision_type: TECHNOLOGY_ADOPTION
+    description: "Flexible document-oriented NoSQL database for schema-optional data."
     keywords:
       - mongodb
       - mongo
       - pymongo
       - motor
+      - nosql
     intent_hints:
       - SCALABILITY
       - DATA_FLEXIBILITY
 
-  - id: architecture-microservices
-    display_name: Microservices Migration
+  - id: redis
+    display_name: Redis Cache & Key-Value Store
+    decision_type: TECHNOLOGY_ADOPTION
+    description: "In-memory data structure store used for caching, rate-limiting, and pub/sub."
+    keywords:
+      - redis
+      - aioredis
+      - in-memory cache
+      - key-value store
+    intent_hints:
+      - LATENCY
+      - SCALABILITY
+
+  - id: elasticsearch
+    display_name: Elasticsearch Search Engine
+    decision_type: TECHNOLOGY_ADOPTION
+    description: "Distributed search and analytics engine for full-text and vector search."
+    keywords:
+      - elasticsearch
+      - opensearch
+      - lucene
+      - full-text search
+    intent_hints:
+      - SCALABILITY
+      - LATENCY
+
+  - id: cassandra
+    display_name: Apache Cassandra NoSQL
+    decision_type: TECHNOLOGY_ADOPTION
+    description: "Highly scalable wide-column store designed for multi-datacenter deployments."
+    keywords:
+      - cassandra
+      - datastax
+      - cql
+      - wide-column
+    intent_hints:
+      - SCALABILITY
+      - RELIABILITY
+
+  - id: dynamodb
+    display_name: AWS DynamoDB
+    decision_type: TECHNOLOGY_ADOPTION
+    description: "Fully managed serverless key-value and document database by AWS."
+    keywords:
+      - dynamodb
+      - amazon-dynamodb
+      - boto3.resource('dynamodb')
+    intent_hints:
+      - SCALABILITY
+      - RELIABILITY
+
+  # ─── Vector Databases (AI/ML) ─────────────────────────────
+  - id: pinecone
+    display_name: Pinecone Vector Database
+    decision_type: AI_ADOPTION
+    description: "Managed vector database optimised for ML embedding similarity search."
+    keywords:
+      - pinecone
+      - pinecone-client
+      - vector database
+      - vector index
+    intent_hints:
+      - AI_ENABLEMENT
+      - LATENCY
+
+  - id: weaviate
+    display_name: Weaviate Vector Database
+    decision_type: AI_ADOPTION
+    description: "Open-source vector database with hybrid search and multi-tenancy."
+    keywords:
+      - weaviate
+      - weaviate-client
+      - vector search
+    intent_hints:
+      - AI_ENABLEMENT
+      - DATA_FLEXIBILITY
+
+  - id: chromadb
+    display_name: ChromaDB Embeddings Database
+    decision_type: AI_ADOPTION
+    description: "Lightweight open-source embedding database for local and cloud RAG pipelines."
+    keywords:
+      - chromadb
+      - chroma
+      - vector embeddings
+    intent_hints:
+      - AI_ENABLEMENT
+
+  - id: qdrant
+    display_name: Qdrant Vector Search Engine
+    decision_type: AI_ADOPTION
+    description: "High-performance vector search engine with payload filtering and on-disk indexing."
+    keywords:
+      - qdrant
+      - qdrant-client
+      - vector similarity
+    intent_hints:
+      - AI_ENABLEMENT
+      - LATENCY
+
+  # ─── API Frameworks & Communication ────────────────────────
+  - id: fastapi
+    display_name: FastAPI Web Framework
+    decision_type: TECHNOLOGY_ADOPTION
+    description: "High-performance async Python web framework with built-in OpenAPI and Pydantic."
+    keywords:
+      - fastapi
+      - uvicorn
+      - starlette
+      - pydantic
+    intent_hints:
+      - LATENCY
+      - MAINTAINABILITY
+
+  - id: grpc
+    display_name: gRPC Remote Procedure Call
+    decision_type: TECHNOLOGY_ADOPTION
+    description: "High-performance RPC framework using Protobuf for service-to-service communication."
+    keywords:
+      - grpc
+      - protobuf
+      - protocol buffers
+      - grpcio
+      - protoc
+    intent_hints:
+      - LATENCY
+      - COUPLING_REDUCTION
+
+  - id: graphql
+    display_name: GraphQL API Interface
+    decision_type: TECHNOLOGY_ADOPTION
+    description: "Query language and runtime for flexible, client-driven API data fetching."
+    keywords:
+      - graphql
+      - graphene
+      - strawberry-graphql
+      - apollo
+      - query language
+    intent_hints:
+      - COUPLING_REDUCTION
+      - DATA_FLEXIBILITY
+
+  # ─── AI / LLM Frameworks ─────────────────────────────────
+  - id: openai
+    display_name: OpenAI API Integration
+    decision_type: AI_ADOPTION
+    description: "Integration with OpenAI GPT models for text generation and embeddings."
+    keywords:
+      - openai
+      - gpt-4
+      - gpt-3
+      - chatgpt
+      - embeddings
+    intent_hints:
+      - AI_ENABLEMENT
+
+  - id: anthropic
+    display_name: Anthropic Claude API Integration
+    decision_type: AI_ADOPTION
+    description: "Integration with Anthropic Claude models via the Anthropic SDK."
+    keywords:
+      - anthropic
+      - claude
+      - anthropic-sdk
+    intent_hints:
+      - AI_ENABLEMENT
+
+  - id: langchain
+    display_name: LangChain Orchestration
+    decision_type: AI_ADOPTION
+    description: "LLM orchestration framework for chains, agents, and retrieval pipelines."
+    keywords:
+      - langchain
+      - langchain-core
+      - langchain-community
+      - llm chain
+    intent_hints:
+      - AI_ENABLEMENT
+      - MAINTAINABILITY
+
+  - id: llamaindex
+    display_name: LlamaIndex RAG Orchestration
+    decision_type: AI_ADOPTION
+    description: "Data framework for LLM-based retrieval-augmented generation (RAG)."
+    keywords:
+      - llamaindex
+      - llama-index
+      - vector store index
+      - retrieval-augmented generation
+    intent_hints:
+      - AI_ENABLEMENT
+
+  - id: langgraph
+    display_name: LangGraph State Machine Workflows
+    decision_type: AI_ADOPTION
+    description: "Stateful, cyclical agent workflow orchestration using graph-based state machines."
+    keywords:
+      - langgraph
+      - StateGraph
+      - state machine
+      - agent graph
+    intent_hints:
+      - AI_ENABLEMENT
+      - MAINTAINABILITY
+
+  - id: crewai
+    display_name: CrewAI Multi-Agent Framework
+    decision_type: AI_ADOPTION
+    description: "Framework for orchestrating role-based cooperative AI agent teams."
+    keywords:
+      - crewai
+      - crew
+      - agent team
+      - role playing agent
+    intent_hints:
+      - AI_ENABLEMENT
+
+  # ─── Security, Authentication & Encryption ──────────────────
+  - id: jwt
+    display_name: JWT Authentication
+    decision_type: SECURITY
+    description: "Stateless authentication using signed JSON Web Tokens (HS256/RS256/ES256)."
+    keywords:
+      - jwt
+      - pyjwt
+      - python-jose
+      - json web token
+      - bearer token
+    intent_hints:
+      - SECURITY
+      - COMPLIANCE
+
+  - id: oauth2
+    display_name: OAuth2 / OIDC Authorization Flow
+    decision_type: SECURITY
+    description: "Delegated authorization via OAuth 2.0 and OpenID Connect."
+    keywords:
+      - oauth
+      - oauth2
+      - authlib
+      - openid-connect
+      - auth0
+    intent_hints:
+      - SECURITY
+      - COMPLIANCE
+
+  - id: ssl-tls
+    display_name: SSL/TLS Connection Hardening
+    decision_type: SECURITY
+    description: "Enforcing encrypted transport via SSL/TLS with certificate validation."
+    keywords:
+      - ssl
+      - tls
+      - HTTPS
+      - cryptography
+      - certificate authority
+      - mtls
+    intent_hints:
+      - SECURITY
+
+  - id: vault
+    display_name: HashiCorp Vault Secret Management
+    decision_type: SECURITY
+    description: "Centralised secret management, dynamic credentials, and encryption as a service."
+    keywords:
+      - vault
+      - hvac
+      - hashicorp vault
+      - secret management
+      - dynamic secrets
+    intent_hints:
+      - SECURITY
+      - COMPLIANCE
+
+  # ─── Observability, Telemetry & Diagnostics ─────────────────
+  - id: opentelemetry
+    display_name: OpenTelemetry Distributed Tracing
+    decision_type: INFRASTRUCTURE
+    description: "Vendor-neutral observability framework for traces, metrics, and logs."
+    keywords:
+      - opentelemetry
+      - otel
+      - tracer
+      - span
+      - tracing
+    intent_hints:
+      - OBSERVABILITY
+      - MAINTAINABILITY
+
+  - id: prometheus
+    display_name: Prometheus Metrics Collection
+    decision_type: INFRASTRUCTURE
+    description: "Pull-based metrics collection and alerting system."
+    keywords:
+      - prometheus
+      - grafana
+      - metrics-client
+      - counter
+      - gauge
+    intent_hints:
+      - OBSERVABILITY
+
+  # ─── Cloud Infrastructure & Orchestration ─────────────────
+  - id: docker
+    display_name: Docker Containerization
+    decision_type: INFRASTRUCTURE
+    description: "OCI container packaging and runtime for reproducible deployments."
+    keywords:
+      - docker
+      - dockerfile
+      - containerize
+      - docker-compose
+    intent_hints:
+      - MAINTAINABILITY
+      - RELIABILITY
+
+  - id: kubernetes
+    display_name: Kubernetes Container Orchestration
+    decision_type: INFRASTRUCTURE
+    description: "Container orchestration platform for automated deployment, scaling, and management."
+    keywords:
+      - kubernetes
+      - k8s
+      - helm chart
+      - deployment manifest
+      - kustomize
+    intent_hints:
+      - SCALABILITY
+      - RELIABILITY
+      - MAINTAINABILITY
+
+  - id: terraform
+    display_name: Terraform Infrastructure as Code
+    decision_type: INFRASTRUCTURE
+    description: "Declarative infrastructure provisioning across cloud providers."
+    keywords:
+      - terraform
+      - iac
+      - hcl
+      - cloudformation
+    intent_hints:
+      - MAINTAINABILITY
+      - COST_REDUCTION
+
+  # ─── Architectural Styles & Patterns ───────────────────────
+  - id: microservices
+    display_name: Microservices Architecture
     decision_type: ARCHITECTURAL
+    description: "Decomposing a monolith into independently deployable services."
     keywords:
       - microservice
-      - split service
-      - separate service
+      - split monolith
       - extract service
+      - service decomposition
+      - distributed architecture
     intent_hints:
       - COUPLING_REDUCTION
       - SCALABILITY
+      - MAINTAINABILITY
+
+  - id: event-driven
+    display_name: Event-Driven Architecture
+    decision_type: ARCHITECTURAL
+    description: "Decoupling components through asynchronous event production and consumption."
+    keywords:
+      - event-driven
+      - async events
+      - pub/sub
+      - publish event
+      - event handler
+    intent_hints:
+      - COUPLING_REDUCTION
+      - SCALABILITY
+
+  - id: cqrs
+    display_name: Command Query Responsibility Segregation (CQRS)
+    decision_type: ARCHITECTURAL
+    description: "Separating read and write operations into distinct models."
+    keywords:
+      - cqrs
+      - separate reads and writes
+      - command handler
+      - query handler
+    intent_hints:
+      - SCALABILITY
+      - COUPLING_REDUCTION
+      - DATA_CONSISTENCY
+
+  - id: clean-architecture
+    display_name: Clean / Hexagonal Architecture
+    decision_type: ARCHITECTURAL
+    description: "Structuring code so domain logic is independent of frameworks and external tools."
+    keywords:
+      - hexagonal
+      - clean architecture
+      - onion architecture
+      - dependency inversion
+      - ports and adapters
+    intent_hints:
+      - COUPLING_REDUCTION
+      - MAINTAINABILITY
+
+  - id: saga
+    display_name: Saga Pattern (Distributed Transactions)
+    decision_type: ARCHITECTURAL
+    description: "Coordinating long-running distributed transactions through compensating actions."
+    keywords:
+      - saga
+      - compensating transaction
+      - distributed transaction
+      - choreography
+      - orchestration
+    intent_hints:
+      - DATA_CONSISTENCY
+      - RELIABILITY
