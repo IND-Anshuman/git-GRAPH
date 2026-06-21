@@ -41,6 +41,20 @@ class SAEntityVersionRepository(IEntityVersionRepository):
         models = self.session.execute(stmt).scalars().all()
         return [DomainMapper.to_entity_version_entity(m) for m in models]
 
+    def get_by_commits(self, commit_hashes: List[str]) -> List[EntityVersion]:
+        """Fetch all entity versions introduced/captured in a list of commits in batch."""
+        if not commit_hashes:
+            return []
+        
+        chunk_size = 500
+        results = []
+        for i in range(0, len(commit_hashes), chunk_size):
+            chunk = commit_hashes[i:i + chunk_size]
+            stmt = select(EntityVersionModel).where(EntityVersionModel.commit_hash.in_(chunk))
+            models = self.session.execute(stmt).scalars().all()
+            results.extend([DomainMapper.to_entity_version_entity(m) for m in models])
+        return results
+
     def _get_ancestor_hashes(self, commit_hash: str) -> List[str]:
         """Helper to fetch all ancestor commit hashes of a commit in Python."""
         ancestors = {commit_hash}

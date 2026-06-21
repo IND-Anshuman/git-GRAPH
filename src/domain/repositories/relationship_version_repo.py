@@ -22,6 +22,11 @@ class IRelationshipVersionRepository(ABC):
         pass
 
     @abstractmethod
+    def get_by_commits(self, commit_hashes: list[str]) -> list[RelationshipVersion]:
+        """Fetch all relationship changes introduced in a list of commits in batch."""
+        pass
+
+    @abstractmethod
     def list_by_relationship(self, relationship_id: uuid.UUID) -> list[RelationshipVersion]:
         """Fetch all changes for a specific relationship."""
         pass

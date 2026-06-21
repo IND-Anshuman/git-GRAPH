@@ -28,6 +28,11 @@ class IEntityVersionRepository(ABC):
         pass
 
     @abstractmethod
+    def get_by_commits(self, commit_hashes: list[str]) -> list[EntityVersion]:
+        """Fetch all entity versions introduced/captured in a list of commits in batch."""
+        pass
+
+    @abstractmethod
     def get_latest_before_or_at(self, seid: SEID, commit_hash: str) -> EntityVersion | None:
         """Find the active version of an entity at or immediately before a given commit."""
         pass

@@ -1,6 +1,8 @@
 """Historical reconstruction service for rebuilding the graph at any commit."""
 
 import uuid
+import copy
+from collections import defaultdict
 from typing import Dict, List, Set, Tuple
 
 from src.application.ports.unit_of_work import IUnitOfWork
@@ -44,17 +46,23 @@ class HistoricalReconstructionService:
         if snapshot:
             # Reconstruct starting state from checkpoint snapshot data
             # Snapshot data contains: {"entities": [serialized...], "relationships": [serialized...]}
-            for data in snapshot.snapshot_data.get("entities", []):
-                entity = uow.code_entities.get_by_seid(SEID.from_string(data["seid"]))
-                if entity:
+            snapshot_seids = [
+                SEID.from_string(data["seid"])
+                for data in snapshot.snapshot_data.get("entities", [])
+            ]
+            if snapshot_seids:
+                fetched_entities = uow.code_entities.get_by_seids(snapshot_seids)
+                for entity in fetched_entities:
                     entities_state[entity.seid] = entity
-                    
-            for data in snapshot.snapshot_data.get("relationships", []):
-                rel_id = uuid.UUID(data["id"])
-                # Fetch relationship
-                stmt = uow.relationships.get_by_id(rel_id)
-                if stmt:
-                    relationships_state[rel_id] = stmt
+
+            snapshot_rel_ids = [
+                uuid.UUID(data["id"])
+                for data in snapshot.snapshot_data.get("relationships", [])
+            ]
+            if snapshot_rel_ids:
+                fetched_relationships = uow.relationships.get_by_ids(snapshot_rel_ids)
+                for rel in fetched_relationships:
+                    relationships_state[rel.id] = rel
             
             # Find index of snapshot commit in chronological walk
             snapshot_hash = snapshot.commit_hash
@@ -62,16 +70,47 @@ class HistoricalReconstructionService:
                 start_index = chronological_walk.index(snapshot_hash) + 1
 
         # 3. Walk forward and apply change events
-        for i in range(start_index, len(chronological_walk)):
-            commit_hash = chronological_walk[i]
-            
-            # Apply entity version changes
-            entity_versions = uow.entity_versions.get_by_commit(commit_hash)
+        commits_to_walk = chronological_walk[start_index:]
+        all_evs = uow.entity_versions.get_by_commits(commits_to_walk) if commits_to_walk else []
+        all_rvs = uow.relationship_versions.get_by_commits(commits_to_walk) if commits_to_walk else []
+
+        # Find all template entities and relationships needed for CREATED events
+        seids_to_fetch = set()
+        for ev in all_evs:
+            if ev.mutation_type == MutationType.CREATED:
+                seids_to_fetch.add(ev.seid)
+
+        rel_ids_to_fetch = set()
+        for rv in all_rvs:
+            if rv.mutation_type == MutationType.CREATED:
+                rel_ids_to_fetch.add(rv.relationship_id)
+
+        fetched_template_entities = {}
+        if seids_to_fetch:
+            for entity in uow.code_entities.get_by_seids(list(seids_to_fetch)):
+                fetched_template_entities[entity.seid] = entity
+
+        fetched_template_relationships = {}
+        if rel_ids_to_fetch:
+            for rel in uow.relationships.get_by_ids(list(rel_ids_to_fetch)):
+                fetched_template_relationships[rel.id] = rel
+
+        evs_by_commit = defaultdict(list)
+        for ev in all_evs:
+            evs_by_commit[ev.commit_hash].append(ev)
+
+        rvs_by_commit = defaultdict(list)
+        for rv in all_rvs:
+            rvs_by_commit[rv.commit_hash].append(rv)
+
+        for commit_hash in commits_to_walk:
+            entity_versions = evs_by_commit.get(commit_hash, [])
             for ev in entity_versions:
                 if ev.mutation_type == MutationType.CREATED:
-                    # Fetch template CodeEntity
-                    entity = uow.code_entities.get_by_seid(ev.seid)
-                    if entity:
+                    template_entity = fetched_template_entities.get(ev.seid)
+                    if template_entity:
+                        # Deepcopy to avoid mutating the template cache in-place
+                        entity = copy.deepcopy(template_entity)
                         # Override values to match this version
                         entity.name = ev.canonical_name
                         entity.qualified_name = ev.canonical_name
@@ -105,12 +144,12 @@ class HistoricalReconstructionService:
                         entity.metadata.update(ev.metadata)
 
             # Apply relationship version changes
-            rel_versions = uow.relationship_versions.get_by_commit(commit_hash)
+            rel_versions = rvs_by_commit.get(commit_hash, [])
             for rv in rel_versions:
                 if rv.mutation_type == MutationType.CREATED:
-                    rel = uow.relationships.get_by_id(rv.relationship_id)
+                    rel = fetched_template_relationships.get(rv.relationship_id)
                     if rel:
-                        relationships_state[rv.relationship_id] = rel
+                        relationships_state[rv.relationship_id] = copy.deepcopy(rel)
                 elif rv.mutation_type == MutationType.DELETED:
                     if rv.relationship_id in relationships_state:
                         del relationships_state[rv.relationship_id]

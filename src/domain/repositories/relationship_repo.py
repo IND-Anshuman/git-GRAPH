@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+import uuid
 
 from src.domain.entities.relationship import Relationship
 from src.domain.enums.relationship_type import RelationshipType
@@ -14,6 +15,14 @@ class IRelationshipRepository(ABC):
 
     @abstractmethod
     def save_batch(self, rels: list[Relationship]) -> None:
+        pass
+
+    @abstractmethod
+    def get_by_id(self, id: uuid.UUID) -> Relationship | None:
+        pass
+
+    @abstractmethod
+    def get_by_ids(self, ids: list[uuid.UUID]) -> list[Relationship]:
         pass
 
     @abstractmethod

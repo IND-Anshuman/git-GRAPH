@@ -32,6 +32,20 @@ class SARelationshipVersionRepository(IRelationshipVersionRepository):
         models = self.session.execute(stmt).scalars().all()
         return [DomainMapper.to_relationship_version_entity(m) for m in models]
 
+    def get_by_commits(self, commit_hashes: List[str]) -> List[RelationshipVersion]:
+        """Fetch all relationship changes introduced in a list of commits in batch."""
+        if not commit_hashes:
+            return []
+        
+        chunk_size = 500
+        results = []
+        for i in range(0, len(commit_hashes), chunk_size):
+            chunk = commit_hashes[i:i + chunk_size]
+            stmt = select(RelationshipVersionModel).where(RelationshipVersionModel.commit_hash.in_(chunk))
+            models = self.session.execute(stmt).scalars().all()
+            results.extend([DomainMapper.to_relationship_version_entity(m) for m in models])
+        return results
+
     def list_by_relationship(self, relationship_id: uuid.UUID) -> List[RelationshipVersion]:
         """Fetch all changes for a specific relationship."""
         stmt = (

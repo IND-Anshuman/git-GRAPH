@@ -22,6 +22,10 @@ class ICodeEntityRepository(ABC):
         pass
 
     @abstractmethod
+    def get_by_seids(self, seids: list[SEID]) -> list[CodeEntity]:
+        pass
+
+    @abstractmethod
     def get_by_repository(self, repo_id: RepositoryId, entity_type: EntityType | None = None) -> list[CodeEntity]:
         pass
 
