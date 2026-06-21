@@ -212,3 +212,42 @@ patterns:
           target_class: jwt
         - match_type: import
           target_module: jwt
+
+  - pattern_id: rsa_sign
+    name: RSA Digital Signature Creation
+    pattern_version: "1.0.0"
+    ontology_node_id: security.cryptography.signing
+    base_confidence: 0.93
+    calibration_notes: "RSA private_key.sign() with padding is the canonical RSA signing call in the cryptography library."
+    index_keys:
+      - "call:private_key.sign"
+      - "call:rsa_sign"
+      - "import:cryptography"
+    rules:
+      ast_features:
+        - match_type: call
+          target_method: sign
+          target_class_pattern: "(RSAPrivateKey|private_key)"
+        - match_type: import
+          target_module_pattern: "(cryptography|rsa)"
+    tags: [rsa, signing, asymmetric]
+
+  - pattern_id: ed25519_sign
+    name: Ed25519 Digital Signature Creation
+    pattern_version: "1.0.0"
+    ontology_node_id: security.cryptography.signing
+    base_confidence: 0.95
+    calibration_notes: "Ed25519PrivateKey.sign() has no padding argument — unique and highly specific."
+    index_keys:
+      - "call:Ed25519PrivateKey.sign"
+      - "import:cryptography.hazmat.primitives.asymmetric.ed25519"
+    rules:
+      required_imports:
+        - cryptography
+      ast_features:
+        - match_type: import
+          target_module_pattern: "cryptography.hazmat.primitives.asymmetric.ed25519"
+        - match_type: call
+          target_method: sign
+          target_class_pattern: "Ed25519PrivateKey"
+    tags: [ed25519, eddsa, signing]

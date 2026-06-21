@@ -1,8 +1,9 @@
-schema_version: "1.0"
+# $schema: ../../../../schemas/patterns_file.schema.json
+schema_version: "2.0"
 patterns:
   - pattern_id: pydantic_field_validator
     name: Pydantic Field Validator Decorator
-    pattern_version: "1.0.0"
+    pattern_version: "2.0.0"
     ontology_node_id: presentation.validation.schema
     base_confidence: 0.95
     index_keys:
@@ -12,13 +13,13 @@ patterns:
     rules:
       ast_features:
         - match_type: decorator
-          target_function_pattern: "(field_validator|validator)"
+          target_function_pattern: "(field_validator|validator|model_validator)"
         - match_type: import
           target_module: pydantic
 
   - pattern_id: marshmallow_validate
     name: Marshmallow Schema Validation
-    pattern_version: "1.0.0"
+    pattern_version: "2.0.0"
     ontology_node_id: presentation.validation.schema
     base_confidence: 0.92
     index_keys:
@@ -34,7 +35,7 @@ patterns:
 
   - pattern_id: jsonschema_validate
     name: JSONSchema Library Validation
-    pattern_version: "1.0.0"
+    pattern_version: "2.0.0"
     ontology_node_id: presentation.validation.schema
     base_confidence: 0.90
     index_keys:
@@ -49,8 +50,8 @@ patterns:
           target_module: jsonschema
 
   - pattern_id: zod_parse
-    name: Zod Schema Parse (TS)
-    pattern_version: "1.0.0"
+    name: Zod Schema Parse (TypeScript)
+    pattern_version: "2.0.0"
     ontology_node_id: presentation.validation.schema
     base_confidence: 0.95
     index_keys:
@@ -60,6 +61,61 @@ patterns:
     rules:
       ast_features:
         - match_type: call
-          target_method_pattern: "(parse|safeParse)"
+          target_method_pattern: "(parse|safeParse|parseAsync)"
         - match_type: import
           target_module: zod
+    tags: [typescript, zod]
+
+  - pattern_id: cerberus_validate
+    name: Cerberus Document Validation
+    pattern_version: "1.0.0"
+    ontology_node_id: presentation.validation.schema
+    base_confidence: 0.90
+    calibration_notes: "Cerberus Validator instantiation with schema dict is highly specific."
+    index_keys:
+      - "import:cerberus"
+      - "call:Validator"
+    rules:
+      required_imports:
+        - cerberus
+      ast_features:
+        - match_type: import
+          target_module: cerberus
+        - match_type: call
+          target_method_pattern: "(Validator|validate)"
+    tags: [cerberus, python]
+
+  - pattern_id: attrs_validate
+    name: Attrs / Cattrs Validation
+    pattern_version: "1.0.0"
+    ontology_node_id: presentation.validation.schema
+    base_confidence: 0.88
+    calibration_notes: "attrs @define + cattrs structure() is the standard validation pattern."
+    index_keys:
+      - "import:attrs"
+      - "import:cattrs"
+      - "decorator:define"
+    rules:
+      ast_features:
+        - match_type: import
+          target_module_pattern: "(attrs|attr|cattrs)"
+        - match_type: decorator
+          target_function_pattern: "(define|attrs|attr\\.s)"
+    tags: [attrs, cattrs, python]
+
+  - pattern_id: io_ts_parse
+    name: io-ts Runtime Type Validation (TypeScript)
+    pattern_version: "1.0.0"
+    ontology_node_id: presentation.validation.schema
+    base_confidence: 0.93
+    calibration_notes: "t.decode() with fold() is the canonical io-ts pattern."
+    index_keys:
+      - "import:io-ts"
+      - "call:decode"
+    rules:
+      ast_features:
+        - match_type: import
+          target_module_pattern: "(io-ts|io\\.ts)"
+        - match_type: call
+          target_method_pattern: "(decode|encode)"
+    tags: [typescript, io-ts, fp-ts]
