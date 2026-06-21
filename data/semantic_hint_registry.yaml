@@ -1,0 +1,276 @@
+# =============================================================
+# git-GRAPH — Semantic Hint Registry
+# =============================================================
+# $schema: ../../schemas/capability_registry.schema.json
+# schema_version: "2.0"
+# last_updated: "2026-06-21T00:00:00Z"
+#
+# NOTE: This file is the CANONICAL source for semantic token
+# lookup. It is a superset of capability_registry.yaml tokens
+# organized by semantic domain. Capability registry is derived
+# from this file for behavior mapping.
+#
+# Each entry uses 'tokens' (not 'semantic_hints') to preserve
+# backward compatibility with existing loader code.
+# =============================================================
+
+authentication:
+  tokens:
+    - password
+    - pwd
+    - credential
+    - token
+    - login
+    - auth
+    - session
+    - oauth
+    - sso
+    - jwt
+    - bearer
+    - passphrase
+    - apikey
+    - api_key
+
+authorization:
+  tokens:
+    - permission
+    - authorize
+    - role
+    - rbac
+    - abac
+    - access_control
+    - policy
+    - enforce
+    - casbin
+    - opa
+    - scope
+    - grant
+    - deny
+
+payment_processing:
+  tokens:
+    - payment
+    - checkout
+    - invoice
+    - creditcard
+    - stripe
+    - transaction
+    - billing
+    - subscription
+    - refund
+    - webhook
+
+security:
+  tokens:
+    - encryption
+    - decryption
+    - hash
+    - bcrypt
+    - pbkdf2
+    - cipher
+    - aes
+    - fernet
+    - rsa
+    - signature
+    - hmac
+    - signing
+    - chacha20
+    - ecdsa
+    - ed25519
+    - certificate
+    - tls
+    - ssl
+    - pem
+    - x509
+
+caching:
+  tokens:
+    - cache
+    - caching
+    - redis
+    - memcached
+    - ttl
+    - expire
+    - evict
+    - memory
+    - store
+    - lru
+    - memoize
+    - hot_data
+
+database:
+  tokens:
+    - db
+    - database
+    - sql
+    - query
+    - orm
+    - transaction
+    - repository
+    - store
+    - connection
+    - cursor
+    - migration
+    - schema
+    - index
+    - table
+
+messaging:
+  tokens:
+    - kafka
+    - rabbitmq
+    - message
+    - publish
+    - consume
+    - queue
+    - topic
+    - broker
+    - pika
+    - amqp
+    - sqs
+    - pubsub
+    - nats
+    - servicebus
+    - celery
+    - stream
+
+rate_limiting:
+  tokens:
+    - rate
+    - limit
+    - slowapi
+    - ratelimit
+    - throttle
+    - sliding
+    - fixed
+    - bucket
+    - window
+    - quota
+    - concurrency
+
+retry:
+  tokens:
+    - retry
+    - backoff
+    - tenacity
+    - attempt
+    - loop
+    - delay
+    - sleep
+    - jitter
+    - timeout
+    - deadline
+
+circuit_breaker:
+  tokens:
+    - circuit
+    - breaker
+    - pybreaker
+    - state
+    - open
+    - closed
+    - half_open
+    - fallback
+    - short_circuit
+    - trip
+
+serialization:
+  tokens:
+    - serialize
+    - deserialize
+    - json
+    - pickle
+    - protobuf
+    - msgpack
+    - marshal
+    - dump
+    - load
+    - cbor
+    - avro
+
+ai_model:
+  tokens:
+    - gemini
+    - openai
+    - llm
+    - invoke
+    - ai
+    - chat
+    - prompt
+    - generate
+    - text
+    - speech
+    - tts
+    - stt
+    - model
+    - embedding
+    - vector
+    - anthropic
+    - claude
+    - ollama
+    - vllm
+    - rerank
+    - rag
+    - retrieval
+
+event_handling:
+  tokens:
+    - event
+    - signal
+    - receiver
+    - emitter
+    - emit
+    - publish
+    - subscribe
+    - connect
+    - blinker
+    - listener
+    - dispatcher
+    - webhook
+
+middleware:
+  tokens:
+    - middleware
+    - interceptor
+    - filter
+    - pipeline
+    - add_middleware
+    - app.use
+    - before_request
+    - after_request
+    - hook
+    - guard
+
+validation:
+  tokens:
+    - validate
+    - validation
+    - schema
+    - verify
+    - check
+    - pydantic
+    - zod
+    - jsonschema
+    - marshmallow
+    - cerberus
+    - sanitize
+    - constraint
+    - attrs
+    - io_ts
+
+api_integration:
+  tokens:
+    - http
+    - rest
+    - api
+    - fetch
+    - axios
+    - requests
+    - httpx
+    - graphql
+    - grpc
+    - client
+    - endpoint
+    - webhook
+    - aiohttp
+    - urllib

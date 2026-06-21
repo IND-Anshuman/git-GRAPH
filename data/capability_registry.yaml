@@ -1,0 +1,441 @@
+# =============================================================
+# git-GRAPH — Unified Capability Registry
+# =============================================================
+# $schema: ../../schemas/capability_registry.schema.json
+# schema_version: "2.0"
+# last_updated: "2026-06-21T00:00:00Z"
+#
+# Maps each high-level capability to:
+#   semantic_hints  — token strings for semantic matching
+#   behaviors       — pattern_ids from the patterns library
+#   description     — human-readable summary
+#   ontology_domain — source domain ontology file
+# =============================================================
+
+authentication:
+  description: "Mechanisms that verify the identity of users, services, or systems."
+  ontology_domain: security
+  semantic_hints:
+    - password
+    - pwd
+    - credential
+    - token
+    - login
+    - auth
+    - session
+    - oauth
+    - sso
+    - jwt
+    - bearer
+    - passphrase
+    - apikey
+    - api_key
+  behaviors:
+    - auth_bcrypt_verification
+    - auth_bcrypt_hash
+    - auth_sha256_verification
+    - auth_jwt_generation
+    - auth_jwt_verification
+    - auth_passlib_verify
+    - auth_argon2_verification
+    - auth_direct_compare
+    - oauth2_authorization_code
+    - oauth2_token_refresh
+    - oauth2_client_credentials
+    - sso_redirect
+    - login_required_guard
+    - session_read
+    - session_write
+    - session_invalidation
+
+authorization:
+  description: "Enforcement of permission-based, role-based, and attribute-based access rights."
+  ontology_domain: security
+  semantic_hints:
+    - permission
+    - authorize
+    - role
+    - rbac
+    - abac
+    - access_control
+    - policy
+    - enforce
+    - casbin
+    - opa
+    - scope
+  behaviors:
+    - authz_permission_check
+    - authz_rbac
+    - abac_policy_check
+    - casbin_enforce
+    - opa_query
+
+caching:
+  description: "High-performance in-memory buffers and distributed cache operations."
+  ontology_domain: data_management
+  semantic_hints:
+    - cache
+    - caching
+    - redis
+    - memcached
+    - ttl
+    - expire
+    - evict
+    - memory
+    - store
+    - lru
+    - memoize
+    - hot_data
+  behaviors:
+    - cache_memory_dict
+    - cache_lru_cache
+    - cache_redis_lookup
+    - cache_redis_set
+    - cache_redis_cluster
+    - cache_invalidation
+    - memcached_get
+    - memcached_set
+    - memcached_delete
+
+circuit_breaker:
+  description: "Circuit breaker pattern to prevent cascade failure propagation."
+  ontology_domain: reliability
+  semantic_hints:
+    - circuit
+    - breaker
+    - pybreaker
+    - state
+    - open
+    - closed
+    - half_open
+    - fallback
+    - short_circuit
+    - trip
+  behaviors:
+    - circuit_breaker_pybreaker
+    - circuit_breaker_manual
+    - circuit_breaker_fallback
+
+database:
+  description: "Persistent data storage, ORM operations, and transaction management."
+  ontology_domain: data_management
+  semantic_hints:
+    - db
+    - database
+    - sql
+    - query
+    - orm
+    - transaction
+    - repository
+    - store
+    - connection
+    - cursor
+    - postgres
+    - mysql
+    - sqlite
+    - mongodb
+    - migration
+    - schema
+  behaviors:
+    - db_raw_sql_execute
+    - db_orm_sqlalchemy_query
+    - db_orm_django_query
+    - db_orm_peewee_query
+    - db_orm_tortoise_query
+    - db_orm_sqlmodel_query
+    - db_orm_prisma_query
+    - db_orm_drizzle_query
+    - db_repository_pattern
+    - db_transaction
+    - db_schema_migration
+
+messaging:
+  description: "Asynchronous messaging brokers, queues, and pub/sub patterns."
+  ontology_domain: integration
+  semantic_hints:
+    - kafka
+    - rabbitmq
+    - message
+    - publish
+    - consume
+    - queue
+    - topic
+    - broker
+    - pika
+    - amqp
+    - sqs
+    - pubsub
+    - nats
+    - servicebus
+    - celery
+  behaviors:
+    - msg_publish_kafka
+    - msg_kafka_streams
+    - msg_publish_rabbitmq
+    - msg_sqs
+    - msg_azure_servicebus
+    - msg_gcp_pubsub
+    - msg_celery
+    - msg_nats
+    - msg_consume
+
+rate_limiting:
+  description: "Rate limiting rules, throttles, and sliding/fixed window controls."
+  ontology_domain: reliability
+  semantic_hints:
+    - rate
+    - limit
+    - slowapi
+    - ratelimit
+    - throttle
+    - sliding
+    - fixed
+    - bucket
+    - window
+    - quota
+    - concurrency
+  behaviors:
+    - token_bucket_check
+    - slowapi_limit
+    - rate_limiter_acquire
+    - sliding_window_check
+    - redis_sliding_window
+    - fixed_window_check
+    - django_ratelimit_decorator
+
+retry_logic:
+  description: "Automatic retry, exponential backoff, and timeout strategies."
+  ontology_domain: reliability
+  semantic_hints:
+    - retry
+    - backoff
+    - tenacity
+    - attempt
+    - loop
+    - delay
+    - sleep
+    - jitter
+    - timeout
+    - deadline
+  behaviors:
+    - retry_tenacity
+    - retry_manual_loop
+    - retry_backoff
+    - fixed_interval_retry
+    - timeout_deadline
+    - timeout_async
+
+cryptography:
+  description: "Encryption, decryption, and cryptographic signing operations."
+  ontology_domain: security
+  semantic_hints:
+    - encrypt
+    - decrypt
+    - cipher
+    - aes
+    - fernet
+    - rsa
+    - signature
+    - hmac
+    - hash
+    - sign
+    - verify
+    - chacha20
+    - ecdsa
+    - ed25519
+    - pem
+    - key_management
+  behaviors:
+    - aes_encrypt
+    - aes_decrypt
+    - chacha20_encrypt
+    - fernet_encrypt
+    - fernet_decrypt
+    - rsa_encrypt
+    - rsa_decrypt
+    - ecdsa_asymmetric
+    - ec_sign
+    - ec_verify
+    - hmac_sign
+    - hmac_verify
+    - rsa_sign
+    - jwt_signing
+
+serialization:
+  description: "Data serialization and deserialization across formats (JSON, binary, schema-based)."
+  ontology_domain: data_management
+  semantic_hints:
+    - serialize
+    - deserialize
+    - json
+    - pickle
+    - protobuf
+    - msgpack
+    - marshal
+    - dump
+    - load
+    - cbor
+    - avro
+    - pydantic
+    - marshmallow
+  behaviors:
+    - json_serialize
+    - json_deserialize
+    - pydantic_serialize
+    - marshmallow_serialize
+    - pickle_serialize
+    - pickle_deserialize
+    - protobuf_serialize
+    - msgpack_serialize
+
+ai_model:
+  description: "LLM inference, vector embeddings, streaming, and agent workflow integrations."
+  ontology_domain: ai
+  semantic_hints:
+    - gemini
+    - openai
+    - llm
+    - invoke
+    - ai
+    - chat
+    - prompt
+    - generate
+    - text
+    - speech
+    - tts
+    - stt
+    - model
+    - embedding
+    - vector
+    - anthropic
+    - claude
+    - ollama
+    - vllm
+    - langchain
+    - langgraph
+    - crewai
+    - autogen
+  behaviors:
+    - ai_model_invoke_gemini
+    - ai_model_invoke_openai
+    - ai_model_invoke_anthropic
+    - ai_model_invoke_langchain
+    - ai_model_invoke_litellm
+    - ai_model_invoke_ollama
+    - ai_model_invoke_vllm
+    - ai_model_streaming
+    - ai_model_embedding
+    - ai_embedding_generate
+    - ai_rerank
+    - ai_retrieve
+    - ai_memory_read
+    - ai_memory_write
+    - ai_agent_plan
+    - ai_agent_execute
+    - ai_agent_reflect
+    - ai_agent_evaluate
+    - ai_tool_invoke
+    - ai_guardrails
+    - ai_workflow_langgraph
+    - ai_workflow_multi_agent
+    - tts_parler_generation
+    - stt_speech_to_text
+
+event_handling:
+  description: "Domain event emission, subscription, and signal-based communication patterns."
+  ontology_domain: integration
+  semantic_hints:
+    - event
+    - signal
+    - receiver
+    - emitter
+    - emit
+    - publish
+    - subscribe
+    - connect
+    - blinker
+    - listener
+    - dispatcher
+    - webhook
+  behaviors:
+    - event_emit
+    - django_signal_send
+    - node_event_emitter_emit
+    - django_signal_receiver
+    - blinker_connect
+    - event_handler_decorator
+
+middleware:
+  description: "Cross-cutting request/response processing middleware and interceptors."
+  ontology_domain: presentation
+  semantic_hints:
+    - middleware
+    - interceptor
+    - filter
+    - pipeline
+    - add_middleware
+    - app.use
+    - before_request
+    - after_request
+    - hook
+  behaviors:
+    - fastapi_middleware
+    - django_middleware_class
+    - express_middleware
+    - flask_before_request
+    - nestjs_interceptor
+    - koa_middleware
+
+validation:
+  description: "Input validation, schema validation, and data integrity checks."
+  ontology_domain: presentation
+  semantic_hints:
+    - validate
+    - validation
+    - schema
+    - verify
+    - check
+    - pydantic
+    - zod
+    - jsonschema
+    - marshmallow
+    - cerberus
+    - sanitize
+    - constraint
+  behaviors:
+    - pydantic_field_validator
+    - marshmallow_validate
+    - jsonschema_validate
+    - zod_parse
+    - cerberus_validate
+    - attrs_validate
+    - io_ts_parse
+
+api_integration:
+  description: "Outbound HTTP REST, GraphQL, and gRPC client integrations."
+  ontology_domain: integration
+  semantic_hints:
+    - http
+    - rest
+    - api
+    - fetch
+    - axios
+    - requests
+    - httpx
+    - graphql
+    - grpc
+    - client
+    - endpoint
+    - webhook
+  behaviors:
+    - api_requests_call
+    - api_httpx_call
+    - api_aiohttp_call
+    - api_urllib3_call
+    - api_http_client_call
+    - api_grpc_call
+    - api_fetch_call
+    - api_axios_call
+    - gql_query
+    - gql_mutation
+    - graphql_post_request
