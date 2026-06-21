@@ -1,8 +1,9 @@
-schema_version: "1.0"
+# $schema: ../../../../schemas/patterns_file.schema.json
+schema_version: "2.0"
 patterns:
   - pattern_id: fastapi_middleware
     name: FastAPI/Starlette Middleware Registration
-    pattern_version: "1.0.0"
+    pattern_version: "2.0.0"
     ontology_node_id: presentation.api_handling.middleware
     base_confidence: 0.93
     index_keys:
@@ -15,7 +16,7 @@ patterns:
 
   - pattern_id: django_middleware_class
     name: Django Middleware Class
-    pattern_version: "1.0.0"
+    pattern_version: "2.0.0"
     ontology_node_id: presentation.api_handling.middleware
     base_confidence: 0.90
     index_keys:
@@ -30,8 +31,8 @@ patterns:
           target_module_pattern: "django"
 
   - pattern_id: express_middleware
-    name: Express Middleware Usage
-    pattern_version: "1.0.0"
+    name: Express.js Middleware Usage
+    pattern_version: "2.0.0"
     ontology_node_id: presentation.api_handling.middleware
     base_confidence: 0.88
     index_keys:
@@ -44,7 +45,7 @@ patterns:
 
   - pattern_id: flask_before_request
     name: Flask Before Request Interceptor
-    pattern_version: "1.0.0"
+    pattern_version: "2.0.0"
     ontology_node_id: presentation.api_handling.middleware
     base_confidence: 0.92
     index_keys:
@@ -53,3 +54,59 @@ patterns:
       ast_features:
         - match_type: decorator
           target_function: before_request
+
+  - pattern_id: nestjs_interceptor
+    name: NestJS Interceptor / Guard
+    pattern_version: "1.0.0"
+    ontology_node_id: presentation.api_handling.middleware
+    base_confidence: 0.91
+    calibration_notes: "UseInterceptors and UseGuards decorators are NestJS-specific middleware equivalents."
+    index_keys:
+      - "decorator:UseInterceptors"
+      - "decorator:UseGuards"
+      - "import:@nestjs/common"
+    rules:
+      required_imports:
+        - "@nestjs/common"
+      ast_features:
+        - match_type: decorator
+          target_function_pattern: "(UseInterceptors|UseGuards|UseFilters|UsePipes)"
+        - match_type: import
+          target_module_pattern: "@nestjs"
+    tags: [nestjs, typescript]
+
+  - pattern_id: koa_middleware
+    name: Koa.js Middleware Usage
+    pattern_version: "1.0.0"
+    ontology_node_id: presentation.api_handling.middleware
+    base_confidence: 0.89
+    index_keys:
+      - "call:use"
+      - "import:koa"
+    rules:
+      required_imports:
+        - koa
+      ast_features:
+        - match_type: import
+          target_module_pattern: "(koa|@koa)"
+        - match_type: call
+          target_method: use
+          target_class_pattern: "(Koa|app)"
+    tags: [koa, nodejs, javascript]
+
+  - pattern_id: gin_middleware
+    name: Gin (Go) Middleware / Handler
+    pattern_version: "1.0.0"
+    ontology_node_id: presentation.api_handling.middleware
+    base_confidence: 0.88
+    calibration_notes: "Gin's Use() method attaches global middleware; Group() scopes middleware to a route group."
+    index_keys:
+      - "call:Use"
+      - "import:github.com/gin-gonic/gin"
+    rules:
+      ast_features:
+        - match_type: import
+          target_module: "github.com/gin-gonic/gin"
+        - match_type: call
+          target_method_pattern: "(Use|Group)"
+    tags: [gin, go]

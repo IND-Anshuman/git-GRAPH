@@ -1,4 +1,5 @@
-schema_version: "1.0"
+# $schema: ../../../../schemas/patterns_file.schema.json
+schema_version: "2.0"
 patterns:
   - pattern_id: session_read
     name: Server-Side Session Read
@@ -52,7 +53,7 @@ patterns:
     rules:
       ast_features:
         - match_type: call
-          target_method_pattern: "(clear|destroy|invalidate|logout)"
+          target_method_pattern: "(clear|destroy|invalidate|logout|flush)"
 
   - pattern_id: login_required_guard
     name: Login Required Guard
@@ -64,4 +65,38 @@ patterns:
     rules:
       ast_features:
         - match_type: decorator
-          target_function_pattern: "(login_required|require_login|auth)"
+          target_function_pattern: "(login_required|require_login|auth_required)"
+
+  - pattern_id: cookie_session
+    name: Cookie-Based Session Management
+    pattern_version: "1.0.0"
+    ontology_node_id: security.authentication.session
+    base_confidence: 0.82
+    calibration_notes: "Setting HttpOnly/Secure cookies is the standard session cookie pattern; medium confidence as cookie ops have many uses."
+    index_keys:
+      - "call:set_cookie"
+      - "call:delete_cookie"
+    rules:
+      ast_features:
+        - match_type: call
+          target_method_pattern: "(set_cookie|delete_cookie|get_cookie)"
+      string_literals:
+        - pattern: "(HttpOnly|Secure|SameSite)"
+          description: "Secure cookie attribute indicates session usage"
+    tags: [cookie, flask, django, express]
+
+  - pattern_id: redis_session_store
+    name: Redis-Backed Session Store
+    pattern_version: "1.0.0"
+    ontology_node_id: security.authentication.session
+    base_confidence: 0.89
+    calibration_notes: "Explicit session store backed by Redis is unambiguous when redis import accompanies session access."
+    index_keys:
+      - "import:flask_session"
+      - "import:connect-redis"
+      - "import:express-session"
+    rules:
+      ast_features:
+        - match_type: import
+          target_module_pattern: "(flask_session|connect-redis|express-session|django_redis)"
+    tags: [redis, session, flask, express, django]

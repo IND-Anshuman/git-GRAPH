@@ -1,10 +1,12 @@
-schema_version: "1.0"
+# $schema: ../../../../schemas/patterns_file.schema.json
+schema_version: "2.0"
 patterns:
   - pattern_id: api_requests_call
     name: HTTP REST API Call (requests)
     pattern_version: "2.0.0"
     ontology_node_id: integration.http_client.rest_call
     base_confidence: 0.88
+    calibration_notes: "High confidence: explicit module import plus method-level call unambiguously identifies REST call."
     index_keys:
       - "import:requests"
       - "call:requests.get"
@@ -24,6 +26,7 @@ patterns:
     pattern_version: "2.0.0"
     ontology_node_id: integration.http_client.rest_call
     base_confidence: 0.88
+    calibration_notes: "High confidence: async-native HTTP client with unambiguous import."
     index_keys:
       - "import:httpx"
       - "call:httpx.get"
@@ -91,9 +94,10 @@ patterns:
 
   - pattern_id: api_grpc_call
     name: gRPC Client Call
-    pattern_version: "2.0.0"
-    ontology_node_id: integration.http_client.rest_call
-    base_confidence: 0.92
+    pattern_version: "2.1.0"
+    ontology_node_id: integration.http_client.grpc_call
+    base_confidence: 0.93
+    calibration_notes: "Very high confidence: grpc import + channel creation is unambiguous. Bumped from 0.92 after adding secure_channel discriminator."
     index_keys:
       - "import:grpc"
       - "call:insecure_channel"
@@ -106,6 +110,7 @@ patterns:
           target_module_pattern: "(grpc|grpc\\.aio)"
         - match_type: call
           target_method_pattern: "(insecure_channel|secure_channel)"
+    tags: [grpc, protobuf, rpc]
 
   - pattern_id: api_endpoint_handler
     name: API Endpoint Handler
@@ -167,7 +172,7 @@ patterns:
           description: "fetch API request invocation"
       string_literals:
         - pattern: "https?://"
-        - pattern_pattern: "(GET|POST|PUT|DELETE|PATCH)"
+        - pattern: "(GET|POST|PUT|DELETE|PATCH)"
 
   - pattern_id: api_axios_call
     name: HTTP REST API Call (axios)
