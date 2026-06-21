@@ -1,0 +1,162 @@
+# =============================================================
+# git-GRAPH — Scalability Intent Patterns
+# =============================================================
+# $schema: ../../../schemas/strategic_intents.schema.json
+schema_version: "2.0"
+last_updated: "2026-06-21T00:00:00Z"
+patterns:
+  - id: intent_scale_out
+    type: SCALABILITY
+    name: Horizontal Scaling
+    description: "Adding more instances/nodes to handle increased load."
+    keywords:
+      - horizontal scaling
+      - scale out
+      - handle more load
+      - throughput increase
+      - cluster expansion
+      - add nodes
+      - add replicas
+      - distributed
+
+  - id: intent_scale_up
+    type: SCALABILITY
+    name: Vertical Scaling
+    description: "Increasing compute resources (CPU, RAM) on existing instances."
+    keywords:
+      - vertical scaling
+      - scale up
+      - more memory
+      - bigger instance
+      - upgrade hardware
+      - cpu upgrade
+
+  - id: intent_load_balancing
+    type: SCALABILITY
+    name: Load Balancing
+    description: "Distributing incoming requests across multiple backend instances."
+    keywords:
+      - load balancer
+      - load balancing
+      - round robin
+      - nginx
+      - haproxy
+      - traffic distribution
+      - reverse proxy
+
+  - id: intent_database_sharding
+    type: SCALABILITY
+    name: Database Sharding
+    description: "Partitioning a database horizontally across multiple nodes."
+    keywords:
+      - sharding
+      - partition
+      - database sharding
+      - horizontal partition
+      - shard key
+      - tenant isolation
+
+  - id: intent_async_processing
+    type: SCALABILITY
+    name: Asynchronous Processing
+    description: "Decoupling heavy work from the request cycle via queues and workers."
+    keywords:
+      - async
+      - asynchronous
+      - background worker
+      - task queue
+      - offload
+      - deferred processing
+      - celery
+      - queue worker
+
+  - id: intent_caching_strategy
+    type: SCALABILITY
+    name: Caching Strategy
+    description: "Using in-memory or distributed caches to reduce database load."
+    keywords:
+      - caching
+      - cache
+      - reduce database calls
+      - redis cache
+      - memcached
+      - cache hit rate
+      - hot data
+      - ttl
+
+  - id: intent_event_streaming
+    type: SCALABILITY
+    name: Event Streaming
+    description: "Using high-throughput event streaming to handle large data volumes."
+    keywords:
+      - event streaming
+      - kafka
+      - high throughput
+      - stream processing
+      - real-time pipeline
+      - faust
+      - consumer group
+
+  - id: intent_cdn_offload
+    type: SCALABILITY
+    name: CDN / Static Asset Offload
+    description: "Offloading static content delivery to a CDN to reduce origin load."
+    keywords:
+      - cdn
+      - content delivery
+      - static assets
+      - edge caching
+      - cloudfront
+      - cloudflare
+      - offload traffic
+
+  - id: intent_connection_pooling
+    type: SCALABILITY
+    name: Connection Pooling
+    description: "Maintaining a pool of reusable database or service connections."
+    keywords:
+      - connection pool
+      - pooling
+      - pgbouncer
+      - sqlalchemy pool
+      - max connections
+      - pool size
+      - connection reuse
+
+  - id: intent_read_replica
+    type: SCALABILITY
+    name: Read Replicas
+    description: "Routing read queries to replicas to reduce primary database load."
+    keywords:
+      - read replica
+      - replica
+      - read-write split
+      - replication
+      - standby
+      - follower
+      - primary-secondary
+
+  - id: intent_rate_limiting_scale
+    type: SCALABILITY
+    name: Rate Limiting for Capacity Protection
+    description: "Protecting backend capacity by limiting request rates per client."
+    keywords:
+      - rate limit
+      - throttle
+      - api quota
+      - request cap
+      - protect capacity
+      - fair use
+
+  - id: intent_pagination
+    type: SCALABILITY
+    name: Pagination and Cursor-Based Queries
+    description: "Returning large result sets in pages to reduce memory and query cost."
+    keywords:
+      - pagination
+      - page size
+      - cursor
+      - offset
+      - limit
+      - infinite scroll
+      - keyset pagination

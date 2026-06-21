@@ -1,0 +1,20 @@
+$schema: "../../schemas/framework_pack.schema.json"
+schema_version: "2.0"
+framework_id: web_framework
+display_name: Base Web Framework
+language: python
+framework_version: "*"
+description: "Base conceptual entities shared by all HTTP web frameworks. Extended by specific framework packs via 'inherits'."
+entities:
+  Controller: Controller
+  Service: Service
+  Repository: Repository
+  Middleware: Middleware
+  ErrorHandler: ErrorHandler
+  DependencyInjector: DependencyInjector
+decorators:
+  Route: APIEndpoint
+relationships:
+  injects: INJECTS
+  handles: HANDLES_REQUEST
+  uses: USES_MIDDLEWARE

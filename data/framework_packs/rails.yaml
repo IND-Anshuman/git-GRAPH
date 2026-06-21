@@ -1,0 +1,28 @@
+$schema: "../../schemas/framework_pack.schema.json"
+schema_version: "2.0"
+framework_id: rails
+display_name: Ruby on Rails Framework
+language: ruby
+framework_version: ">=7.0"
+description: "Full-stack MVC web framework for Ruby that emphasises convention over configuration and developer happiness."
+inherits:
+  - web_framework
+entities:
+  ApplicationController: Controller
+  ApplicationRecord: Repository
+  ActiveJob: BackgroundTask
+  ActionMailer: Notifier
+  ActiveStorage: FileStore
+  ActionCable: WebSocketChannel
+  Concern: Mixin
+decorators:
+  before_action: Middleware
+  after_action: Middleware
+  rescue_from: ErrorHandler
+relationships:
+  has_many: HAS_MANY
+  belongs_to: BELONGS_TO
+  has_one: HAS_ONE
+  perform_later: PUBLISHES_EVENT_TO
+  broadcast_to: PUSHES_TO_CLIENT
+  include: DEPENDS_ON_MODULE

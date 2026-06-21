@@ -1,0 +1,24 @@
+$schema: "../../schemas/framework_pack.schema.json"
+schema_version: "2.0"
+framework_id: spring
+display_name: Spring Framework (Core)
+language: java
+framework_version: ">=6.0"
+description: "Core Spring Framework providing dependency injection, AOP, and application context management."
+entities:
+  Component: Service
+  Repository: Repository
+  Service: Service
+  Controller: Controller
+  ApplicationContext: ApplicationContext
+  BeanFactory: ServiceRegistrar
+decorators:
+  "@Component": Service
+  "@Repository": Repository
+  "@Service": Service
+  "@Autowired": INJECTS
+  "@Qualifier": INJECTS
+  "@Primary": INJECTS
+relationships:
+  autowire: INJECTS
+  getBean: RESOLVES

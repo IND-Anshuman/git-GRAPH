@@ -1,0 +1,24 @@
+$schema: "../../schemas/framework_pack.schema.json"
+schema_version: "2.0"
+framework_id: fiber
+display_name: Fiber HTTP Framework (Go)
+language: go
+framework_version: ">=2.50"
+description: "Express.js-inspired web framework for Go built on top of Fasthttp, designed for extreme performance."
+inherits:
+  - web_framework
+entities:
+  App: Application
+  Router: Controller
+  Ctx: HttpRequest
+  Handler: Middleware
+decorators: {}
+relationships:
+  Get: HANDLES_REQUEST
+  Post: HANDLES_REQUEST
+  Put: HANDLES_REQUEST
+  Delete: HANDLES_REQUEST
+  Patch: HANDLES_REQUEST
+  Use: USES_MIDDLEWARE
+  Group: MOUNTS_ROUTER
+  fiber.New: BOOTSTRAPS

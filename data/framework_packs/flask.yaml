@@ -1,0 +1,27 @@
+$schema: "../../schemas/framework_pack.schema.json"
+schema_version: "2.0"
+framework_id: flask
+display_name: Flask Web Framework
+language: python
+framework_version: ">=2.0"
+description: "Lightweight WSGI Python web framework with a simple core and flexible extension ecosystem."
+inherits:
+  - web_framework
+entities:
+  Flask: Application
+  Blueprint: Controller
+  Request: HttpRequest
+  Response: HttpResponse
+  g: RequestContext
+  current_app: ApplicationContext
+decorators:
+  "@app.route": APIEndpoint
+  "@bp.route": APIEndpoint
+  "@app.before_request": Middleware
+  "@app.after_request": Middleware
+  "@app.errorhandler": ErrorHandler
+  "@login_required": AuthGuard
+relationships:
+  register_blueprint: MOUNTS_ROUTER
+  before_request: USES_MIDDLEWARE
+  teardown_appcontext: LIFECYCLE_HOOK

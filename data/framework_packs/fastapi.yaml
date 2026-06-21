@@ -1,0 +1,38 @@
+$schema: "../../schemas/framework_pack.schema.json"
+schema_version: "2.0"
+framework_id: fastapi
+display_name: FastAPI Web Framework
+language: python
+framework_version: ">=0.100.0"
+description: "High-performance async Python web framework with OpenAPI spec generation, dependency injection, and Pydantic validation."
+inherits:
+  - web_framework
+entities:
+  APIRouter: Controller
+  FastAPI: Application
+  WebSocket: WebSocketChannel
+  BackgroundTasks: AsyncTaskQueue
+  HTTPException: ErrorResponse
+  Depends: DependencyInjector
+  Request: HttpRequest
+  Response: HttpResponse
+decorators:
+  "@app.get": APIEndpoint
+  "@app.post": APIEndpoint
+  "@router.get": APIEndpoint
+  "@router.post": APIEndpoint
+  "@app.put": APIEndpoint
+  "@app.delete": APIEndpoint
+  "@app.patch": APIEndpoint
+  "@app.websocket": WebSocketEndpoint
+  "@app.middleware": Middleware
+  "@router.put": APIEndpoint
+  "@router.delete": APIEndpoint
+  "@router.patch": APIEndpoint
+  "@app.exception_handler": ErrorHandler
+  "@app.on_event": LifecycleHook
+relationships:
+  Depends: INJECTS
+  add_middleware: USES_MIDDLEWARE
+  add_exception_handler: HANDLES_ERROR
+  include_router: MOUNTS_ROUTER

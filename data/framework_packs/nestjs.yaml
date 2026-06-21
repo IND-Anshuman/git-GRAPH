@@ -1,0 +1,41 @@
+$schema: "../../schemas/framework_pack.schema.json"
+schema_version: "2.0"
+framework_id: nestjs
+display_name: NestJS Framework
+language: typescript
+framework_version: ">=10.0"
+description: "Progressive TypeScript Node.js framework for building efficient, scalable, and enterprise-grade server-side applications."
+inherits:
+  - web_framework
+entities:
+  Controller: Controller
+  Injectable: Service
+  Module: Module
+  Provider: Service
+  Guard: AuthGuard
+  Interceptor: Middleware
+  Pipe: InputValidator
+  ExceptionFilter: ErrorHandler
+  EventEmitter2: EventEmitter
+decorators:
+  "@Controller": Controller
+  "@Get": APIEndpoint
+  "@Post": APIEndpoint
+  "@Put": APIEndpoint
+  "@Delete": APIEndpoint
+  "@Patch": APIEndpoint
+  "@Injectable": Service
+  "@Module": Module
+  "@UseGuards": AuthGuard
+  "@UseInterceptors": Middleware
+  "@UsePipes": InputValidator
+  "@EventPattern": EventHandler
+  "@MessagePattern": MessageConsumer
+  "@OnEvent": EventHandler
+  "@Cron": CronJob
+relationships:
+  NestFactory.create: BOOTSTRAPS
+  app.useGlobalGuards: USES_MIDDLEWARE
+  app.useGlobalInterceptors: USES_MIDDLEWARE
+  imports: DEPENDS_ON_MODULE
+  providers: REGISTERS_SERVICE

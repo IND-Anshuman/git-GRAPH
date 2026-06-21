@@ -1,0 +1,32 @@
+$schema: "../../schemas/framework_pack.schema.json"
+schema_version: "2.0"
+framework_id: langgraph
+display_name: LangGraph Workflow Framework
+language: python
+framework_version: ">=0.1.0"
+description: "Stateful, cyclical agent workflow orchestration using a graph-based state machine. Built on top of LangChain."
+entities:
+  StateGraph: Workflow
+  ToolNode: Tool
+  MessagesState: Memory
+  Checkpointer: MemoryStore
+  RunnableLambda: PipelineStep
+  RunnableSequence: Pipeline
+  RunnableParallel: ParallelPipeline
+  HumanMessage: UserInput
+  AIMessage: AgentOutput
+  ToolMessage: ToolOutput
+  CompiledGraph: ExecutableWorkflow
+decorators:
+  "@tool": Tool
+relationships:
+  add_edge: ORCHESTRATES
+  add_node: OWNS
+  compile: EXECUTES
+  add_conditional_edges: CONDITIONAL_BRANCH
+  interrupt: HUMAN_IN_LOOP
+  invoke: EXECUTES
+  stream: STREAMS_OUTPUT
+  astream: STREAMS_OUTPUT_ASYNC
+  aget_state: READS_STATE
+  aupdate_state: WRITES_STATE

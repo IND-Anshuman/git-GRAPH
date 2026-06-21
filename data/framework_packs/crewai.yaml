@@ -1,0 +1,25 @@
+$schema: "../../schemas/framework_pack.schema.json"
+schema_version: "2.0"
+framework_id: crewai
+display_name: CrewAI Multi-Agent Framework
+language: python
+framework_version: ">=0.36.0"
+description: "Framework for orchestrating role-based cooperative AI agent teams with sequential or hierarchical execution strategies."
+entities:
+  Agent: Agent
+  Task: Workflow
+  Crew: AgentTeam
+  Tool: Tool
+  LLM: Model
+  Memory: MemoryStore
+  Process: ExecutionStrategy
+  TaskOutput: AgentOutput
+relationships:
+  kickoff: ORCHESTRATES
+  kickoff_async: ORCHESTRATES_ASYNC
+  execute: EXECUTES
+  sequential: SEQUENTIAL_EXECUTION
+  hierarchical: HIERARCHICAL_EXECUTION
+  assign_task: DELEGATES_TO
+  use_tool: USES_TOOL
+  callback: REFLECTS_ON_RESULT

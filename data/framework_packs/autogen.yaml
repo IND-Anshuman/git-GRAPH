@@ -1,0 +1,26 @@
+$schema: "../../schemas/framework_pack.schema.json"
+schema_version: "2.0"
+framework_id: autogen
+display_name: AutoGen Multi-Agent Framework
+language: python
+framework_version: ">=0.2.0"
+description: "Framework for building multi-agent conversational systems with code execution and function calling capabilities."
+entities:
+  ConversableAgent: Agent
+  AssistantAgent: Agent
+  UserProxyAgent: Agent
+  GroupChat: AgentTeam
+  GroupChatManager: SupervisorAgent
+  CodeExecutorAgent: Agent
+  ConversationResult: AgentOutput
+  FunctionCall: ToolInvocation
+  SwarmAgent: Agent
+relationships:
+  initiate_chat: ORCHESTRATES
+  initiate_swarm_chat: ORCHESTRATES
+  send: SENDS_MESSAGE_TO
+  register_reply: REFLECTS_ON_RESULT
+  register_function: REGISTERS_TOOL
+  a2a: ROUTES_TO_AGENT
+  execute_code: EXECUTES
+  generate_reply: GENERATES_OUTPUT

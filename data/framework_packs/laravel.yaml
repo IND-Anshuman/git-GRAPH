@@ -1,0 +1,31 @@
+$schema: "../../schemas/framework_pack.schema.json"
+schema_version: "2.0"
+framework_id: laravel
+display_name: Laravel PHP Framework
+language: php
+framework_version: ">=10.0"
+description: "Elegant PHP web framework with expressive Eloquent ORM, queue system, and robust ecosystems."
+inherits:
+  - web_framework
+entities:
+  Controller: Controller
+  Model: Repository
+  Job: BackgroundTask
+  Event: DomainEvent
+  Listener: EventHandler
+  Middleware: Middleware
+  ServiceProvider: ServiceRegistrar
+  FormRequest: InputValidator
+decorators:
+  Route::get: APIEndpoint
+  Route::post: APIEndpoint
+  Route::put: APIEndpoint
+  Route::delete: APIEndpoint
+  Route::patch: APIEndpoint
+relationships:
+  belongsTo: BELONGS_TO
+  hasMany: HAS_MANY
+  hasOne: HAS_ONE
+  dispatch: PUBLISHES_EVENT_TO
+  handle: CONSUMES_FROM_TOPIC
+  middleware: USES_MIDDLEWARE

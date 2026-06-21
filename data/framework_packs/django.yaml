@@ -1,0 +1,35 @@
+$schema: "../../schemas/framework_pack.schema.json"
+schema_version: "2.0"
+framework_id: django
+display_name: Django Web Framework
+language: python
+framework_version: ">=4.0"
+description: "Batteries-included Python web framework with ORM, admin, auth, migrations, and class-based views."
+inherits:
+  - web_framework
+entities:
+  Model: Repository
+  View: Controller
+  TemplateView: Controller
+  Serializer: Serializer
+  ModelSerializer: Serializer
+  ViewSet: Controller
+  ModelViewSet: Controller
+  ModelAdmin: AdminController
+  Middleware: Middleware
+  Signal: EventEmitter
+  Form: InputValidator
+  ModelForm: InputValidator
+decorators:
+  register: Service
+  "@login_required": AuthGuard
+  "@permission_required": AuthGuard
+  "@csrf_exempt": SecurityBypass
+  "@receiver": EventHandler
+relationships:
+  ForeignKey: BELONGS_TO
+  ManyToManyField: HAS_MANY
+  post_save: PUBLISHES_EVENT_TO
+  pre_delete: PUBLISHES_EVENT_TO
+  connect: SUBSCRIBES_TO_EVENT
+  dispatch: EXECUTES

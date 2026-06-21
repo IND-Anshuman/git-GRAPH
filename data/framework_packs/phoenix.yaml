@@ -1,0 +1,27 @@
+$schema: "../../schemas/framework_pack.schema.json"
+schema_version: "2.0"
+framework_id: phoenix
+display_name: Phoenix Web Framework (Elixir)
+language: elixir
+framework_version: ">=1.7"
+description: "High-productivity Elixir web framework built on the BEAM VM, known for soft real-time channels and LiveView."
+inherits:
+  - web_framework
+entities:
+  Controller: Controller
+  Router: Router
+  Socket: MessageBroker
+  Channel: Topic
+  Plug: Middleware
+  AbsintheSchema: APISchema
+  EctoSchema: Repository
+  GenServer: Actor
+  LiveView: ReactivePage
+relationships:
+  connect: SENDS_MESSAGE_TO
+  broadcast: PUBLISHES_TO_TOPIC
+  handle_call: PROCESSES_MESSAGE
+  handle_cast: PROCESSES_MESSAGE
+  handle_info: HANDLES_EVENT
+  use_plug: USES_MIDDLEWARE
+  push: PUSHES_TO_CLIENT

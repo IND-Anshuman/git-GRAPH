@@ -1,0 +1,24 @@
+$schema: "../../schemas/framework_pack.schema.json"
+schema_version: "2.0"
+framework_id: express
+display_name: Express.js Web Framework
+language: javascript
+framework_version: ">=4.18"
+description: "Minimal and flexible Node.js web application framework providing a thin layer of fundamental web application features."
+inherits:
+  - web_framework
+entities:
+  Router: Controller
+  Application: Application
+  Request: HttpRequest
+  Response: HttpResponse
+  NextFunction: Middleware
+decorators: {}
+relationships:
+  app.get: HANDLES_REQUEST
+  app.post: HANDLES_REQUEST
+  app.put: HANDLES_REQUEST
+  app.delete: HANDLES_REQUEST
+  app.use: USES_MIDDLEWARE
+  router.use: USES_MIDDLEWARE
+  express.Router: MOUNTS_ROUTER

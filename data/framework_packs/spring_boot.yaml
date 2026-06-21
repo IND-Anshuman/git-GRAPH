@@ -1,0 +1,36 @@
+$schema: "../../schemas/framework_pack.schema.json"
+schema_version: "2.0"
+framework_id: spring_boot
+display_name: Spring Boot Web Framework
+language: java
+framework_version: ">=3.0"
+description: "Opinionated Spring-based framework for building production-ready Java microservices with minimal configuration."
+inherits:
+  - spring
+  - web_framework
+entities:
+  RestController: Controller
+  ResponseEntity: HttpResponse
+  RequestMapping: APIEndpoint
+decorators:
+  "@RestController": Controller
+  "@GetMapping": APIEndpoint
+  "@PostMapping": APIEndpoint
+  "@PutMapping": APIEndpoint
+  "@DeleteMapping": APIEndpoint
+  "@Bean": ManagedBean
+  "@Configuration": ConfigurationClass
+  "@Transactional": TransactionBoundary
+  "@EventListener": EventHandler
+  "@KafkaListener": MessageConsumer
+  "@RabbitListener": MessageConsumer
+  "@Scheduled": CronJob
+  "@Entity": DomainModel
+  "@Table": DomainModel
+  "@FeignClient": HttpClient
+  "@CircuitBreaker": CircuitBreakerGuard
+  "@Async": AsyncOperation
+relationships:
+  DependsOn: INJECTS
+  publish: PUBLISHES_EVENT_TO
+  listen: CONSUMES_FROM_TOPIC

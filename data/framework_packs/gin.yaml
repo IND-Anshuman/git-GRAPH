@@ -1,0 +1,26 @@
+$schema: "../../schemas/framework_pack.schema.json"
+schema_version: "2.0"
+framework_id: gin
+display_name: Gin HTTP Framework (Go)
+language: go
+framework_version: ">=1.9"
+description: "High-performance HTTP web framework for Go with martini-like API and zero-allocation router."
+inherits:
+  - web_framework
+entities:
+  Engine: Application
+  RouterGroup: Controller
+  Context: HttpRequest
+  HandlerFunc: Middleware
+  H: ResponseBody
+decorators: {}
+relationships:
+  GET: HANDLES_REQUEST
+  POST: HANDLES_REQUEST
+  PUT: HANDLES_REQUEST
+  DELETE: HANDLES_REQUEST
+  PATCH: HANDLES_REQUEST
+  Use: USES_MIDDLEWARE
+  Group: MOUNTS_ROUTER
+  gin.New: BOOTSTRAPS
+  gin.Default: BOOTSTRAPS
