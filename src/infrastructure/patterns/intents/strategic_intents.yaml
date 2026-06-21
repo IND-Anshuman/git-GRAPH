@@ -1,32 +1,227 @@
+# $schema: ../../../../schemas/strategic_intents.schema.json
+schema_version: "2.0"
+last_updated: "2026-06-21T00:00:00Z"
 patterns:
   - id: scalability
     name: Scalability
+    description: "Ability to handle increasing load by scaling horizontally or vertically."
     keywords:
       - scale
-      - load
-      - performance
-      - high volume
+      - scalability
       - throughput
-      - clusters
+      - horizontal scaling
+      - vertical scaling
+      - load balancer
+      - partition
+      - sharding
+      - clustering
+      - high volume
+      - replication
+      - queue capacity
+      - auto-scaling
+      - elastic
 
   - id: reliability
     name: Reliability
+    description: "Ability to tolerate failures and continue operating correctly."
     keywords:
+      - reliability
       - fault tolerance
       - failover
+      - high availability
       - backup
+      - redundancy
       - resilient
       - robust
+      - circuit breaker
+      - retry policy
+      - disaster recovery
       - uptime
+      - graceful degradation
+      - health check
 
   - id: security
     name: Security
+    description: "Protection of data, systems, and users from unauthorised access and breaches."
     keywords:
+      - security
       - auth
+      - authentication
+      - authorization
       - encrypt
       - decrypt
       - jwt
-      - cert
-      - policy
-      - permission
-      - oauth
+      - oauth2
+      - ssl
+      - tls
+      - token
+      - credentials
+      - certificate
+      - firewall
+      - cors
+      - rate limit
+      - zero trust
+      - secret management
+
+  - id: latency
+    name: Latency
+    description: "Reducing response time and improving execution speed."
+    keywords:
+      - latency
+      - response time
+      - execution time
+      - slow
+      - fast
+      - optimize performance
+      - memory cache
+      - indexing
+      - profiling
+      - async
+      - asynchronous
+      - background job
+      - database connection pool
+      - p99
+      - percentile
+
+  - id: coupling_reduction
+    name: Coupling Reduction
+    description: "Reducing inter-component dependencies to improve modularity and deployability."
+    keywords:
+      - coupling
+      - decouple
+      - dependency
+      - extract service
+      - separate service
+      - isolation
+      - modularity
+      - refactor
+      - api gateway
+      - abstraction
+      - domain-driven design
+      - bounded context
+      - interface segregation
+
+  - id: cost_reduction
+    name: Cost Reduction
+    description: "Reducing infrastructure, compute, or operational costs."
+    keywords:
+      - cost
+      - budget
+      - bill
+      - expense
+      - serverless
+      - resource consolidation
+      - optimize resources
+      - scale down
+      - compute efficiency
+      - billing tier
+      - spot instances
+      - reserved capacity
+
+  - id: ai_enablement
+    name: AI Enablement
+    description: "Integrating machine learning and generative AI capabilities into the system."
+    keywords:
+      - ai
+      - ml
+      - artificial intelligence
+      - machine learning
+      - llm
+      - large language model
+      - embeddings
+      - rag
+      - vector database
+      - prompt engineering
+      - agentic
+      - neural network
+      - fine-tuning
+      - inference
+
+  - id: compliance
+    name: Compliance
+    description: "Meeting regulatory, legal, and governance requirements."
+    keywords:
+      - compliance
+      - regulation
+      - gdpr
+      - hipaa
+      - audit log
+      - data retention
+      - privacy policy
+      - legal requirement
+      - licensing
+      - governance
+      - sox
+      - pci-dss
+      - iso27001
+
+  - id: observability
+    name: Observability
+    description: "Ability to understand internal system state from external outputs (logs, traces, metrics)."
+    keywords:
+      - observability
+      - monitoring
+      - distributed tracing
+      - telemetry
+      - metrics
+      - structured logging
+      - dashboard
+      - alerting
+      - logging
+      - diagnostics
+      - instrumentation
+      - grafana
+      - prometheus
+      - opentelemetry
+      - sentry
+      - datadog
+
+  - id: maintainability
+    name: Maintainability
+    description: "Ease of understanding, modifying, testing, and extending the codebase."
+    keywords:
+      - maintainability
+      - clean code
+      - readable
+      - testable
+      - modular
+      - documentation
+      - refactor
+      - technical debt
+      - code quality
+      - linting
+      - type safety
+      - separation of concerns
+      - design pattern
+
+  - id: data_consistency
+    name: Data Consistency
+    description: "Ensuring data correctness, integrity, and consistency across operations and services."
+    keywords:
+      - consistency
+      - data integrity
+      - acid
+      - atomicity
+      - transaction
+      - idempotent
+      - eventual consistency
+      - strong consistency
+      - distributed transaction
+      - saga
+      - two-phase commit
+      - conflict resolution
+
+  - id: data_flexibility
+    name: Data Flexibility
+    description: "Ability to handle varied, evolving, or schema-optional data structures."
+    keywords:
+      - flexibility
+      - schema-less
+      - dynamic schema
+      - nosql
+      - document store
+      - polymorphic
+      - heterogeneous data
+      - json storage
+      - semi-structured
+      - graph data
