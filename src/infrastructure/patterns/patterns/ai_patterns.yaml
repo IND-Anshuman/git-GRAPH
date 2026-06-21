@@ -220,7 +220,7 @@ patterns:
   - pattern_id: ai_guardrails
     name: Agent Guardrails
     pattern_version: "2.0.0"
-    ontology_node_id: ai.guardrails
+    ontology_node_id: ai.guardrails.input
     base_confidence: 0.95
     index_keys:
       - "call:guard"
