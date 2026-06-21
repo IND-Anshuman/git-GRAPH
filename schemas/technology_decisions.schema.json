@@ -1,0 +1,41 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://git-graph/schemas/technology_decisions.schema.json",
+  "title": "Technology Decisions File",
+  "type": "object",
+  "required": ["schema_version", "patterns"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "schema_version": { "type": "string" },
+    "last_updated": { "type": "string" },
+    "patterns": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "display_name", "decision_type", "keywords", "intent_hints"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string" },
+          "display_name": { "type": "string" },
+          "decision_type": {
+            "type": "string",
+            "enum": ["TECHNOLOGY_ADOPTION", "AI_ADOPTION", "SECURITY", "INFRASTRUCTURE", "ARCHITECTURAL"]
+          },
+          "keywords": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+          "intent_hints": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": ["SCALABILITY", "RELIABILITY", "SECURITY", "LATENCY", "COUPLING_REDUCTION", "COST_REDUCTION", "AI_ENABLEMENT", "COMPLIANCE", "OBSERVABILITY", "MAINTAINABILITY", "DATA_CONSISTENCY", "DATA_FLEXIBILITY"]
+            },
+            "minItems": 1
+          },
+          "description": { "type": "string" },
+          "deprecated": { "type": "boolean", "default": false },
+          "superseded_by": { "type": "string" }
+        }
+      }
+    }
+  }
+}

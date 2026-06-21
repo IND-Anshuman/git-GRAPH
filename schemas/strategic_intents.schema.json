@@ -1,0 +1,26 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://git-graph/schemas/strategic_intents.schema.json",
+  "title": "Strategic Intents File",
+  "type": "object",
+  "required": ["schema_version", "patterns"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "schema_version": { "type": "string" },
+    "patterns": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "name", "keywords"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$" },
+          "name": { "type": "string" },
+          "description": { "type": "string" },
+          "keywords": { "type": "array", "items": { "type": "string" }, "minItems": 3 }
+        }
+      }
+    }
+  }
+}

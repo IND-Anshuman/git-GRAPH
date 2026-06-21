@@ -1,0 +1,36 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://git-graph/schemas/ontology_node.schema.json",
+  "title": "Ontology Node",
+  "description": "Schema for a single ontology node in a domain ontology YAML file.",
+  "type": "object",
+  "required": ["id", "name", "is_leaf", "description"],
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Dot-separated unique identifier (domain.category.subcategory).",
+      "pattern": "^[a-z_]+\\.[a-z_]+(\\.[a-z_]+)*$"
+    },
+    "name": { "type": "string", "minLength": 2 },
+    "parent_id": {
+      "oneOf": [
+        { "type": "string", "pattern": "^[a-z_]+\\.[a-z_]+(\\.[a-z_]+)*$" },
+        { "type": "null" }
+      ]
+    },
+    "is_leaf": {
+      "type": "boolean",
+      "description": "True if this node has no children. Patterns can only reference leaf nodes."
+    },
+    "description": { "type": "string", "minLength": 5 },
+    "children": {
+      "type": "array",
+      "items": { "$ref": "ontology_node.schema.json" }
+    },
+    "tags": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  }
+}

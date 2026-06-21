@@ -1,0 +1,142 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://git-graph/schemas/pattern.schema.json",
+  "title": "Behavioral Pattern Definition",
+  "description": "Schema for a single behavioral pattern entry in a git-GRAPH patterns YAML file.",
+  "type": "object",
+  "required": ["pattern_id", "name", "pattern_version", "ontology_node_id", "base_confidence", "index_keys", "rules"],
+  "additionalProperties": false,
+  "properties": {
+    "pattern_id": {
+      "type": "string",
+      "description": "Unique snake_case identifier for this pattern.",
+      "pattern": "^[a-z][a-z0-9_]*$"
+    },
+    "name": {
+      "type": "string",
+      "description": "Human-readable name for the pattern.",
+      "minLength": 3
+    },
+    "pattern_version": {
+      "type": "string",
+      "description": "SemVer version of this pattern definition.",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "ontology_node_id": {
+      "type": "string",
+      "description": "Dot-separated ontology node identifier. Must resolve to a leaf node in a domain ontology file.",
+      "pattern": "^[a-z_]+\\.[a-z_]+(\\.[a-z_]+)*$"
+    },
+    "base_confidence": {
+      "type": "number",
+      "description": "Base detection confidence score (0.0–1.0).",
+      "minimum": 0.0,
+      "maximum": 1.0
+    },
+    "index_keys": {
+      "type": "array",
+      "description": "Fast-path lookup keys used by the indexer (format: type:value).",
+      "items": {
+        "type": "string",
+        "pattern": "^(call|import|decorator|struct|subscript|string):.+$"
+      },
+      "minItems": 1
+    },
+    "rules": {
+      "type": "object",
+      "description": "Detection rules for this pattern.",
+      "required": ["ast_features"],
+      "additionalProperties": false,
+      "properties": {
+        "required_imports": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Imports that MUST be present for this pattern to match."
+        },
+        "ast_features": {
+          "type": "array",
+          "description": "AST-level features to match.",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["match_type"],
+            "properties": {
+              "match_type": {
+                "type": "string",
+                "enum": ["call", "import", "decorator", "comparison", "while_loop", "attribute_access", "binary_op", "subscript", "class_definition", "function_definition"]
+              },
+              "target_module": { "type": "string" },
+              "target_module_pattern": { "type": "string" },
+              "target_function": { "type": "string" },
+              "target_function_pattern": { "type": "string" },
+              "target_method": { "type": "string" },
+              "target_method_pattern": { "type": "string" },
+              "target_class": { "type": "string" },
+              "target_class_pattern": { "type": "string" },
+              "target_object_pattern": { "type": "string" },
+              "target_attribute_pattern": { "type": "string" },
+              "target_decorator": { "type": "string" },
+              "operators": {
+                "type": "array",
+                "items": { "type": "string" }
+              },
+              "key_pattern": { "type": "string" },
+              "description": { "type": "string" }
+            }
+          }
+        },
+        "string_literals": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "pattern": { "type": "string" },
+              "description": { "type": "string" }
+            }
+          }
+        },
+        "negative_indicators": {
+          "type": "array",
+          "description": "Symbols that DISQUALIFY this pattern if present.",
+          "items": {
+            "type": "object",
+            "required": ["symbol"],
+            "properties": {
+              "symbol": { "type": "string" }
+            }
+          }
+        },
+        "data_flow": {
+          "type": "array",
+          "description": "Source-to-sink data flow tracing rules.",
+          "items": {
+            "type": "object",
+            "required": ["source_param_pattern", "sink_call"],
+            "properties": {
+              "source_param_pattern": { "type": "string" },
+              "sink_call": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "deprecated": {
+      "type": "boolean",
+      "description": "If true, this pattern is deprecated and will be removed in a future version.",
+      "default": false
+    },
+    "superseded_by": {
+      "type": "string",
+      "description": "pattern_id of the pattern that replaces this one (set when deprecated: true)."
+    },
+    "calibration_notes": {
+      "type": "string",
+      "description": "Human-readable notes explaining how base_confidence was determined."
+    },
+    "tags": {
+      "type": "array",
+      "description": "Free-form tags for additional categorization.",
+      "items": { "type": "string" }
+    }
+  }
+}

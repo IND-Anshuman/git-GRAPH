@@ -1,0 +1,37 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://git-graph/schemas/framework_pack.schema.json",
+  "title": "Framework Pack",
+  "description": "Schema for a git-GRAPH framework pack YAML file.",
+  "type": "object",
+  "required": ["schema_version", "framework_id", "language", "framework_version"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "schema_version": { "type": "string", "pattern": "^\\d+\\.\\d+$" },
+    "framework_id": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$" },
+    "display_name": { "type": "string" },
+    "language": {
+      "type": "string",
+      "enum": ["python", "javascript", "typescript", "java", "elixir", "php", "ruby", "go", "rust", "csharp", "kotlin"]
+    },
+    "framework_version": { "type": "string" },
+    "description": { "type": "string" },
+    "inherits": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "entities": {
+      "type": "object",
+      "additionalProperties": { "type": "string" }
+    },
+    "decorators": {
+      "type": "object",
+      "additionalProperties": { "type": "string" }
+    },
+    "relationships": {
+      "type": "object",
+      "additionalProperties": { "type": "string" }
+    }
+  }
+}

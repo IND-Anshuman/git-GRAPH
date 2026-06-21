@@ -1,0 +1,28 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://git-graph/schemas/capability_registry.schema.json",
+  "title": "Capability Registry",
+  "description": "Schema for the unified capability registry YAML file.",
+  "type": "object",
+  "additionalProperties": {
+    "type": "object",
+    "required": ["semantic_hints", "behaviors"],
+    "additionalProperties": false,
+    "properties": {
+      "semantic_hints": {
+        "type": "array",
+        "description": "Token strings used for semantic similarity matching.",
+        "items": { "type": "string" },
+        "minItems": 1
+      },
+      "behaviors": {
+        "type": "array",
+        "description": "List of pattern_ids that implement this capability.",
+        "items": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$" },
+        "minItems": 1
+      },
+      "description": { "type": "string" },
+      "ontology_domain": { "type": "string" }
+    }
+  }
+}
