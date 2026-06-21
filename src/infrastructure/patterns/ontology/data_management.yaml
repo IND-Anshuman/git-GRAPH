@@ -1,5 +1,7 @@
+$schema: "../../../../schemas/ontology_file.schema.json"
 schema_version: "1.0"
-ontology_version: "3.0.0"
+ontology_version: "3.1.0"
+last_updated: "2026-06-21T00:00:00Z"
 domain: Data_Management
 nodes:
   - id: data_management.caching
@@ -43,7 +45,7 @@ nodes:
         name: ORM Query
         parent_id: data_management.database
         is_leaf: true
-        description: "Database access via an ORM (SQLAlchemy, Django ORM, Peewee)."
+        description: "Database access via an ORM (SQLAlchemy, Django ORM, Prisma, Drizzle)."
       - id: data_management.database.repository_pattern
         name: Repository Pattern
         parent_id: data_management.database
@@ -64,20 +66,61 @@ nodes:
         name: JSON Serialization
         parent_id: data_management.serialization
         is_leaf: true
-        description: "JSON encode/decode operations."
+        description: "JSON encode/decode operations (json, orjson, ujson, pydantic)."
       - id: data_management.serialization.binary
         name: Binary Serialization
         parent_id: data_management.serialization
         is_leaf: true
-        description: "Protobuf, MessagePack, pickle, or similar binary serialization."
+        description: "Protobuf, MessagePack, CBOR, Avro, pickle, or similar binary serialization."
+      - id: data_management.serialization.schema_based
+        name: Schema-Based Serialization
+        parent_id: data_management.serialization
+        is_leaf: true
+        description: "Serialization governed by an explicit schema (Avro, Protobuf, Marshmallow)."
   - id: data_management.migration
     name: Database Migration
     parent_id: null
     is_leaf: false
-    description: "Database schema migration operations."
+    description: "Database schema migration and versioning operations."
     children:
       - id: data_management.migration.schema_migration
         name: Schema Migration
         parent_id: data_management.migration
         is_leaf: true
-        description: "Database schema migration (Alembic, Flyway, Liquibase)"
+        description: "Database schema migration (Alembic, Flyway, Liquibase, Django migrations)."
+  - id: data_management.vector_store
+    name: Vector Store
+    parent_id: null
+    is_leaf: false
+    description: "Vector database storage and similarity search operations."
+    children:
+      - id: data_management.vector_store.upsert
+        name: Vector Upsert
+        parent_id: data_management.vector_store
+        is_leaf: true
+        description: "Inserting or updating vector embeddings in a vector database."
+        tags: [pinecone, weaviate, chromadb, qdrant, milvus]
+      - id: data_management.vector_store.search
+        name: Vector Similarity Search
+        parent_id: data_management.vector_store
+        is_leaf: true
+        description: "ANN or exact similarity search over a vector database."
+        tags: [pinecone, weaviate, chromadb, qdrant, milvus, pgvector]
+  - id: data_management.search_index
+    name: Search Index
+    parent_id: null
+    is_leaf: false
+    description: "Full-text and hybrid search index operations."
+    children:
+      - id: data_management.search_index.index
+        name: Document Indexing
+        parent_id: data_management.search_index
+        is_leaf: true
+        description: "Adding or updating documents in a search index."
+        tags: [elasticsearch, opensearch, solr, typesense]
+      - id: data_management.search_index.search
+        name: Search Query
+        parent_id: data_management.search_index
+        is_leaf: true
+        description: "Executing a full-text or hybrid search query."
+        tags: [elasticsearch, opensearch, typesense]

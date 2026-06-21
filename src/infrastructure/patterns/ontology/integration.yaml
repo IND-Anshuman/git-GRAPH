@@ -1,5 +1,7 @@
+$schema: "../../../../schemas/ontology_file.schema.json"
 schema_version: "1.0"
-ontology_version: "3.0.0"
+ontology_version: "3.1.0"
+last_updated: "2026-06-21T00:00:00Z"
 domain: Integration
 nodes:
   - id: integration.messaging
@@ -28,12 +30,18 @@ nodes:
         name: REST API Call
         parent_id: integration.http_client
         is_leaf: true
-        description: "Outbound REST API invocation via requests, httpx, aiohttp."
+        description: "Outbound REST API invocation via requests, httpx, aiohttp, fetch, axios."
+      - id: integration.http_client.grpc_call
+        name: gRPC Call
+        parent_id: integration.http_client
+        is_leaf: true
+        description: "Outbound gRPC stub call via a generated protobuf channel."
+        tags: [grpc, protobuf]
       - id: integration.http_client.graphql_call
         name: GraphQL Call
         parent_id: integration.http_client
         is_leaf: true
-        description: "Outbound GraphQL query or mutation."
+        description: "Outbound GraphQL query or mutation via gql client or raw HTTP."
   - id: integration.event
     name: Event Handling
     parent_id: null
@@ -60,17 +68,17 @@ nodes:
         name: AI Model Invoke
         parent_id: integration.ai_model
         is_leaf: true
-        description: "LLM inference call via provider SDK (OpenAI, Gemini, Anthropic)"
+        description: "LLM inference call via provider SDK (OpenAI, Gemini, Anthropic, LiteLLM)."
       - id: integration.ai_model.streaming
         name: AI Model Streaming
         parent_id: integration.ai_model
         is_leaf: true
-        description: "Streaming token generation from LLM"
+        description: "Streaming token generation from LLM."
       - id: integration.ai_model.embedding
         name: AI Model Embedding
         parent_id: integration.ai_model
         is_leaf: true
-        description: "Vector embedding generation via embedding model API"
+        description: "Vector embedding generation via embedding model API."
   - id: integration.audio
     name: Audio Processing
     parent_id: null
@@ -81,9 +89,9 @@ nodes:
         name: Text-to-Speech
         parent_id: integration.audio
         is_leaf: true
-        description: "Text-to-speech audio synthesis"
+        description: "Text-to-speech audio synthesis."
       - id: integration.audio.stt
         name: Speech-to-Text
         parent_id: integration.audio
         is_leaf: true
-        description: "Speech-to-text transcription"
+        description: "Speech-to-text transcription."

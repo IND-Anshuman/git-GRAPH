@@ -1,5 +1,7 @@
+$schema: "../../../../schemas/ontology_file.schema.json"
 schema_version: "1.0"
-ontology_version: "3.0.0"
+ontology_version: "3.1.0"
+last_updated: "2026-06-21T00:00:00Z"
 domain: Presentation
 nodes:
   - id: presentation.api_handling
@@ -12,12 +14,30 @@ nodes:
         name: API Endpoint Handler
         parent_id: presentation.api_handling
         is_leaf: true
-        description: "Handler function for a specific HTTP route and method."
+        description: "Handler function for a specific HTTP route and method (REST, GraphQL)."
       - id: presentation.api_handling.middleware
         name: Middleware
         parent_id: presentation.api_handling
         is_leaf: true
-        description: "Cross-cutting request/response processing middleware."
+        description: "Cross-cutting request/response processing middleware or interceptor."
+      - id: presentation.api_handling.websocket
+        name: WebSocket Handler
+        parent_id: presentation.api_handling
+        is_leaf: true
+        description: "Bidirectional WebSocket connection handler."
+        tags: [fastapi, django-channels, socket.io, phoenix]
+      - id: presentation.api_handling.sse
+        name: Server-Sent Events Handler
+        parent_id: presentation.api_handling
+        is_leaf: true
+        description: "Server-sent events (SSE) streaming endpoint handler."
+        tags: [fastapi, flask, express]
+      - id: presentation.api_handling.graphql_endpoint
+        name: GraphQL Schema Endpoint
+        parent_id: presentation.api_handling
+        is_leaf: true
+        description: "GraphQL schema resolver and endpoint registration."
+        tags: [strawberry, graphene, ariadne, nexus]
   - id: presentation.validation
     name: Input Validation
     parent_id: null
@@ -28,4 +48,10 @@ nodes:
         name: Schema Validation
         parent_id: presentation.validation
         is_leaf: true
-        description: "Validation against a defined schema (Pydantic, jsonschema)."
+        description: "Validation against a defined schema (Pydantic, Zod, jsonschema, Cerberus)."
+      - id: presentation.validation.sanitization
+        name: Input Sanitization
+        parent_id: presentation.validation
+        is_leaf: true
+        description: "Sanitizing user input to prevent injection attacks."
+        tags: [bleach, html-sanitizer, dompurify]

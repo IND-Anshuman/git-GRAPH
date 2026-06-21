@@ -1,5 +1,7 @@
+$schema: "../../../../schemas/ontology_file.schema.json"
 schema_version: "1.0"
-ontology_version: "3.0.0"
+ontology_version: "3.1.0"
+last_updated: "2026-06-21T00:00:00Z"
 domain: Reliability
 nodes:
   - id: reliability.retry
@@ -23,6 +25,11 @@ nodes:
         parent_id: reliability.retry
         is_leaf: true
         description: "Retry up to a maximum number of attempts."
+      - id: reliability.retry.jitter
+        name: Jittered Backoff
+        parent_id: reliability.retry
+        is_leaf: true
+        description: "Retry with randomised jitter to avoid thundering herd."
   - id: reliability.circuit_breaker
     name: Circuit Breaker
     parent_id: null
@@ -38,7 +45,7 @@ nodes:
         name: Circuit Breaker Fallback
         parent_id: reliability.circuit_breaker
         is_leaf: true
-        description: "Fallback handler invoked when circuit is OPEN"
+        description: "Fallback handler invoked when circuit is OPEN."
   - id: reliability.rate_limiting
     name: Rate Limiting
     parent_id: null
@@ -60,6 +67,11 @@ nodes:
         parent_id: reliability.rate_limiting
         is_leaf: true
         description: "Rate limiting via fixed time window counter."
+      - id: reliability.rate_limiting.concurrency
+        name: Concurrency Limit
+        parent_id: reliability.rate_limiting
+        is_leaf: true
+        description: "Limiting the number of concurrent requests or coroutines."
   - id: reliability.timeout
     name: Timeout Management
     parent_id: null
@@ -70,9 +82,25 @@ nodes:
         name: Hard Deadline Timeout
         parent_id: reliability.timeout
         is_leaf: true
-        description: "Hard deadline timeout on blocking operation"
+        description: "Hard deadline timeout on a blocking operation."
       - id: reliability.timeout.async_timeout
         name: Async Timeout
         parent_id: reliability.timeout
         is_leaf: true
-        description: "Async operation timeout via asyncio.wait_for or equivalent"
+        description: "Async operation timeout via asyncio.wait_for or equivalent."
+  - id: reliability.health_check
+    name: Health Check
+    parent_id: null
+    is_leaf: false
+    description: "Liveness and readiness health check endpoints and probes."
+    children:
+      - id: reliability.health_check.liveness
+        name: Liveness Probe
+        parent_id: reliability.health_check
+        is_leaf: true
+        description: "Liveness probe indicating if the service is running."
+      - id: reliability.health_check.readiness
+        name: Readiness Probe
+        parent_id: reliability.health_check
+        is_leaf: true
+        description: "Readiness probe indicating if the service can accept traffic."

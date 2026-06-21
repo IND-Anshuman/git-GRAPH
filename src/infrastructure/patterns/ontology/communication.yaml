@@ -1,0 +1,78 @@
+# =============================================================
+# git-GRAPH — Communication Domain Ontology
+# =============================================================
+$schema: "../../../../schemas/ontology_file.schema.json"
+schema_version: "1.0"
+ontology_version: "1.0.0"
+last_updated: "2026-06-21T00:00:00Z"
+domain: Communication
+nodes:
+  - id: communication.messaging
+    name: Messaging
+    parent_id: null
+    is_leaf: false
+    description: "Asynchronous message-based communication via brokers, queues, and streams."
+    children:
+      - id: communication.messaging.publish
+        name: Message Publishing
+        parent_id: communication.messaging
+        is_leaf: true
+        description: "Publishing messages to a queue, topic, exchange, or broker."
+        tags: [kafka, rabbitmq, sqs, pubsub, nats, celery]
+      - id: communication.messaging.consume
+        name: Message Consumption
+        parent_id: communication.messaging
+        is_leaf: true
+        description: "Consuming or subscribing to messages from a queue, topic, or broker."
+        tags: [kafka, rabbitmq, sqs, nats, celery]
+      - id: communication.messaging.stream
+        name: Message Streaming
+        parent_id: communication.messaging
+        is_leaf: true
+        description: "Real-time event streaming with replay and partitioning (e.g. Kafka Streams, Faust)."
+        tags: [kafka, faust]
+  - id: communication.api_integration
+    name: API Integration
+    parent_id: null
+    is_leaf: false
+    description: "Outbound API calls to external services via REST, gRPC, or GraphQL."
+    children:
+      - id: communication.api_integration.rest
+        name: REST API Call
+        parent_id: communication.api_integration
+        is_leaf: true
+        description: "Outbound REST API invocation via requests, httpx, aiohttp, fetch, axios."
+      - id: communication.api_integration.grpc
+        name: gRPC Call
+        parent_id: communication.api_integration
+        is_leaf: true
+        description: "Outbound gRPC stub call via a generated channel."
+        tags: [grpc, protobuf]
+      - id: communication.api_integration.graphql
+        name: GraphQL Call
+        parent_id: communication.api_integration
+        is_leaf: true
+        description: "Outbound GraphQL query or mutation via gql client or raw HTTP."
+        tags: [graphql, apollo]
+  - id: communication.event_handling
+    name: Event Handling
+    parent_id: null
+    is_leaf: false
+    description: "Domain event emission, subscription, and signal-based communication."
+    children:
+      - id: communication.event_handling.emit
+        name: Event Emission
+        parent_id: communication.event_handling
+        is_leaf: true
+        description: "Emitting or dispatching domain or application events."
+      - id: communication.event_handling.handler
+        name: Event Handler
+        parent_id: communication.event_handling
+        is_leaf: true
+        description: "Handling or processing received domain events."
+      - id: communication.event_handling.websocket
+        name: WebSocket Channel
+        parent_id: communication.event_handling
+        is_leaf: true
+        description: "Bidirectional real-time WebSocket communication channel."
+        tags: [websocket, socket.io, channels]

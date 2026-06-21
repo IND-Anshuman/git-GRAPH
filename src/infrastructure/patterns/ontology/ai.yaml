@@ -1,18 +1,21 @@
+$schema: "../../../../schemas/ontology_file.schema.json"
 schema_version: "1.0"
-ontology_version: "3.0.0"
+ontology_version: "3.1.0"
+last_updated: "2026-06-21T00:00:00Z"
 domain: AI
 nodes:
   - id: ai.models
     name: Models
     parent_id: null
     is_leaf: false
-    description: "LLM, Embeddings, and Reranking model calls."
+    description: "LLM, Embeddings, Reranking, and multi-modal model calls."
     children:
       - id: ai.models.invoke
         name: Model Invoke
         parent_id: ai.models
         is_leaf: true
         description: "Standard model execution/generation calls."
+        tags: [openai, gemini, anthropic, litellm, ollama, vllm]
       - id: ai.models.embedding
         name: Embedding Generate
         parent_id: ai.models
@@ -23,27 +26,38 @@ nodes:
         parent_id: ai.models
         is_leaf: true
         description: "Re-ranking list of search results."
+      - id: ai.models.multimodal
+        name: Multi-Modal Invoke
+        parent_id: ai.models
+        is_leaf: true
+        description: "Image, audio, or video understanding via a multi-modal model."
+        tags: [gemini, gpt4o, claude3]
   - id: ai.retrieval
     name: Retrieval
     parent_id: null
     is_leaf: false
-    description: "Retrieving context from database or vector stores."
+    description: "Retrieving context from databases or vector stores (RAG)."
     children:
       - id: ai.retrieval.retrieve
         name: Retrieve
         parent_id: ai.retrieval
         is_leaf: true
-        description: "Retrieve relevant context."
+        description: "Retrieve relevant context (RAG)."
       - id: ai.retrieval.vector_search
         name: Vector Search
         parent_id: ai.retrieval
         is_leaf: true
-        description: "Vector database search."
+        description: "Vector database similarity search."
+      - id: ai.retrieval.hybrid_search
+        name: Hybrid Search
+        parent_id: ai.retrieval
+        is_leaf: true
+        description: "Hybrid keyword + vector similarity search."
   - id: ai.memory
     name: Memory
     parent_id: null
     is_leaf: false
-    description: "Agent memory storage operations."
+    description: "Agent memory storage and retrieval operations."
     children:
       - id: ai.memory.read
         name: Memory Read
@@ -85,7 +99,7 @@ nodes:
         name: Agent Evaluate
         parent_id: ai.agent
         is_leaf: true
-        description: "Evaluating outputs."
+        description: "Evaluating outputs against criteria."
   - id: ai.tool
     name: Tool
     parent_id: null
@@ -97,11 +111,29 @@ nodes:
         parent_id: ai.tool
         is_leaf: true
         description: "Invocation of a tool or function calling."
+      - id: ai.tool.register
+        name: Tool Register
+        parent_id: ai.tool
+        is_leaf: true
+        description: "Registration of a callable function as an agent tool."
   - id: ai.guardrails
     name: Guardrails
     parent_id: null
-    is_leaf: true
-    description: "Safety layers, prompt validation, and PII filters."
+    is_leaf: false
+    description: "Safety layers, prompt validation, PII filters, and output moderation."
+    children:
+      - id: ai.guardrails.input
+        name: Input Guardrail
+        parent_id: ai.guardrails
+        is_leaf: true
+        description: "Validating or filtering agent/LLM input prompts."
+        tags: [guardrails-ai, nemo-guardrails]
+      - id: ai.guardrails.output
+        name: Output Guardrail
+        parent_id: ai.guardrails
+        is_leaf: true
+        description: "Validating or filtering LLM-generated outputs."
+        tags: [guardrails-ai, nemo-guardrails]
   - id: ai.workflow
     name: Workflow
     parent_id: null
@@ -118,3 +150,9 @@ nodes:
         parent_id: ai.workflow
         is_leaf: true
         description: "Coordination of teams of agents (e.g. CrewAI, AutoGen)."
+      - id: ai.workflow.pipeline
+        name: Sequential Pipeline
+        parent_id: ai.workflow
+        is_leaf: true
+        description: "Sequential chain of model calls and transforms."
+        tags: [langchain, haystack]

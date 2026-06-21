@@ -1,5 +1,7 @@
+$schema: "../../../../schemas/ontology_file.schema.json"
 schema_version: "1.0"
-ontology_version: "3.0.0"
+ontology_version: "3.1.0"
+last_updated: "2026-06-21T00:00:00Z"
 domain: Security
 nodes:
   - id: security.authentication
@@ -48,7 +50,7 @@ nodes:
         name: Attribute-Based Access Control
         parent_id: security.authorization
         is_leaf: true
-        description: "Access control based on entity attributes and policies."
+        description: "Access control based on entity attributes and policies (Casbin, OPA, PyABAC)."
       - id: security.authorization.permission_check
         name: Permission Check
         parent_id: security.authorization
@@ -64,14 +66,38 @@ nodes:
         name: Symmetric Encryption
         parent_id: security.cryptography
         is_leaf: true
-        description: "AES, DES, or similar symmetric cipher operations."
+        description: "AES, ChaCha20, Fernet, or similar symmetric cipher operations."
       - id: security.cryptography.asymmetric
         name: Asymmetric Encryption
         parent_id: security.cryptography
         is_leaf: true
-        description: "RSA, EC, or similar asymmetric cipher operations."
+        description: "RSA, EC, ECDSA, or similar asymmetric cipher and key operations."
       - id: security.cryptography.signing
         name: Digital Signing
         parent_id: security.cryptography
         is_leaf: true
-        description: "HMAC, RSA-sign, or EC-sign operations."
+        description: "HMAC, RSA-sign, EC-sign, Ed25519, or JWT signing operations."
+  - id: security.key_management
+    name: Key Management
+    parent_id: null
+    is_leaf: false
+    description: "Cryptographic key generation, storage, rotation, and lifecycle management."
+    children:
+      - id: security.key_management.generation
+        name: Key Generation
+        parent_id: security.key_management
+        is_leaf: true
+        description: "Generating cryptographic keys (RSA, EC, symmetric keys)."
+        tags: [cryptography, keyvault, kms, hsm]
+      - id: security.key_management.rotation
+        name: Key Rotation
+        parent_id: security.key_management
+        is_leaf: true
+        description: "Rotating or revoking cryptographic keys."
+        tags: [keyvault, kms, vault]
+      - id: security.key_management.storage
+        name: Secret Storage
+        parent_id: security.key_management
+        is_leaf: true
+        description: "Secure storage of secrets, keys, and credentials (Vault, AWS KMS, Azure Key Vault)."
+        tags: [vault, kms, keyvault, secrets_manager]
