@@ -44,8 +44,12 @@ class SASourceFileRepository(ISourceFileRepository):
         self.session.merge(model)
         
     def save_batch(self, files: List[SourceFile]) -> None:
-        models = [DomainMapper.to_source_file_model(f) for f in files]
-        for model in models:
+        raw_models = [DomainMapper.to_source_file_model(f) for f in files]
+        # Deduplicate by source file ID and file path
+        by_id = {m.id: m for m in raw_models}
+        by_path = {m.file_path: m for m in by_id.values()}
+        
+        for model in by_path.values():
             self.session.merge(model)
 
     def delete_by_repository(self, repo_id: RepositoryId) -> None:

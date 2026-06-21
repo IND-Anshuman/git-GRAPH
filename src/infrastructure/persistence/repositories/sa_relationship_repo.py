@@ -26,6 +26,19 @@ class SARelationshipRepository(IRelationshipRepository):
             return DomainMapper.to_relationship_entity(model)
         return None
 
+    def get_by_ids(self, ids: List[uuid.UUID]) -> List[Relationship]:
+        if not ids:
+            return []
+        
+        chunk_size = 500
+        results = []
+        for i in range(0, len(ids), chunk_size):
+            chunk = ids[i:i + chunk_size]
+            stmt = select(RelationshipModel).where(RelationshipModel.id.in_(chunk))
+            models = self.session.execute(stmt).scalars().all()
+            results.extend([DomainMapper.to_relationship_entity(m) for m in models])
+        return results
+
     def get_by_repository(self, repo_id: RepositoryId, rel_type: RelationshipType | None = None) -> List[Relationship]:
         if rel_type:
             stmt = select(RelationshipModel).where(
@@ -52,8 +65,15 @@ class SARelationshipRepository(IRelationshipRepository):
         self.session.merge(model)
 
     def save_batch(self, rels: List[Relationship]) -> None:
-        models = [DomainMapper.to_relationship_model(r) for r in rels]
-        for model in models:
+        raw_models = [DomainMapper.to_relationship_model(r) for r in rels]
+        # Deduplicate by relationship ID and unique constraint key (source_seid, target_seid, relationship_type)
+        by_id = {m.id: m for m in raw_models}
+        by_key = {}
+        for m in by_id.values():
+            key = (m.source_seid, m.target_seid, m.relationship_type)
+            by_key[key] = m
+            
+        for model in by_key.values():
             self.session.merge(model)
 
     def delete_by_repository(self, repo_id: RepositoryId) -> None:

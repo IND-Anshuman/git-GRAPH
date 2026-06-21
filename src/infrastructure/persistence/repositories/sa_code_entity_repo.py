@@ -26,6 +26,20 @@ class SACodeEntityRepository(ICodeEntityRepository):
             return DomainMapper.to_code_entity(model)
         return None
 
+    def get_by_seids(self, seids: List[SEID]) -> List[CodeEntity]:
+        if not seids:
+            return []
+        
+        chunk_size = 500
+        seid_values = [s.value for s in seids]
+        results = []
+        for i in range(0, len(seid_values), chunk_size):
+            chunk = seid_values[i:i + chunk_size]
+            stmt = select(CodeEntityModel).where(CodeEntityModel.seid.in_(chunk))
+            models = self.session.execute(stmt).scalars().all()
+            results.extend([DomainMapper.to_code_entity(m) for m in models])
+        return results
+
     def get_by_repository(self, repo_id: RepositoryId, entity_type: EntityType | None = None) -> List[CodeEntity]:
         if entity_type:
             stmt = select(CodeEntityModel).where(
@@ -47,13 +61,13 @@ class SACodeEntityRepository(ICodeEntityRepository):
         self.session.merge(model)
 
     def save_batch(self, entities: List[CodeEntity]) -> None:
-        models = [DomainMapper.to_code_entity_model(e) for e in entities]
-        if not models:
+        raw_models = [DomainMapper.to_code_entity_model(e) for e in entities]
+        if not raw_models:
             return
         
-        # Sort and merge/flush by hierarchy depth to ensure parents are physically
-        # inserted/updated in the database before their children.
-        by_seid = {m.seid: m for m in models}
+        # Deduplicate by SEID to prevent multiple insertions of the same entity in the same transaction
+        by_seid = {m.seid: m for m in raw_models}
+        models = list(by_seid.values())
         memo = {}
 
         def get_depth(m):

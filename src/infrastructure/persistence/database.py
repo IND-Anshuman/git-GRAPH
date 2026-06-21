@@ -15,6 +15,16 @@ class DatabaseEngine:
             database_url: The SQLAlchemy connection string.
         """
         self.engine = create_engine(database_url)
+        
+        from sqlalchemy import event
+        @event.listens_for(self.engine, "connect")
+        def set_sqlite_pragma(dbapi_connection, connection_record):
+            import sqlite3
+            if isinstance(dbapi_connection, sqlite3.Connection):
+                cursor = dbapi_connection.cursor()
+                cursor.execute("PRAGMA foreign_keys=ON;")
+                cursor.close()
+
         self.session_factory = sessionmaker(
             bind=self.engine,
             autocommit=False,
