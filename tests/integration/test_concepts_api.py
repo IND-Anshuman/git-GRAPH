@@ -312,3 +312,38 @@ def test_concepts_api_endpoints(api_client):
     assert len(flows) == 1
     assert flows[0]["flow_type"] == "REQUEST_RESPONSE_FLOW"
 
+
+def test_extract_all_in_one_concepts_endpoint(api_client):
+    from unittest.mock import MagicMock
+    from src.presentation.dependencies import get_extract_all_in_one_concepts_use_case
+
+    mock_use_case = MagicMock()
+    mock_use_case.execute.return_value = {
+        "status": "success",
+        "message": "Mocked successfully",
+        "processed_commits": 1
+    }
+
+    app.dependency_overrides[get_extract_all_in_one_concepts_use_case] = lambda: mock_use_case
+    try:
+        repo_id = uuid.uuid4()
+        # Test synchronous call with commit_hash
+        resp = api_client.post(
+            f"/api/v1/repositories/{repo_id}/concepts/extract-all-in-one",
+            params={"commit_hash": "hash123"}
+        )
+        assert resp.status_code == 202
+        data = resp.json()
+        assert data["status"] == "success"
+        assert data["message"] == "Mocked successfully"
+        mock_use_case.execute.assert_called_with(str(repo_id), "hash123")
+
+        # Test asynchronous call without commit_hash
+        mock_use_case.reset_mock()
+        resp = api_client.post(f"/api/v1/repositories/{repo_id}/concepts/extract-all-in-one")
+        assert resp.status_code == 202
+        assert "started asynchronously" in resp.json()["message"]
+    finally:
+        app.dependency_overrides.clear()
+
+
