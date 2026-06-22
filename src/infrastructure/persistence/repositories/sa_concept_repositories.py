@@ -206,12 +206,22 @@ class SAConceptClusterRepository(IConceptClusterRepository):
         return [ConceptMapper.to_concept_cluster_entity(m) for m in models]
 
     def add_member(self, cluster_id: uuid.UUID, concept_id: uuid.UUID) -> None:
+        stmt = select(ConceptClusterMemberModel).where(
+            and_(
+                ConceptClusterMemberModel.cluster_id == cluster_id,
+                ConceptClusterMemberModel.concept_id == concept_id,
+            )
+        )
+        existing = self.session.execute(stmt).scalar_one_or_none()
+        if existing:
+            return
+
         model = ConceptClusterMemberModel(
             id=uuid.uuid4(),
             cluster_id=cluster_id,
             concept_id=concept_id,
         )
-        self.session.merge(model)
+        self.session.add(model)
         # Update member count
         self.session.execute(
             update(ConceptClusterModel)
