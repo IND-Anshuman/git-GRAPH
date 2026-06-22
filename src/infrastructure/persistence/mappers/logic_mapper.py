@@ -153,11 +153,14 @@ class LogicMapper:
 
     @staticmethod
     def to_logic_signature_entity(model: LogicSignatureModel) -> LogicSignature:
+        canonical_name = model.metadata_.get("canonical_name", model.entity_name)
+        lang_str = model.metadata_.get("language")
+        language = LogicMapper._parse_enum(SupportedLanguage, lang_str) if lang_str else SupportedLanguage.PYTHON
         return LogicSignature(
             id=model.id,
             repository_id=RepositoryId(model.repository_id),
-            canonical_name=model.entity_name,
-            language=SupportedLanguage.PYTHON,  # Default, can be overridden by metadata
+            canonical_name=canonical_name,
+            language=language,
             ontology_node_id=model.primary_ontology_node_id,
             description=model.entity_name,
             created_at=model.created_at,
