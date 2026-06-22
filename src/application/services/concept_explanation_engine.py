@@ -87,7 +87,7 @@ class ConceptExplanationEngine:
             primary_triggers.append(
                 {
                     "pattern_id": pattern_id,
-                    "entity_seid": lv.code_entity_seid.value if hasattr(lv.code_entity_seid, "value") else str(lv.code_entity_seid),
+                    "entity_seid": str(lv.code_entity_seid),
                     "file_path": file_path,
                     "confidence": float(lv.overall_confidence),
                 }
