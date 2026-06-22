@@ -4,13 +4,12 @@ import uuid
 from typing import Dict, List, Set, Tuple, Any
 from datetime import datetime
 
-from sqlalchemy import select
-
 from src.domain.entities.concept_node import ConceptNode
 from src.domain.entities.concept_version import ConceptVersion
 from src.domain.entities.concept_evidence import ConceptEvidence
 from src.domain.entities.concept_relationship import ConceptRelationship
 from src.domain.entities.concept_drift import ConceptDrift
+from src.domain.value_objects.entity_id import SEID
 from src.application.ports.unit_of_work import IUnitOfWork
 
 
@@ -106,20 +105,13 @@ class ConceptDriftEngine:
         dependencies = set()
         for seid_str in seids:
             # Look up relationships where source_seid is our entity at this commit
-            # (To avoid full graph queries, we can scan relationship versions active at this commit)
-            stmt = (
-                select(uow.relationships._sa_model)
-                .where(
-                    uow.relationships._sa_model.source_seid == seid_str
-                )
-            )
-            # Fetch relationships matching the source SEID
             try:
-                models = uow._session.execute(stmt).scalars().all()
-                for m in models:
-                    dependencies.add(f"{m.relationship_type}:{m.target_seid}")
+                rels = uow.relationships.get_by_source(SEID(uuid.UUID(seid_str)))
+                for r in rels:
+                    rel_type = r.relationship_type.name if hasattr(r.relationship_type, "name") else str(r.relationship_type)
+                    dependencies.add(f"{rel_type}:{r.target_seid.value}")
             except Exception:
-                pass # Fallback in case table queries fail in test harnesses
+                pass # Fallback in case queries fail in test harnesses
 
         return seids, patterns, dependencies
 
