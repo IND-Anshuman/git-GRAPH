@@ -28,6 +28,13 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     container = Container(settings)
     app.state.container = container
     
+    # Initialize pattern registry from DB
+    try:
+        container.ontology_registry_service.initialize_registry()
+        logger.info("Initialized pattern registry from database.")
+    except Exception as e:
+        logger.error(f"Failed to initialize pattern registry on startup: {e}")
+    
     # DB Init
     # try:
     #     from src.infrastructure.database.models import Base

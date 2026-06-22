@@ -50,6 +50,15 @@ class LogicExtractionOrchestrator:
         generates signatures/versions/evidence, and computes transitions/drift.
         """
         print(f"[LogicOrchestrator] extract_repository_logic called for repo={repository_id.value}, commit={commit_hash}")
+        
+        # Ensure patterns are loaded in memory registry
+        if not self._extraction_engine._registry.get_all_patterns():
+            print("[LogicOrchestrator] In-memory pattern registry is empty. Initializing from database...")
+            with self._uow_factory() as uow:
+                patterns = uow.behavior_patterns.list_active()
+            self._extraction_engine._registry.register_patterns(patterns)
+            print(f"[LogicOrchestrator] Registered {len(patterns)} patterns.")
+
         # 1. Fetch Repository and Checkout commit
         with self._uow_factory() as uow:
             repo = uow.repositories.get_by_id(repository_id)
@@ -270,6 +279,14 @@ class LogicExtractionOrchestrator:
         """
         print(f"[LogicOrchestrator] extract_all_repository_logic called for repo={repository_id.value}")
 
+        # Ensure patterns are loaded in memory registry
+        if not self._extraction_engine._registry.get_all_patterns():
+            print("[LogicOrchestrator] In-memory pattern registry is empty. Initializing from database...")
+            with self._uow_factory() as uow:
+                patterns = uow.behavior_patterns.list_active()
+            self._extraction_engine._registry.register_patterns(patterns)
+            print(f"[LogicOrchestrator] Registered {len(patterns)} patterns.")
+
         # 1. Fetch Repository
         with self._uow_factory() as uow:
             repo = uow.repositories.get_by_id(repository_id)
@@ -324,7 +341,7 @@ class LogicExtractionOrchestrator:
                     changed_entities = []
                     for seid in changed_seids:
                         entity = uow.code_entities.get_by_seid(seid)
-                        if entity and entity.entity_type.value in ("FUNCTION", "METHOD"):
+                        if entity and entity.entity_type in (EntityType.FUNCTION, EntityType.METHOD):
                             changed_entities.append(entity)
 
                 if not changed_entities:
