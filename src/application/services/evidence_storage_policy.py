@@ -8,6 +8,12 @@ import logging
 from datetime import datetime
 from sqlalchemy import select, delete
 from src.infrastructure.persistence.models.evidence_models import SEEEEvidenceModel, CompilerOutputModel
+from src.infrastructure.persistence.models.logic_models import (
+    LogicSignatureModel,
+    LogicVersionModel,
+    LogicEvidenceModel,
+    BehaviorExplanationModel,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -29,14 +35,23 @@ class EvidenceStoragePruningService:
                 SEEEEvidenceModel.repository_id == repository_id
             ).distinct()
             commits = [row[0] for row in session.execute(stmt).fetchall()]
-            
-            if not commits:
+
+            stmt_logic = select(LogicVersionModel.commit_hash).join(
+                LogicSignatureModel, LogicVersionModel.signature_id == LogicSignatureModel.id
+            ).where(
+                LogicSignatureModel.repository_id == repository_id
+            ).distinct()
+            logic_commits = [row[0] for row in session.execute(stmt_logic).fetchall()]
+
+            all_commits = list(set(commits).union(set(logic_commits)))
+
+            if not all_commits:
                 return
                 
             # Get committing times or creation times to sort
             from src.infrastructure.persistence.models.commit_model import CommitModel
             commit_dates = []
-            for c_hash in commits:
+            for c_hash in all_commits:
                 c_stmt = select(CommitModel.timestamp).where(
                     CommitModel.repository_id == repository_id,
                     CommitModel.hash == c_hash
@@ -132,11 +147,31 @@ class EvidenceStoragePruningService:
                     CompilerOutputModel.commit_hash == c_hash
                 )
                 comp_rows = session.execute(comp_stmt).scalars().all()
+
+                versions_stmt = select(LogicVersionModel).join(
+                    LogicSignatureModel, LogicVersionModel.signature_id == LogicSignatureModel.id
+                ).where(
+                    LogicSignatureModel.repository_id == repository_id,
+                    LogicVersionModel.commit_hash == c_hash
+                )
+                versions = session.execute(versions_stmt).scalars().all()
+                version_ids = [v.id for v in versions]
+
+                evidence_rows = []
+                exp_rows = []
+                if version_ids:
+                    evidence_stmt = select(LogicEvidenceModel).where(LogicEvidenceModel.version_id.in_(version_ids))
+                    evidence_rows = session.execute(evidence_stmt).scalars().all()
+
+                    exp_stmt = select(BehaviorExplanationModel).where(BehaviorExplanationModel.version_id.in_(version_ids))
+                    exp_rows = session.execute(exp_stmt).scalars().all()
                 
-                if seee_rows or comp_rows:
+                if seee_rows or comp_rows or evidence_rows or exp_rows:
                     archive_payload = {
                         "seee_evidence": [],
-                        "compiler_outputs": []
+                        "compiler_outputs": [],
+                        "logic_evidence": [],
+                        "behavior_explanations": []
                     }
                     
                     for row in seee_rows:
@@ -190,6 +225,38 @@ class EvidenceStoragePruningService:
                             "created_at": row.created_at.isoformat()
                         })
                         archive_payload["compiler_outputs"].append(data)
+
+                    for row in evidence_rows:
+                        archive_payload["logic_evidence"].append({
+                            "id": str(row.id),
+                            "version_id": str(row.version_id),
+                            "evidence_type": row.evidence_type,
+                            "pattern_id": row.pattern_id,
+                            "matched_text": row.matched_text,
+                            "line_number": row.line_number,
+                            "column_offset": row.column_offset,
+                            "confidence": float(row.confidence),
+                            "weight": float(row.weight),
+                            "metadata": row.metadata_,
+                            "created_at": row.created_at.isoformat()
+                        })
+                        session.delete(row)
+
+                    for row in exp_rows:
+                        archive_payload["behavior_explanations"].append({
+                            "id": str(row.id),
+                            "version_id": str(row.version_id),
+                            "explanation_type": row.explanation_type,
+                            "summary": row.summary,
+                            "detail": row.detail,
+                            "security_implications": row.security_implications,
+                            "recommended_action": row.recommended_action,
+                            "confidence": float(row.confidence),
+                            "generated_by": row.generated_by,
+                            "metadata": row.metadata_,
+                            "created_at": row.created_at.isoformat()
+                        })
+                        session.delete(row)
                         
                     archive_file_path = os.path.join(self.archive_dir, f"cold_evidence_{repository_id}_{c_hash}.json.gz")
                     with gzip.open(archive_file_path, "wt", encoding="utf-8") as f:

@@ -14,6 +14,8 @@ from src.application.use_cases.reconstruct_graph import ReconstructGraphUseCase
 
 # Phase 3 Use Cases
 from src.application.use_cases.extract_logic_use_case import ExtractLogicUseCase
+from src.application.use_cases.extract_all_logic_use_case import ExtractAllLogicUseCase
+from src.application.use_cases.get_logic_timeline_use_case import GetLogicTimelineUseCase
 from src.application.use_cases.get_entity_logic_use_case import GetEntityLogicUseCase
 from src.application.use_cases.get_entity_logic_history_use_case import GetEntityLogicHistoryUseCase
 from src.application.use_cases.get_behavior_evolution_use_case import GetBehaviorEvolutionUseCase
@@ -85,6 +87,12 @@ def get_temporal_replay_service(request: Request) -> Any:
 
 def get_extract_logic_use_case(request: Request) -> ExtractLogicUseCase:
     return request.app.state.container.get_extract_logic_use_case()
+
+def get_extract_all_logic_use_case(request: Request) -> ExtractAllLogicUseCase:
+    return request.app.state.container.get_extract_all_logic_use_case()
+
+def get_get_logic_timeline_use_case(request: Request) -> GetLogicTimelineUseCase:
+    return request.app.state.container.get_get_logic_timeline_use_case()
 
 def get_get_entity_logic_use_case(request: Request) -> GetEntityLogicUseCase:
     return request.app.state.container.get_get_entity_logic_use_case()

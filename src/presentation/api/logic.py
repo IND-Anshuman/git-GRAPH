@@ -3,9 +3,11 @@
 from typing import List, Optional
 import uuid
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks
 
 from src.application.use_cases.extract_logic_use_case import ExtractLogicUseCase
+from src.application.use_cases.extract_all_logic_use_case import ExtractAllLogicUseCase
+from src.application.use_cases.get_logic_timeline_use_case import GetLogicTimelineUseCase
 from src.application.use_cases.get_entity_logic_use_case import GetEntityLogicUseCase
 from src.application.use_cases.get_entity_logic_history_use_case import (
     GetEntityLogicHistoryUseCase,
@@ -34,6 +36,7 @@ from src.presentation.schemas.logic_schemas import (
     LogicEvidenceSchema,
     LogicValidationReportSchema,
     LogicVersionSchema,
+    RepositoryLogicTimelineSchema,
 )
 from src.presentation.dependencies import (
     get_extract_logic_use_case,
@@ -44,6 +47,8 @@ from src.presentation.dependencies import (
     get_get_behavior_explanation_use_case,
     get_get_behavior_drift_use_case,
     get_validate_logic_use_case,
+    get_extract_all_logic_use_case,
+    get_get_logic_timeline_use_case,
 )
 
 logic_router = APIRouter(prefix="/logic", tags=["logic"])
@@ -158,3 +163,23 @@ def validate_logic(
 ):
     """Run validation checks across logic signatures, versions, and transitions."""
     return use_case.execute()
+
+
+@logic_router.post("/repositories/{repository_id}/extract-all", status_code=status.HTTP_202_ACCEPTED)
+def extract_all_logic(
+    repository_id: str,
+    background_tasks: BackgroundTasks,
+    use_case: ExtractAllLogicUseCase = Depends(get_extract_all_logic_use_case),
+):
+    """Trigger asynchronous repository-wide logic extraction for all commits."""
+    background_tasks.add_task(use_case.execute, repository_id)
+    return {"status": "success", "message": "Bulk logic extraction started."}
+
+
+@logic_router.get("/repositories/{repository_id}/timeline", response_model=RepositoryLogicTimelineSchema)
+def get_repository_logic_timeline(
+    repository_id: str,
+    use_case: GetLogicTimelineUseCase = Depends(get_get_logic_timeline_use_case),
+):
+    """Retrieve repository-wide logic signatures, versions, transitions timeline."""
+    return use_case.execute(repository_id)

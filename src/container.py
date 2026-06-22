@@ -25,6 +25,8 @@ from src.application.use_cases.get_concept_explanation import GetConceptExplanat
 
 # Phase 3 Use Cases
 from src.application.use_cases.extract_logic_use_case import ExtractLogicUseCase
+from src.application.use_cases.extract_all_logic_use_case import ExtractAllLogicUseCase
+from src.application.use_cases.get_logic_timeline_use_case import GetLogicTimelineUseCase
 from src.application.use_cases.get_entity_logic_use_case import GetEntityLogicUseCase
 from src.application.use_cases.get_entity_logic_history_use_case import GetEntityLogicHistoryUseCase
 from src.application.use_cases.get_behavior_evolution_use_case import GetBehaviorEvolutionUseCase
@@ -447,6 +449,17 @@ class Container:
         return ExtractLogicUseCase(
             uow_factory=self.get_uow_factory(),
             orchestrator=self.logic_extraction_orchestrator
+        )
+
+    def get_extract_all_logic_use_case(self) -> ExtractAllLogicUseCase:
+        return ExtractAllLogicUseCase(
+            uow_factory=self.get_uow_factory(),
+            orchestrator=self.logic_extraction_orchestrator
+        )
+
+    def get_get_logic_timeline_use_case(self) -> GetLogicTimelineUseCase:
+        return GetLogicTimelineUseCase(
+            uow_factory=self.get_uow_factory()
         )
 
     def get_get_entity_logic_use_case(self) -> GetEntityLogicUseCase:

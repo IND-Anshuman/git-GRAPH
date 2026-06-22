@@ -170,3 +170,18 @@ class ValidationIssueSchema(BaseModel):
 class LogicValidationReportSchema(BaseModel):
     is_valid: bool
     issues: List[ValidationIssueSchema]
+
+
+class SignatureTimelineSchema(BaseModel):
+    signature: LogicSignatureSchema
+    versions: List[LogicVersionSchema]
+    transitions: List[LogicTransitionSchema]
+    explanations: List[BehaviorExplanationSchema]
+    evidence: List[LogicEvidenceSchema]
+    drift: List[BehaviorDriftSchema]
+
+
+class RepositoryLogicTimelineSchema(BaseModel):
+    repository_id: str
+    signatures: List[SignatureTimelineSchema]
+
