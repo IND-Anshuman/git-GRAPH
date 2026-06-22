@@ -285,6 +285,14 @@ class Container:
             detect_concepts_use_case=self.detect_concepts_use_case
         )
 
+        from src.application.use_cases.extract_all_in_one_concepts_use_case import ExtractAllInOneConceptsUseCase
+        self.extract_all_in_one_concepts_use_case = ExtractAllInOneConceptsUseCase(
+            uow_factory=self.get_uow_factory(),
+            logic_orchestrator=self.logic_extraction_orchestrator,
+            concept_backfill_service=self.concept_backfill_service,
+            detect_concepts_use_case=self.detect_concepts_use_case,
+        )
+
         # Phase 5A Discovery / Meta-Ontology Bounded Context
         self.embedding_registry = EmbeddingRegistry(uow=self.get_uow_factory()())
         self.calibration_engine = ConfidenceCalibrationEngine()
@@ -512,6 +520,9 @@ class Container:
 
     def get_concept_backfill_service(self) -> ConceptBackfillService:
         return self.concept_backfill_service
+
+    def get_extract_all_in_one_concepts_use_case(self) -> Any:
+        return self.extract_all_in_one_concepts_use_case
 
     def get_canonical_registry(self) -> CanonicalRegistry:
         return self.canonical_registry

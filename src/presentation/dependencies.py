@@ -32,6 +32,7 @@ from src.application.use_cases.get_concept_relationships import GetConceptRelati
 from src.application.use_cases.get_concept_drift import GetConceptDriftUseCase
 from src.application.use_cases.get_concept_explanation import GetConceptExplanationUseCase
 from src.application.services.concept_backfill_service import ConceptBackfillService
+from src.application.use_cases.extract_all_in_one_concepts_use_case import ExtractAllInOneConceptsUseCase
 
 
 def get_container(request: Request) -> Any:
@@ -138,6 +139,9 @@ def get_get_concept_explanation_use_case(request: Request) -> GetConceptExplanat
 
 def get_concept_backfill_service(request: Request) -> ConceptBackfillService:
     return request.app.state.container.get_concept_backfill_service()
+
+def get_extract_all_in_one_concepts_use_case(request: Request) -> ExtractAllInOneConceptsUseCase:
+    return request.app.state.container.get_extract_all_in_one_concepts_use_case()
 
 
 # Phase 4.5 Semantic Expansion Bounded Context

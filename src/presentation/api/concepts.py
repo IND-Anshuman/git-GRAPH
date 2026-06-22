@@ -3,9 +3,10 @@
 from typing import Callable, List, Optional
 import uuid
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks
 
 from src.application.use_cases.detect_concepts import DetectConceptsUseCase
+from src.application.use_cases.extract_all_in_one_concepts_use_case import ExtractAllInOneConceptsUseCase
 from src.application.use_cases.get_concepts import GetConceptsUseCase
 from src.application.use_cases.get_concept_evolution import GetConceptEvolutionUseCase
 from src.application.use_cases.get_concept_relationships import GetConceptRelationshipsUseCase
@@ -34,6 +35,7 @@ from src.presentation.dependencies import (
     get_get_concept_drift_use_case,
     get_get_concept_explanation_use_case,
     get_concept_backfill_service,
+    get_extract_all_in_one_concepts_use_case,
     get_uow_factory,
 )
 from src.infrastructure.persistence.models.concept_models import (
@@ -65,6 +67,31 @@ def extract_concepts(
         return summary
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@concepts_router.post("/repositories/{id}/concepts/extract-all-in-one", status_code=status.HTTP_202_ACCEPTED)
+def extract_all_in_one_concepts(
+    id: str,
+    background_tasks: BackgroundTasks,
+    commit_hash: Optional[str] = None,
+    use_case: ExtractAllInOneConceptsUseCase = Depends(get_extract_all_in_one_concepts_use_case),
+):
+    """Trigger all-in-one logic and concept extraction. Runs asynchronously if repository-wide."""
+    try:
+        uuid.UUID(id)
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid repository UUID format.")
+
+    if commit_hash:
+        try:
+            return use_case.execute(id, commit_hash)
+        except ValueError as e:
+            raise HTTPException(status_code=404, detail=str(e))
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=str(e))
+    else:
+        background_tasks.add_task(use_case.execute, id)
+        return {"status": "success", "message": "All-in-one logic and concept extraction started asynchronously."}
 
 
 @concepts_router.get("/repositories/{id}/concepts", response_model=List[ConceptResponse])
