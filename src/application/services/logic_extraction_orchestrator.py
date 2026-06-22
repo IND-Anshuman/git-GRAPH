@@ -147,6 +147,8 @@ class LogicExtractionOrchestrator:
                         signature.metadata["entity_type"] = entity.entity_type.value
                         signature.metadata["file_path"] = entity.location.file_path
                         signature.metadata["overall_confidence"] = version.overall_confidence
+                        signature.metadata["canonical_name"] = signature.canonical_name
+                        signature.metadata["language"] = signature.language.name
 
                         version.metadata["entity_seid"] = str(entity.seid.value)
                         version.metadata["line_start"] = entity.location.start_line
@@ -391,6 +393,8 @@ class LogicExtractionOrchestrator:
                                 signature.metadata["entity_type"] = entity.entity_type.value
                                 signature.metadata["file_path"] = entity.location.file_path
                                 signature.metadata["overall_confidence"] = version.overall_confidence
+                                signature.metadata["canonical_name"] = signature.canonical_name
+                                signature.metadata["language"] = signature.language.name
 
                                 version.metadata["entity_seid"] = str(entity.seid.value)
                                 version.metadata["line_start"] = entity.location.start_line
