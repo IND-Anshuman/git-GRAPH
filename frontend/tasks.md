@@ -1,8 +1,25 @@
-# Tasks: Software Intelligence Platform Stage 1
+# Tasks: Software Intelligence Platform
 
-## Task Summary
+## Status: Stage 1 Complete | Stage 2 Planning
 
-**Total Tasks:** 60+ implementation tasks across 14 phases | **Estimated Duration:** 40-50 hours | **Quality Level:** Production/God-level
+**Stage 1:** 60+ implementation tasks across 14 phases | **Status:** ✅ COMPLETE  
+**Stage 2:** Architecture Studio | **Status:** 📋 Planning
+
+---
+
+## STAGE 1: COMPLETE ✅
+
+### Task Summary
+
+**Total Tasks:** 60+ implementation tasks across 14 phases | **Duration:** 40-50 hours | **Quality:** Production/God-level | **Status:** ✅ ALL COMPLETE
+
+All 14 phases have been implemented with production-grade quality:
+- Next.js 16 + Turbopack
+- React 19 + TypeScript Strict
+- 60+ components fully operational
+- Three-tier architecture complete
+- All performance targets exceeded
+- WCAG AA compliance verified
 
 ---
 
@@ -138,24 +155,24 @@
 
 ---
 
-## Task Execution Checklist
+## Task Execution Checklist - Stage 1
 
-Use this to track progress:
+All tasks complete:
 
-- [ ] Phase 1: Bootstrap (Tasks 1.1-1.8)
-- [ ] Phase 2: API Integration (Tasks 2.1-2.6)
-- [ ] Phase 3: Zustand (Tasks 3.1-3.4)
-- [ ] Phase 4: Hooks (Tasks 4.1-4.7)
-- [ ] Phase 5: UI Components (Tasks 5.1-5.12)
-- [ ] Phase 6: Layout (Tasks 6.1-6.5)
-- [ ] Phase 7: Dashboard (Tasks 7.1-7.5)
-- [ ] Phase 8: Explorer (Tasks 8.1-8.8)
-- [ ] Phase 9: Search & Palette (Tasks 9.1-9.4)
-- [ ] Phase 10: Error Handling (Tasks 10.1-10.4)
-- [ ] Phase 11: Performance (Tasks 11.1-11.5)
-- [ ] Phase 12: Accessibility (Tasks 12.1-12.4)
-- [ ] Phase 13: Testing (Tasks 13.1-13.3)
-- [ ] Phase 14: Documentation (Tasks 14.1-14.3)
+- [✅] Phase 1: Bootstrap (Tasks 1.1-1.8)
+- [✅] Phase 2: API Integration (Tasks 2.1-2.6)
+- [✅] Phase 3: Zustand (Tasks 3.1-3.4)
+- [✅] Phase 4: Hooks (Tasks 4.1-4.7)
+- [✅] Phase 5: UI Components (Tasks 5.1-5.12)
+- [✅] Phase 6: Layout (Tasks 6.1-6.5)
+- [✅] Phase 7: Dashboard (Tasks 7.1-7.5)
+- [✅] Phase 8: Explorer (Tasks 8.1-8.8)
+- [✅] Phase 9: Search & Palette (Tasks 9.1-9.4)
+- [✅] Phase 10: Error Handling (Tasks 10.1-10.4)
+- [✅] Phase 11: Performance (Tasks 11.1-11.5)
+- [✅] Phase 12: Accessibility (Tasks 12.1-12.4)
+- [✅] Phase 13: Testing (Tasks 13.1-13.3)
+- [✅] Phase 14: Documentation (Tasks 14.1-14.3)
 
 ---
 
@@ -209,3 +226,161 @@ Every task maps to at least one requirement (Req 1-15) or design section (Design
 ## Next: Begin Implementation
 
 Review `/implementation-plan.md` for detailed task descriptions, then start Phase 1 (Bootstrap & Design System).
+
+---
+
+---
+
+# STAGE 2: Architecture Studio (PLANNING)
+
+## Overview
+
+Stage 2 adds interactive graph visualization for architecture exploration, dependency mapping, and pattern detection.
+
+**Status:** 📋 Planning  
+**Estimated Duration:** 12-17 days  
+**Total Tasks:** 20-25 tasks across 5 phases  
+**Complexity:** High
+
+---
+
+## Stage 2 Phase Overview (Preliminary)
+
+| Phase | Title | Tasks | Duration | Complexity |
+|-------|-------|-------|----------|-----------|
+| 2.1 | Graph Infrastructure | 4-5 | 2-3 days | High |
+| 2.2 | Architecture Graph Components | 5-6 | 3-4 days | High |
+| 2.3 | Dependency Visualization | 4-5 | 2-3 days | Medium-High |
+| 2.4 | Pattern Detection UI | 3-4 | 2-3 days | Medium |
+| 2.5 | Integration & Optimization | 4-5 | 3-4 days | Medium-High |
+| **TOTAL** | | **20-25** | **12-17 days** | **High** |
+
+---
+
+## Stage 2 Features (Proposed)
+
+### 1. Interactive Architecture Graph Visualization
+- React Flow canvas with pan/zoom controls
+- ELK.js automatic hierarchical layouts
+- D3-force physics simulations
+- Node clustering by architecture patterns
+- Multi-level graph navigation (drill-down/up)
+
+### 2. Dependency Explorer
+- Visual capability dependency graphs
+- Blast radius calculations with impact depth
+- Circular dependency detection & warnings
+- Bidirectional relationship mapping
+- Interactive node selection synced with Capability Explorer
+
+### 3. Pattern Detection & Visualization
+- Architecture pattern recognition (layered, microservices, event-driven, monolithic)
+- Anti-pattern detection (god objects, cyclic dependencies, tight coupling)
+- Boundary visualization (clear architectural layers)
+- Component cohesion/coupling metrics visualization
+
+### 4. New Routes & Integration Points
+- `/architecture` - Architecture Studio main page
+- Deep-linking from Stage 1 Dashboard dependency widgets
+- Capability detail tabs include "View in Architecture Graph" button
+- Synchronized selection state with Capability Navigator
+
+---
+
+## Stage 2 Technology Additions
+
+### New Dependencies
+- **reactflow** (^11.10.0) - Interactive graph nodes/edges, minimap, controls
+- **@elkjs/elk** (^0.9.0) - Hierarchical graph auto-layout algorithm
+- **d3-force** (^3.0.0) - Force-directed graph simulations
+- **@visx/visx** (^3.10.0) - Additional SVG data visualization primitives
+- **dagre** (^0.8.5) - Alternative directed graph layout (optional)
+
+### Integration with Stage 1
+- Extend Zustand stores: `architectureStore.ts` (selected nodes, graph filters, layout mode)
+- New TanStack Query hooks: `useArchitectureGraph`, `useDependencyTree`, `usePatternAnalysis`
+- New API endpoints: `GET /api/v1/architecture/graph`, `GET /api/v1/dependencies/tree`
+- Component reuse: Common atoms (Badge, Card, MetricCard) from Stage 1
+
+---
+
+## Stage 2 Preliminary Task List
+
+### Phase 2.1: Graph Infrastructure (4-5 tasks)
+- **2.1.1** Install React Flow, ELK.js, D3-Force dependencies
+- **2.1.2** Create `architectureStore.ts` Zustand store (selected nodes, layout mode, filters)
+- **2.1.3** Implement `useArchitectureGraph` hook with TanStack Query
+- **2.1.4** Create React Flow base canvas component with controls
+- **2.1.5** Integrate ELK.js layout engine with worker thread
+
+### Phase 2.2: Architecture Graph Components (5-6 tasks)
+- **2.2.1** Create custom node components (Capability, Entity, Concept nodes)
+- **2.2.2** Create custom edge components (Dependency, Relationship edges with labels)
+- **2.2.3** Implement node clustering algorithm by architecture pattern
+- **2.2.4** Add minimap, zoom controls, fit-view buttons
+- **2.2.5** Implement node selection & multi-select with keyboard shortcuts
+- **2.2.6** Add context menu for nodes (view details, expand dependencies, focus)
+
+### Phase 2.3: Dependency Visualization (4-5 tasks)
+- **2.3.1** Implement blast radius calculation & visualization
+- **2.3.2** Create circular dependency detector with warning highlights
+- **2.3.3** Build dependency depth visualization (color-coded layers)
+- **2.3.4** Add impact analysis panel (shows affected capabilities on node selection)
+- **2.3.5** Implement bidirectional relationship tracing
+
+### Phase 2.4: Pattern Detection UI (3-4 tasks)
+- **2.4.1** Create pattern detection card component (shows detected patterns)
+- **2.4.2** Implement anti-pattern highlight system (red borders, warning badges)
+- **2.4.3** Add boundary visualization overlay (architectural layers)
+- **2.4.4** Create pattern metrics dashboard widget
+
+### Phase 2.5: Integration & Optimization (4-5 tasks)
+- **2.5.1** Link Dashboard dependency widgets to Architecture Studio
+- **2.5.2** Add "View in Graph" button to Capability Detail Panel
+- **2.5.3** Synchronize selection state between Navigator and Graph
+- **2.5.4** Optimize graph rendering performance (virtualization, throttling)
+- **2.5.5** Add graph export functionality (PNG, SVG, JSON)
+
+---
+
+## Stage 2 Success Metrics (Preliminary)
+
+✅ Interactive graph with 1000+ nodes renders smoothly (≥30 FPS)  
+✅ Layout calculation completes <2s for 500 nodes  
+✅ Node selection syncs with Stage 1 Capability Navigator  
+✅ All patterns/anti-patterns detected correctly  
+✅ Blast radius calculations accurate  
+✅ Graph state persists across navigation  
+✅ WCAG AA compliance maintained  
+✅ No performance degradation to Stage 1 features  
+
+---
+
+## Stage 2 Next Steps
+
+1. **Create detailed requirements.md for Stage 2**
+   - Architecture graph requirements (15-20 new requirements)
+   - Integration requirements with Stage 1
+   - Performance requirements for graph rendering
+
+2. **Create design.md for Stage 2**
+   - React Flow component architecture
+   - ELK.js layout algorithm configuration
+   - Graph state management patterns
+   - API endpoint specifications
+
+3. **Finalize tasks.md for Stage 2**
+   - Break down 20-25 tasks with acceptance criteria
+   - Define task dependencies
+   - Estimate durations
+
+4. **Update implementation-plan.md**
+   - Add Stage 2 phase-by-phase breakdown
+   - Define integration checkpoints with Stage 1
+   - Create testing strategy for graph interactions
+
+---
+
+**Stage 1:** ✅ COMPLETE (All 60+ tasks)  
+**Stage 2:** 📋 PLANNING (20-25 tasks estimated)  
+**Next:** Create Stage 2 detailed specification documents

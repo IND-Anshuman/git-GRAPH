@@ -3575,3 +3575,563 @@ export default nextConfig
 | **Event bus for cross-stage communication** | Loose coupling, independent stage development | Stages can be developed/deployed separately |
 | **Plugin architecture** | Extensible without core modification | Future stages integrate cleanly |
 
+
+
+---
+
+---
+
+# STAGE 2: Architecture Studio Technical Design (PLANNING)
+
+## Status
+
+**Stage 1:** ✅ COMPLETE (All architecture components implemented)  
+**Stage 2:** 📋 PLANNING IN PROGRESS
+
+## Overview
+
+Stage 2 extends the Software Intelligence Platform with interactive graph visualization for architecture exploration, dependency mapping, and pattern detection using React Flow and ELK.js.
+
+**Integration Approach:** Non-breaking extension of Stage 1 architecture  
+**New Dependencies:** reactflow, @elkjs/elk, d3-force, @visx/visx  
+**Estimated Components:** 15-20 new components, 2-3 new stores, 5-7 new hooks
+
+---
+
+## Preliminary Architecture Design
+
+### Stage 2 Component Additions
+
+```
+AppShell (Stage 1 - no changes)
+├── MainContent
+│   ├── ArchitectureStudio (NEW - Stage 2)
+│   │   ├── ArchitectureCanvas (React Flow container)
+│   │   │   ├── CustomNodes (Capability, Entity, Concept nodes)
+│   │   │   ├── CustomEdges (Dependency, Relationship edges)
+│   │   │   ├── Controls (Zoom, Fit, Minimap, Layout selector)
+│   │   │   ├── Minimap (Overview of graph)
+│   │   │   └── ContextMenu (Node actions)
+│   │   ├── ImpactAnalysisPanel (Blast radius, dependencies)
+│   │   ├── PatternDetectionPanel (Detected patterns, anti-patterns)
+│   │   └── GraphToolbar (Layout mode, filters, export)
+│   ├── DashboardPage (Stage 1 - minor additions)
+│   │   └── DependencyGraphWidget (Add "View Graph" button)
+│   └── ExplorerPage (Stage 1 - minor additions)
+│       └── DetailPanel (Add "View in Graph" button to CapabilityTab)
+```
+
+### Stage 2 State Management Extensions
+
+**New Zustand Store:**
+```typescript
+// stores/architecture-store.ts
+interface ArchitectureState {
+  selectedNodeIds: Set<string>
+  layoutMode: 'hierarchical' | 'force' | 'radial'
+  graphFilters: {
+    showPatterns: boolean
+    showAntiPatterns: boolean
+    hideIsolatedNodes: boolean
+    depthFilter: number // 1-5+
+  }
+  viewportState: { x: number; y: number; zoom: number }
+  
+  // Actions
+  selectNode: (id: string) => void
+  selectMultiple: (ids: string[]) => void
+  deselectAll: () => void
+  setLayoutMode: (mode: LayoutMode) => void
+  updateFilters: (filters: Partial<GraphFilters>) => void
+  updateViewport: (viewport: ViewportState) => void
+  resetGraph: () => void
+}
+```
+
+**New TanStack Query Hooks:**
+```typescript
+// hooks/useArchitectureGraph.ts
+export function useArchitectureGraph(filters: GraphFilters) {
+  return useQuery({
+    queryKey: queryKeys.architecture.graph(filters),
+    queryFn: () => fetchArchitectureGraph(filters),
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  })
+}
+
+// hooks/useDependencyTree.ts
+export function useDependencyTree(capabilityId: string, direction: 'upstream' | 'downstream' | 'both') {
+  return useQuery({
+    queryKey: queryKeys.dependencies.tree(capabilityId, direction),
+    queryFn: () => fetchDependencyTree(capabilityId, direction),
+  })
+}
+
+// hooks/usePatternDetection.ts
+export function usePatternDetection(repositoryId: string) {
+  return useQuery({
+    queryKey: queryKeys.patterns.detect(repositoryId),
+    queryFn: () => fetchPatternDetection(repositoryId),
+    staleTime: 10 * 60 * 1000, // 10 minutes (patterns change infrequently)
+  })
+}
+```
+
+---
+
+## React Flow Architecture
+
+### Graph Node Types
+
+**Custom Node Components:**
+```typescript
+// components/architecture/nodes/CapabilityNode.tsx
+interface CapabilityNodeData {
+  id: string
+  name: string
+  type: CapabilityType
+  riskLevel: RiskLevel
+  dependencyCount: number
+  metrics: {
+    maturity: number
+    coverage: number
+    confidence: number
+  }
+}
+
+export function CapabilityNode({ data }: NodeProps<CapabilityNodeData>) {
+  const isSelected = useArchitectureStore(state => 
+    state.selectedNodeIds.has(data.id)
+  )
+  
+  return (
+    <motion.div
+      className={cn(
+        'capability-node',
+        isSelected && 'ring-2 ring-primary'
+      )}
+      whileHover={{ scale: 1.05 }}
+    >
+      <div className="node-header">
+        <RiskBadge level={data.riskLevel} size="sm" />
+        <span className="node-title">{data.name}</span>
+      </div>
+      <div className="node-metrics">
+        <MetricBar label="Maturity" value={data.metrics.maturity} />
+        <MetricBar label="Coverage" value={data.metrics.coverage} />
+      </div>
+      <Handle type="source" position={Position.Right} />
+      <Handle type="target" position={Position.Left} />
+    </motion.div>
+  )
+}
+```
+
+### Graph Edge Types
+
+**Custom Edge Components:**
+```typescript
+// components/architecture/edges/DependencyEdge.tsx
+interface DependencyEdgeData {
+  label: string
+  type: 'uses' | 'implements' | 'extends' | 'aggregates'
+  weight: number // 1-10
+  isCircular: boolean
+}
+
+export function DependencyEdge({
+  id,
+  sourceX,
+  sourceY,
+  targetX,
+  targetY,
+  data,
+}: EdgeProps<DependencyEdgeData>) {
+  const [edgePath, labelX, labelY] = getBezierPath({
+    sourceX,
+    sourceY,
+    targetX,
+    targetY,
+  })
+  
+  return (
+    <>
+      <path
+        id={id}
+        d={edgePath}
+        className={cn(
+          'dependency-edge',
+          data.isCircular && 'stroke-red-500 stroke-dasharray-4'
+        )}
+        strokeWidth={Math.max(1, data.weight / 2)}
+        markerEnd="url(#arrow)"
+      />
+      <EdgeLabelRenderer>
+        <div
+          style={{
+            position: 'absolute',
+            transform: `translate(-50%, -50%) translate(${labelX}px,${labelY}px)`,
+          }}
+          className="edge-label"
+        >
+          {data.label}
+        </div>
+      </EdgeLabelRenderer>
+    </>
+  )
+}
+```
+
+---
+
+## ELK.js Layout Integration
+
+### Layout Engine Setup
+
+```typescript
+// lib/graph-layout.ts
+import ELK from 'elkjs/lib/elk.bundled.js'
+
+const elk = new ELK()
+
+export async function calculateHierarchicalLayout(
+  nodes: Node[],
+  edges: Edge[],
+  options: ELKLayoutOptions = {}
+): Promise<{ nodes: Node[]; edges: Edge[] }> {
+  const elkGraph = {
+    id: 'root',
+    layoutOptions: {
+      'elk.algorithm': 'layered',
+      'elk.direction': options.direction || 'DOWN',
+      'elk.spacing.nodeNode': '80',
+      'elk.layered.spacing.nodeNodeBetweenLayers': '100',
+      ...options.layoutOptions,
+    },
+    children: nodes.map(node => ({
+      id: node.id,
+      width: node.width || 180,
+      height: node.height || 80,
+    })),
+    edges: edges.map(edge => ({
+      id: edge.id,
+      sources: [edge.source],
+      targets: [edge.target],
+    })),
+  }
+  
+  const layoutedGraph = await elk.layout(elkGraph)
+  
+  return {
+    nodes: nodes.map((node, index) => ({
+      ...node,
+      position: {
+        x: layoutedGraph.children![index].x!,
+        y: layoutedGraph.children![index].y!,
+      },
+    })),
+    edges,
+  }
+}
+
+// Run layout in Web Worker for non-blocking execution
+export function layoutGraphAsync(
+  nodes: Node[],
+  edges: Edge[],
+  mode: LayoutMode
+): Promise<LayoutResult> {
+  return new Promise((resolve) => {
+    const worker = new Worker(new URL('./layout.worker.ts', import.meta.url))
+    
+    worker.postMessage({ nodes, edges, mode })
+    
+    worker.onmessage = (e) => {
+      resolve(e.data)
+      worker.terminate()
+    }
+  })
+}
+```
+
+---
+
+## Performance Optimizations for Large Graphs
+
+### Node Virtualization Strategy
+
+```typescript
+// components/architecture/ArchitectureCanvas.tsx
+export function ArchitectureCanvas() {
+  const nodes = useArchitectureStore(state => state.nodes)
+  const [viewport, setViewport] = useState({ x: 0, y: 0, zoom: 1 })
+  
+  // Only render nodes within viewport + buffer
+  const visibleNodes = useMemo(() => {
+    const buffer = 200 // pixels
+    const viewportBounds = {
+      left: -viewport.x - buffer,
+      right: (-viewport.x + window.innerWidth) / viewport.zoom + buffer,
+      top: -viewport.y - buffer,
+      bottom: (-viewport.y + window.innerHeight) / viewport.zoom + buffer,
+    }
+    
+    return nodes.filter(node => 
+      node.position.x > viewportBounds.left &&
+      node.position.x < viewportBounds.right &&
+      node.position.y > viewportBounds.top &&
+      node.position.y < viewportBounds.bottom
+    )
+  }, [nodes, viewport])
+  
+  return (
+    <ReactFlow
+      nodes={visibleNodes}
+      onViewportChange={setViewport}
+      // ... other props
+    />
+  )
+}
+```
+
+### Throttled Updates
+
+```typescript
+// Debounce viewport updates to reduce re-renders
+const debouncedViewportUpdate = useMemo(
+  () => debounce((viewport: Viewport) => {
+    updateArchitectureStore({ viewportState: viewport })
+  }, 300),
+  []
+)
+```
+
+---
+
+## API Endpoint Extensions (Stage 2)
+
+### New Backend Endpoints Required
+
+```typescript
+// types/api.ts (Stage 2 additions)
+
+interface GraphNode {
+  id: string
+  type: 'capability' | 'entity' | 'concept'
+  label: string
+  data: CapabilityNodeData | EntityNodeData | ConceptNodeData
+  position?: { x: number; y: number }
+}
+
+interface GraphEdge {
+  id: string
+  source: string
+  target: string
+  type: 'dependency' | 'relationship'
+  data: DependencyEdgeData | RelationshipEdgeData
+}
+
+interface ArchitectureGraphResponse {
+  nodes: GraphNode[]
+  edges: GraphEdge[]
+  patterns: DetectedPattern[]
+  antiPatterns: AntiPattern[]
+  metrics: GraphMetrics
+}
+
+interface DetectedPattern {
+  id: string
+  type: 'layered' | 'microservices' | 'event-driven' | 'monolithic'
+  confidence: number
+  affectedNodeIds: string[]
+  description: string
+}
+
+interface AntiPattern {
+  id: string
+  type: 'god_object' | 'circular_dependency' | 'tight_coupling'
+  severity: 'low' | 'medium' | 'high' | 'critical'
+  affectedNodeIds: string[]
+  recommendation: string
+}
+
+// api/endpoints.ts (Stage 2 additions)
+export async function fetchArchitectureGraph(
+  filters: GraphFilters
+): Promise<ArchitectureGraphResponse> {
+  const params = new URLSearchParams({
+    capabilityIds: filters.capabilityIds?.join(',') || '',
+    depth: String(filters.depth || 3),
+    includePatterns: String(filters.includePatterns !== false),
+  })
+  
+  const response = await apiClient.get<ArchitectureGraphResponse>(
+    `/api/v1/architecture/graph?${params}`
+  )
+  return response.data
+}
+
+export async function fetchDependencyTree(
+  capabilityId: string,
+  direction: 'upstream' | 'downstream' | 'both'
+): Promise<DependencyTreeResponse> {
+  const response = await apiClient.get<DependencyTreeResponse>(
+    `/api/v1/dependencies/tree?capabilityId=${capabilityId}&direction=${direction}`
+  )
+  return response.data
+}
+
+export async function fetchPatternDetection(
+  repositoryId: string
+): Promise<PatternDetectionResponse> {
+  const response = await apiClient.get<PatternDetectionResponse>(
+    `/api/v1/patterns/detect?repositoryId=${repositoryId}`
+  )
+  return response.data
+}
+```
+
+---
+
+## Integration Points with Stage 1
+
+### 1. Dashboard Widget Integration
+
+```typescript
+// components/dashboard/DependencyGraphWidget.tsx (Stage 1 - add button)
+export function DependencyGraphWidget() {
+  const { data: dependencies } = useDependencies()
+  const router = useRouter()
+  
+  const viewInGraph = () => {
+    const ids = dependencies.slice(0, 5).map(d => d.id).join(',')
+    router.push(`/architecture?selected=${ids}`)
+  }
+  
+  return (
+    <Card>
+      <h3>Dependency Graph Summary</h3>
+      {/* existing content */}
+      <Button onClick={viewInGraph} variant="outline" className="mt-4">
+        View in Architecture Graph →
+      </Button>
+    </Card>
+  )
+}
+```
+
+### 2. Capability Detail Integration
+
+```typescript
+// components/explorer/tabs/CapabilityTab.tsx (Stage 1 - add button)
+export function CapabilityTab({ capability }: { capability: Capability }) {
+  const router = useRouter()
+  
+  const viewInGraph = () => {
+    router.push(`/architecture?selected=${capability.id}&focus=true`)
+  }
+  
+  return (
+    <div>
+      {/* existing content */}
+      <div className="mt-6">
+        <Button onClick={viewInGraph} variant="secondary">
+          <GraphIcon className="mr-2 h-4 w-4" />
+          View in Architecture Graph
+        </Button>
+      </div>
+    </div>
+  )
+}
+```
+
+### 3. Bidirectional Selection Sync
+
+```typescript
+// Sync selection between Navigator and Graph
+useEffect(() => {
+  const unsubscribe = useArchitectureStore.subscribe(
+    (state) => state.selectedNodeIds,
+    (selectedNodeIds) => {
+      // Update Capability Navigator when graph selection changes
+      if (selectedNodeIds.size === 1) {
+        const [selectedId] = selectedNodeIds
+        useUIStore.getState().setSelectedCapabilityId(selectedId)
+      }
+    }
+  )
+  
+  return unsubscribe
+}, [])
+```
+
+---
+
+## Stage 2 Correctness Properties (Preliminary)
+
+### Property 10: Graph Layout Calculation Performance
+
+**Specification:** Layout calculation for 500 nodes SHALL complete in <2 seconds without blocking the UI thread.
+
+**Invariant:**
+- Layout runs in Web Worker
+- Main thread remains responsive (<100ms tasks)
+- User can interact with UI during layout
+- Progress indicator shows calculation status
+
+### Property 11: Graph Rendering Performance ≥30 FPS
+
+**Specification:** Graph with 1000+ nodes SHALL maintain minimum 30 FPS during pan/zoom interactions.
+
+**Invariant:**
+- Only visible nodes rendered (viewport + buffer)
+- Throttled viewport updates (300ms debounce)
+- Memoized node/edge components
+- Hardware-accelerated transforms (CSS transform)
+
+### Property 12: Selection State Synchronization
+
+**Specification:** Selecting node in graph SHALL immediately update Navigator selection and vice versa with <100ms latency.
+
+**Invariant:**
+- Bidirectional Zustand subscription
+- No infinite loops
+- URL state updates on selection
+- Selection persists across page refreshes
+
+---
+
+## Next Steps for Stage 2 Design
+
+1. **Finalize component architecture**
+   - Detail all 15-20 new components
+   - Define prop interfaces
+   - Plan component hierarchy
+
+2. **Complete API specifications**
+   - Define all request/response types
+   - Document query parameters
+   - Plan error handling
+
+3. **Design graph algorithms**
+   - Blast radius calculation algorithm
+   - Circular dependency detection
+   - Pattern recognition heuristics
+   - Clustering algorithms
+
+4. **Performance testing strategy**
+   - Synthetic 1000+ node graphs
+   - FPS measurement tools
+   - Layout calculation benchmarks
+   - Memory profiling
+
+5. **Accessibility plan for graphs**
+   - Keyboard navigation in graph canvas
+   - Screen reader descriptions for nodes
+   - Alternative text-based views
+   - ARIA labels for graph interactions
+
+---
+
+**Stage 1 Design:** ✅ COMPLETE (All architecture patterns implemented)  
+**Stage 2 Design:** 📋 PLANNING (Preliminary architecture defined)  
+**Next:** Complete detailed Stage 2 design document with full component specifications

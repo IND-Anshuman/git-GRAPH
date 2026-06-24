@@ -633,3 +633,89 @@ frontend/
 | 14. Error Handling | Graceful fallbacks, user-friendly messages, retry logic, error logging |
 | 15. Design Tokens | Complete color palette, typography scale, spacing, shadows, motion |
 
+
+
+---
+
+---
+
+# STAGE 2: Architecture Studio Requirements (PLANNING)
+
+## Status
+
+**Stage 1:** ✅ COMPLETE (All 15 requirements implemented)  
+**Stage 2:** 📋 PLANNING IN PROGRESS
+
+## Overview
+
+Stage 2 extends the Software Intelligence Platform with interactive graph visualization capabilities for architecture exploration, dependency analysis, and pattern detection. This phase integrates React Flow and ELK.js to provide visual representations of software structure and relationships.
+
+## Preliminary Requirements (To be detailed)
+
+### Requirement 16: Interactive Architecture Graph Visualization (Draft)
+
+**User Story:** As a developer, I want to visualize software architecture as an interactive graph, so that I can understand component relationships and system structure at a glance.
+
+**Key Features:**
+- React Flow canvas with pan/zoom/fit controls
+- ELK.js hierarchical automatic layouts
+- D3-force physics-based layouts
+- Node clustering by architecture patterns
+- Multi-level navigation (drill-down/up)
+
+### Requirement 17: Dependency Explorer & Blast Radius (Draft)
+
+**User Story:** As a developer, I want to visualize capability dependencies and calculate blast radius, so that I can assess the impact of changes before making them.
+
+**Key Features:**
+- Visual dependency graph with directional edges
+- Blast radius calculation with impact depth visualization
+- Circular dependency detection and warnings
+- Bidirectional relationship tracing
+- Interactive node selection synced with Capability Navigator
+
+### Requirement 18: Pattern Detection & Visualization (Draft)
+
+**User Story:** As an architect, I want automated detection and visualization of architecture patterns and anti-patterns, so that I can assess code quality and identify areas for improvement.
+
+**Key Features:**
+- Architecture pattern recognition (layered, microservices, event-driven)
+- Anti-pattern detection (god objects, circular dependencies, tight coupling)
+- Visual boundary overlays for architectural layers
+- Pattern metrics dashboard widget
+
+### Requirement 19: Graph State Management & Persistence (Draft)
+
+**User Story:** As a user, I want my graph view preferences and selected nodes to persist, so that I can resume my analysis session seamlessly.
+
+**Key Features:**
+- Zustand store for graph state (selected nodes, layout mode, filters, viewport)
+- localStorage persistence for layout preferences
+- URL-based state sharing (selected node IDs, layout mode)
+- Synchronized selection between Graph and Navigator
+
+### Requirement 20: Graph Performance & Scalability (Draft)
+
+**User Story:** As a user, I want smooth graph interactions even with 1000+ nodes, so that large codebases remain explorable.
+
+**Key Features:**
+- Node virtualization for large graphs (>1000 nodes)
+- Layout calculation in Web Worker (non-blocking)
+- Throttled viewport updates (debounced 300ms)
+- Target: ≥30 FPS with 1000+ nodes
+
+---
+
+## Next Steps for Stage 2 Requirements
+
+1. Detail each preliminary requirement with EARS format
+2. Define acceptance criteria for all features
+3. Map requirements to design sections
+4. Validate with stakeholders
+5. Create property-based test specifications
+
+---
+
+**Stage 1 Requirements:** ✅ COMPLETE (15 requirements, all acceptance criteria met)  
+**Stage 2 Requirements:** 📋 PLANNING (5 preliminary requirements, to be detailed)  
+**Next:** Create comprehensive Stage 2 requirements with acceptance criteria
