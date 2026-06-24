@@ -23,7 +23,7 @@ export function useDebouncedCallback<T extends (...args: unknown[]) => unknown>(
 ): (...args: Parameters<T>) => void {
   const callbackRef = useRef(callback);
   callbackRef.current = callback;
-  const timerRef = useRef<ReturnType<typeof setTimeout>>();
+  const timerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   return useCallback(
     (...args: Parameters<T>) => {
