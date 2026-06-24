@@ -15,6 +15,11 @@ interface CommandPaletteState {
   close: () => void;
   toggle: () => void;
 
+  isSearchOpen: boolean;
+  openSearch: () => void;
+  closeSearch: () => void;
+  toggleSearch: () => void;
+
   recentCommands: CommandRecord[];
   recordCommandExecution: (id: string, label: string) => void;
   clearHistory: () => void;
@@ -27,6 +32,11 @@ export const useCommandPaletteStore = create<CommandPaletteState>()(
       open: () => set({ isOpen: true }),
       close: () => set({ isOpen: false }),
       toggle: () => set((s) => ({ isOpen: !s.isOpen })),
+
+      isSearchOpen: false,
+      openSearch: () => set({ isSearchOpen: true, isOpen: false }), // close palette when search opens
+      closeSearch: () => set({ isSearchOpen: false }),
+      toggleSearch: () => set((s) => ({ isSearchOpen: !s.isSearchOpen, isOpen: false })),
 
       recentCommands: [],
 
@@ -58,7 +68,9 @@ export const useCommandPaletteStore = create<CommandPaletteState>()(
       storage: createJSONStorage(() => {
         try { return localStorage; } catch { return sessionStorage; }
       }),
+      // Only persist recentCommands
       partialize: (s) => ({ recentCommands: s.recentCommands }),
     }
   )
 );
+
