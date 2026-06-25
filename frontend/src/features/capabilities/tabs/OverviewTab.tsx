@@ -49,7 +49,7 @@ export default function OverviewTab({ capabilityId }: OverviewTabProps) {
   return (
     <div className="flex flex-col gap-6 p-1 animate-fade-in">
       {/* Description Card */}
-      <div className="bg-sip-surface/40 border border-[var(--color-border)] rounded-lg p-5">
+      <div className="glass-card glow-hover p-5">
         <h4 className="text-xs font-semibold text-sip-text-tertiary uppercase tracking-wider mb-2">
           Description
         </h4>
@@ -58,21 +58,20 @@ export default function OverviewTab({ capabilityId }: OverviewTabProps) {
         </p>
       </div>
 
-      {/* Metrics Row */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="bg-sip-surface/40 border border-[var(--color-border)] rounded-lg p-4 flex flex-col items-center justify-center text-center gap-2">
+        <div className="glass-card glow-hover p-4 flex flex-col items-center justify-center text-center gap-2">
           <ScoreRing score={scoreToInt(capability.maturity_score)} size={60} strokeWidth={4} label="Maturity" />
           <span className="text-xs font-semibold text-sip-text-secondary">Maturity Score</span>
         </div>
-        <div className="bg-sip-surface/40 border border-[var(--color-border)] rounded-lg p-4 flex flex-col items-center justify-center text-center gap-2">
+        <div className="glass-card glow-hover p-4 flex flex-col items-center justify-center text-center gap-2">
           <ScoreRing score={scoreToInt(capability.risk_score)} size={60} strokeWidth={4} label="Risk" />
           <span className="text-xs font-semibold text-sip-text-secondary">Risk Score</span>
         </div>
-        <div className="bg-sip-surface/40 border border-[var(--color-border)] rounded-lg p-4 flex flex-col items-center justify-center text-center gap-2">
+        <div className="glass-card glow-hover p-4 flex flex-col items-center justify-center text-center gap-2">
           <ScoreRing score={scoreToInt(capability.coverage_score)} size={60} strokeWidth={4} label="Coverage" />
           <span className="text-xs font-semibold text-sip-text-secondary">Code Coverage</span>
         </div>
-        <div className="bg-sip-surface/40 border border-[var(--color-border)] rounded-lg p-4 flex flex-col items-center justify-center text-center gap-2">
+        <div className="glass-card glow-hover p-4 flex flex-col items-center justify-center text-center gap-2">
           <ScoreRing score={scoreToInt(capability.confidence)} size={60} strokeWidth={4} label="Confidence" />
           <span className="text-xs font-semibold text-sip-text-secondary">Model Confidence</span>
         </div>
@@ -81,7 +80,7 @@ export default function OverviewTab({ capabilityId }: OverviewTabProps) {
       {/* Expandable Sections */}
       <div className="flex flex-col gap-4">
         {/* Concepts */}
-        <div className="border border-[var(--color-border)] rounded-lg bg-sip-surface/20">
+        <div className="border border-[var(--color-border)]/60 rounded-lg glass-card bg-opacity-10 backdrop-blur-sm">
           <button
             onClick={() => setConceptsExpanded(!conceptsExpanded)}
             className="w-full flex items-center justify-between px-4 py-3 hover:bg-sip-surface/40 transition-colors rounded-t-lg"
@@ -113,7 +112,7 @@ export default function OverviewTab({ capabilityId }: OverviewTabProps) {
         </div>
 
         {/* Behaviors */}
-        <div className="border border-[var(--color-border)] rounded-lg bg-sip-surface/20">
+        <div className="border border-[var(--color-border)]/60 rounded-lg glass-card bg-opacity-10 backdrop-blur-sm">
           <button
             onClick={() => setBehaviorsExpanded(!behaviorsExpanded)}
             className="w-full flex items-center justify-between px-4 py-3 hover:bg-sip-surface/40 transition-colors rounded-t-lg"
@@ -145,7 +144,7 @@ export default function OverviewTab({ capabilityId }: OverviewTabProps) {
         </div>
 
         {/* Entities */}
-        <div className="border border-[var(--color-border)] rounded-lg bg-sip-surface/20">
+        <div className="border border-[var(--color-border)]/60 rounded-lg glass-card bg-opacity-10 backdrop-blur-sm">
           <button
             onClick={() => setEntitiesExpanded(!entitiesExpanded)}
             className="w-full flex items-center justify-between px-4 py-3 hover:bg-sip-surface/40 transition-colors rounded-t-lg"
@@ -178,7 +177,7 @@ export default function OverviewTab({ capabilityId }: OverviewTabProps) {
         </div>
 
         {/* Flows */}
-        <div className="border border-[var(--color-border)] rounded-lg bg-sip-surface/20">
+        <div className="border border-[var(--color-border)]/60 rounded-lg glass-card bg-opacity-10 backdrop-blur-sm">
           <button
             onClick={() => setFlowsExpanded(!flowsExpanded)}
             className="w-full flex items-center justify-between px-4 py-3 hover:bg-sip-surface/40 transition-colors rounded-t-lg"
@@ -211,7 +210,7 @@ export default function OverviewTab({ capabilityId }: OverviewTabProps) {
       </div>
 
       {/* Metadata Panel */}
-      <div className="bg-sip-surface/20 border border-[var(--color-border)] rounded-lg p-4 flex flex-wrap gap-x-8 gap-y-3 text-xs text-sip-text-secondary">
+      <div className="glass-card p-4 flex flex-wrap gap-x-8 gap-y-3 text-xs text-sip-text-secondary">
         <div className="flex items-center gap-2">
           <Calendar className="w-4 h-4 text-sip-text-tertiary" />
           <span>Discovered on: {formatDate(capability.created_at)}</span>

@@ -14,6 +14,7 @@ import {
   Bar,
   XAxis,
   YAxis,
+  Cell,
 } from 'recharts';
 import { useCapabilityHealth } from '@/hooks/useCapabilities';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
@@ -188,10 +189,7 @@ export default function HealthTab({ capabilityId }: HealthTabProps) {
                 />
                 <Bar dataKey="value" radius={[4, 4, 0, 0]}>
                   {barData.map((entry, index) => (
-                    <span key={index} style={{ display: 'none' }} />
-                  ))}
-                  {barData.map((entry, index) => (
-                    <Bar key={entry.name} dataKey="value" fill={entry.color} />
+                    <Cell key={`cell-${index}`} fill={entry.color} />
                   ))}
                 </Bar>
               </BarChart>

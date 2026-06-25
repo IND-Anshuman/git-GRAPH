@@ -12,6 +12,8 @@ import RiskBadge from '@/components/common/RiskBadge';
 import EmptyState from '@/components/common/EmptyState';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 
+import { motion, AnimatePresence } from 'framer-motion';
+
 // Lazy-loaded Tab content
 const OverviewTab = dynamic(() => import('./tabs/OverviewTab'), {
   loading: () => <TabLoader label="Overview" />,
@@ -132,10 +134,16 @@ export function CapabilityDetail() {
   return (
     <section
       aria-label="Capability details"
-      className="flex flex-col h-full bg-sip-bg-base overflow-hidden"
+      className="flex flex-col h-full rounded-[var(--radius-2xl)] overflow-hidden"
+      style={{
+        background: "rgba(20, 26, 42, 0.45)",
+        backdropFilter: "blur(16px)",
+        WebkitBackdropFilter: "blur(16px)",
+        border: "1px solid var(--color-border)",
+      }}
     >
       {/* Detail Header */}
-      <div className="border-b border-[var(--color-border)] p-6 bg-sip-surface shrink-0">
+      <div className="border-b border-[var(--color-border)]/60 p-6 bg-white/[0.015] shrink-0">
         <div className="flex flex-wrap items-start justify-between gap-4 mb-4">
           <div className="flex flex-col min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
@@ -183,8 +191,19 @@ export function CapabilityDetail() {
       </div>
 
       {/* Detail Tab Content Area */}
-      <div className="flex-1 overflow-y-auto p-6 bg-sip-bg-base">
-        {renderTabContent()}
+      <div className="flex-1 overflow-y-auto p-6 bg-transparent">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={activeTab}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
+            className="w-full h-full"
+          >
+            {renderTabContent()}
+          </motion.div>
+        </AnimatePresence>
       </div>
     </section>
   );
