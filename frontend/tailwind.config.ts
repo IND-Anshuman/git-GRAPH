@@ -34,10 +34,20 @@ const config: Config = {
           "text-tertiary": "var(--color-text-tertiary)",
           "text-muted": "var(--color-text-muted)",
         },
+        neon: {
+          blue: "#00F0FF",
+          purple: "#B026FF",
+          pink: "#FF10F0",
+          green: "#39FF14",
+          orange: "#FF6B35",
+        },
       },
       fontFamily: {
         sans: ["var(--font-sans)", "system-ui", "sans-serif"],
         mono: ["var(--font-mono)", "monospace"],
+        display: ["Orbitron", "var(--font-display)", "sans-serif"],
+        terminal: ["JetBrains Mono", "var(--font-terminal)", "monospace"],
+        cyber: ["Orbitron", "Rajdhani", "sans-serif"],
       },
       spacing: {
         "18": "4.5rem",
