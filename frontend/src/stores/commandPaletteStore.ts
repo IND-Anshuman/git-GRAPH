@@ -66,7 +66,14 @@ export const useCommandPaletteStore = create<CommandPaletteState>()(
     {
       name: "sip-command-palette-store",
       storage: createJSONStorage(() => {
-        try { return localStorage; } catch { return sessionStorage; }
+        if (typeof window !== "undefined") {
+          try { return localStorage; } catch { return sessionStorage; }
+        }
+        return {
+          getItem: () => null,
+          setItem: () => {},
+          removeItem: () => {},
+        };
       }),
       // Only persist recentCommands
       partialize: (s) => ({ recentCommands: s.recentCommands }),

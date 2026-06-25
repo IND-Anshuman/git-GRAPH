@@ -79,12 +79,19 @@ export const useUIStore = create<UIState>()(
       name: "sip-ui-store",
       storage: createJSONStorage(() => {
         // Graceful localStorage degradation (Requirement 14.6)
-        try {
-          return localStorage;
-        } catch {
-          console.warn("[UIStore] localStorage unavailable — session state not persisted");
-          return sessionStorage;
+        if (typeof window !== "undefined") {
+          try {
+            return localStorage;
+          } catch {
+            console.warn("[UIStore] localStorage unavailable — session state not persisted");
+            return sessionStorage;
+          }
         }
+        return {
+          getItem: () => null,
+          setItem: () => {},
+          removeItem: () => {},
+        };
       }),
       // Only persist these fields — the rest are session-only
       partialize: (state) => ({
