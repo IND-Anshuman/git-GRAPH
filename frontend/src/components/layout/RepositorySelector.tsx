@@ -20,8 +20,8 @@ export const RepositorySelector = React.memo<RepositorySelectorProps>(
           <button
             type="button"
             className={cn(
-              'flex items-center gap-2 h-9 px-3 rounded-[var(--radius-lg)]',
-              'bg-sip-surface border border-[var(--color-border)]',
+              'flex items-center gap-2 h-10 px-3.5 rounded-[var(--radius-xl)]',
+              'bg-[var(--color-bg-surface)]/90 border border-[var(--color-border)] shadow-[var(--shadow-sm)]',
               'text-sip-text-primary text-xs font-semibold select-none',
               'hover:bg-[var(--color-bg-surface-elevated)] hover:border-[var(--color-border-strong)]',
               'transition-all duration-150 ease-out',
@@ -42,8 +42,8 @@ export const RepositorySelector = React.memo<RepositorySelectorProps>(
             align="start"
             sideOffset={4}
             className={cn(
-              'z-[var(--z-dropdown)] min-w-[200px] max-w-[300px] p-1 rounded-[var(--radius-lg)]',
-              'bg-[#161A22] border border-[var(--color-border)] shadow-[var(--shadow-xl)]',
+              'z-[var(--z-dropdown)] min-w-[220px] max-w-[320px] p-1.5 rounded-[var(--radius-2xl)]',
+              'bg-[rgba(13,18,31,0.98)] border border-[var(--color-border)] shadow-[var(--shadow-xl)] backdrop-blur-xl',
               'animate-fade-in'
             )}
           >
@@ -63,7 +63,7 @@ export const RepositorySelector = React.memo<RepositorySelectorProps>(
                     key={repo.id}
                     onClick={() => onSelect(repo.id)}
                     className={cn(
-                      'flex items-center justify-between px-2 py-2 text-xs font-medium rounded-md cursor-pointer outline-none select-none',
+                      'flex items-center justify-between px-2.5 py-2.5 text-xs font-medium rounded-xl cursor-pointer outline-none select-none',
                       'text-sip-text-secondary hover:text-sip-text-primary hover:bg-[#222938]',
                       isSelected && 'text-[var(--color-primary)] bg-[var(--color-primary-muted)] hover:bg-[var(--color-primary-muted)]'
                     )}

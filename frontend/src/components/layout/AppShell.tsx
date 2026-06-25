@@ -23,17 +23,39 @@ export default function AppShell({ children }: AppShellProps) {
 
   const { data: repositories = [], isLoading, isError } = useRepositories();
 
-  // Auto-select first repository if none selected
+  // Auto-select first repository if none selected (prioritize one with files/entities)
   useEffect(() => {
-    if (repositories.length > 0 && !activeRepositoryId) {
-      setActiveRepositoryId(repositories[0].id);
+    if (repositories.length > 0) {
+      const exists = repositories.some((r) => r.id === activeRepositoryId);
+      if (!activeRepositoryId || !exists) {
+        // Sort repositories to prioritize those with higher entity_count or file_count
+        const bestRepo = [...repositories].sort((a, b) => {
+          const aCount = a.entity_count ?? 0;
+          const bCount = b.entity_count ?? 0;
+          if (bCount !== aCount) return bCount - aCount;
+          
+          const aFiles = a.file_count ?? 0;
+          const bFiles = b.file_count ?? 0;
+          return bFiles - aFiles;
+        })[0];
+        
+        setActiveRepositoryId(bestRepo.id);
+      }
     }
   }, [repositories, activeRepositoryId, setActiveRepositoryId]);
 
   const currentSidebarWidth = sidebarOpen ? 220 : 60;
 
   return (
-    <div className="min-h-screen bg-sip-bg-base text-sip-text-primary flex">
+    <div className="min-h-screen bg-sip-bg-base text-sip-text-primary flex relative overflow-hidden">
+      {/* Ambient background effects — cyber neon aurora */}
+      <div className="ambient-grid" />
+      <div className="ambient-aurora-blue" />
+      <div className="ambient-aurora-cyan" />
+      <div className="ambient-aurora-purple" />
+      {/* Subtle neon top vignette */}
+      <div className="pointer-events-none fixed inset-x-0 top-0 h-24 bg-gradient-to-b from-[rgba(0,240,255,0.04)] to-transparent" />
+
       {/* Skip to Main Content Link (Accessibility WCAG) */}
       <a
         href="#main-content"
@@ -47,7 +69,7 @@ export default function AppShell({ children }: AppShellProps) {
 
       {/* Main Layout Area */}
       <div
-        className="flex flex-col flex-1 min-w-0 transition-[padding-left] duration-300 ease-out"
+        className="flex flex-col flex-1 min-w-0 transition-[padding-left] duration-300 ease-in-out"
         style={{
           paddingLeft: `${currentSidebarWidth}px`,
           // Set dynamic custom variable for topbar left offset
@@ -64,27 +86,39 @@ export default function AppShell({ children }: AppShellProps) {
           tabIndex={-1}
         >
           {isLoading ? (
-            <div className="flex flex-col items-center justify-center min-h-[calc(100vh-var(--topbar-height))] gap-3">
-              <LoadingSpinner size="lg" />
-              <p className="text-xs text-sip-text-secondary tracking-wider font-mono">
+            <div className="flex flex-col items-center justify-center min-h-[calc(100vh-var(--topbar-height))] gap-4">
+              <div
+                className="rounded-full p-4"
+                style={{
+                  background: 'rgba(0,240,255,0.06)',
+                  border: '1px solid rgba(0,240,255,0.25)',
+                  boxShadow: '0 0 20px rgba(0,240,255,0.15)',
+                }}
+              >
+                <LoadingSpinner size="lg" />
+              </div>
+              <p
+                className="text-[11px] tracking-[0.28em] uppercase font-mono"
+                style={{ color: 'var(--neon-blue)', textShadow: '0 0 10px rgba(0,240,255,0.5)' }}
+              >
                 RESOLVING SEMANTIC LAYERS...
               </p>
             </div>
           ) : isError ? (
             <div className="flex flex-col items-center justify-center min-h-[calc(100vh-var(--topbar-height))] p-6 text-center">
-              <div className="p-3 bg-[var(--color-danger)]/10 text-[var(--color-danger)] rounded-full mb-4 border border-[var(--color-danger)]/20 animate-pulse">
-                ⚠️
+              <div className="mb-5 inline-flex h-14 w-14 items-center justify-center rounded-2xl border border-[var(--color-danger)]/20 bg-[var(--color-danger)]/10 text-[var(--color-danger)] shadow-[var(--shadow-lg)]">
+                !
               </div>
-              <h2 className="text-base font-bold text-sip-text-primary mb-1">
+              <h2 className="text-lg font-bold text-sip-text-primary mb-2">
                 Failed to Connect to Backend
               </h2>
-              <p className="text-xs text-sip-text-secondary max-w-sm mb-4">
-                Ensure the FastAPI application is running at <code className="font-mono text-sip-text-primary">http://localhost:8000/api/v1</code>.
+              <p className="text-sm text-sip-text-secondary max-w-md mb-5 leading-relaxed">
+                Ensure the FastAPI application is running at <code className="font-mono text-sip-text-primary">http://localhost:8000/api/v1</code> and try again.
               </p>
               <button
                 type="button"
                 onClick={() => window.location.reload()}
-                className="px-4 py-2 text-xs font-semibold rounded-md text-white bg-[var(--color-primary)] hover:bg-[var(--color-primary)]/90"
+                className="px-4 py-2 text-sm font-semibold rounded-xl text-[var(--color-text-inverse)] bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] shadow-[var(--shadow-glow)] transition-colors"
               >
                 Retry Connection
               </button>
