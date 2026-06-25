@@ -396,19 +396,154 @@ For questions or clarifications, reference the relevant sections in `design.md` 
 
 ---
 
+## Stage 1.5: UI Polish & Visual Enhancements (RECOMMENDED NEXT)
+
+### Overview
+
+Before Stage 2, a visual enhancement pass is recommended to elevate the UI from functional to visually stunning. This phase focuses on micro-interactions, advanced animations, and aesthetic refinements.
+
+### Proposed Visual Enhancements
+
+#### 1. **Advanced Animations & Micro-interactions**
+- **Glassmorphism effects** on cards and panels (backdrop-blur, semi-transparent backgrounds)
+- **Parallax scrolling** effects on Dashboard widgets
+- **Smooth page transitions** with advanced Framer Motion variants
+- **Hover effects** with glow, elevation, and color shifts
+- **Loading states** with skeleton shimmer animations
+- **Stagger animations** for list items and cards (cascade effect)
+- **Magnetic cursor** effects for interactive elements
+- **Ripple effects** on button clicks
+
+#### 2. **3D & Depth Visual Effects**
+- **3D card tilt** on hover (react-tilt or custom CSS transforms)
+- **Depth layers** with shadows and blur to create visual hierarchy
+- **Floating animations** for dashboard widgets (subtle y-axis movement)
+- **Perspective transforms** on capability cards
+- **Z-axis animations** for modal entrances
+
+#### 3. **Enhanced Color System & Gradients**
+- **Gradient accents** on primary elements (borders, backgrounds)
+- **Iridescent effects** on status badges (color shift on hover)
+- **Glow effects** with CSS filters and box-shadow
+- **Dynamic color themes** based on risk levels or health status
+- **Neon highlights** for interactive elements
+- **Aurora gradients** for background overlays
+
+#### 4. **Data Visualization Improvements**
+- **Animated charts** with entrance animations (Recharts customization)
+- **Progress rings** with smooth count-up animations (use react-spring)
+- **Sparklines** showing trend data in cards
+- **Mini-graphs** in capability cards (risk trends, health over time)
+- **Heatmaps** for activity visualization
+- **Animated metrics** with number count-up effects
+
+#### 5. **Typography & Content Presentation**
+- **Variable fonts** with weight animations on hover
+- **Text gradients** for headings and key metrics
+- **Typewriter effects** for loading states
+- **Letter spacing animations** on hover
+- **Glow text** for critical alerts
+
+#### 6. **Interactive Elements**
+- **Drag handles** with visual feedback
+- **Resize indicators** for split panels
+- **Pull-to-refresh** animations
+- **Swipe gestures** on mobile
+- **Long-press actions** with radial progress
+
+#### 7. **Ambient Background Effects**
+- **Animated mesh gradients** (subtle moving background)
+- **Particle effects** for celebratory moments (task completion)
+- **Grid patterns** with glow on hover
+- **Noise textures** for depth
+- **Subtle scanlines** for cyberpunk aesthetic
+
+### Implementation Approach
+
+**Phase 1.5 Tasks (15-20 tasks, 5-7 days):**
+
+1. **Animation System Overhaul**
+   - Upgrade Framer Motion animations with advanced variants
+   - Add react-spring for physics-based animations
+   - Implement custom easing curves
+
+2. **Visual Effects Library**
+   - Create reusable glassmorphism components
+   - Build 3D tilt wrapper component
+   - Design gradient system with CSS variables
+
+3. **Chart Enhancements**
+   - Animate Recharts components with custom transitions
+   - Add interactive tooltips with rich content
+   - Implement sparklines component
+
+4. **Card & Panel Redesign**
+   - Apply depth effects to all cards
+   - Add hover states with elevation
+   - Implement floating animations
+
+5. **Loading & Skeleton States**
+   - Replace basic skeletons with shimmer effects
+   - Add progress indicators with smooth animations
+   - Create branded loading spinner
+
+6. **Background & Ambient Effects**
+   - Implement animated mesh gradient background
+   - Add subtle grid overlay
+   - Create particle system for celebrations
+
+### Visual Inspiration References
+
+- **Vercel Dashboard** - Clean gradients, smooth transitions
+- **Linear App** - Micro-interactions, keyboard shortcuts, smooth animations
+- **Raycast** - Command palette UX, search interactions
+- **Stripe Dashboard** - Data visualization, charts, progressive disclosure
+- **GitHub Copilot** - Ambient effects, glow states
+- **Notion** - Drag interactions, hover states
+
+### Technology Additions (Stage 1.5)
+
+- **react-spring** (^9.7.0) - Physics-based animations
+- **react-tilt** (^1.0.0) - 3D card tilt effects
+- **@react-three/fiber** (optional, for 3D backgrounds)
+- **react-particle-image** (for particle effects)
+- **rough-notation** (for hand-drawn highlights)
+
+### Success Metrics (Stage 1.5)
+
+✅ All interactions feel fluid and responsive (≥60 FPS)  
+✅ Loading states engaging and on-brand  
+✅ Hover effects add delight without distraction  
+✅ Visual hierarchy clear with depth and color  
+✅ Animations respect prefers-reduced-motion  
+✅ Bundle size increase <50KB gzipped  
+✅ Lighthouse performance score remains >90  
+
+---
+
 ## Stage 2: Architecture Studio (PLANNING)
 
 ### Overview
 
-Stage 2 introduces interactive graph visualization capabilities for exploring software architecture, dependencies, and structural relationships using React Flow and ELK.js.
+Stage 2 introduces interactive **2D/3D graph visualization** capabilities for exploring software architecture, dependencies, and structural relationships using React Flow, ELK.js, and optionally Three.js/React Three Fiber for 3D knowledge graphs.
 
 ### Proposed Features
 
 1. **Interactive Architecture Graph Visualization**
-   - Force-directed graph layout using React Flow
+   - **2D Graph Mode:** Force-directed graph layout using React Flow
+   - **3D Knowledge Graph Mode:** Interactive 3D visualization using Three.js/React Three Fiber
    - ELK.js for automatic hierarchical layouts
    - D3-force for physics simulations
    - Node clustering by architecture patterns
+   - **VR/AR preview mode** (future consideration)
+
+2. **Advanced Visual Effects**
+   - **Node glow effects** based on health/risk
+   - **Edge animations** showing data flow direction
+   - **Pulse effects** for active dependencies
+   - **Particle trails** connecting related nodes
+   - **Ambient occlusion** in 3D mode for depth perception
+   - **Bloom effects** for highlighted nodes
 
 2. **Dependency Explorer**
    - Visualize capability dependency graphs
@@ -430,21 +565,33 @@ Stage 2 introduces interactive graph visualization capabilities for exploring so
 
 ### Technology Additions
 
-- **reactflow** (^11.x) - Interactive graph nodes/edges
+- **reactflow** (^11.x) - Interactive 2D graph nodes/edges
 - **@elkjs/elk** (^0.9.x) - Hierarchical graph layouts
 - **d3-force** (^3.x) - Force-directed simulations
 - **@visx/visx** (^3.x) - Additional data visualization primitives
+- **@react-three/fiber** (^8.x) - 3D knowledge graph rendering (optional)
+- **@react-three/drei** (^9.x) - 3D helpers and effects
+- **three** (^0.160.x) - WebGL 3D graphics library
+- **react-spring/three** (^9.x) - 3D animations
 
 ### Implementation Estimate
 
-**Duration:** 12-17 days (5 phases, 20-25 tasks)
+**Stage 1.5 (UI Polish):** 5-7 days (15-20 tasks)  
+**Stage 2 (Architecture Studio):** 12-17 days (5 phases, 20-25 tasks)
 
-**Phases:**
+**Stage 1.5 Phases:**
+1. Advanced Animations & Micro-interactions (3-4 days)
+2. Visual Effects & Glassmorphism (2-3 days)
+3. Chart & Data Visualization Upgrades (1-2 days)
+4. Background & Ambient Effects (1 day)
+
+**Stage 2 Phases:**
 1. Graph Infrastructure (React Flow setup, ELK integration)
-2. Architecture Graph Components (nodes, edges, controls)
-3. Dependency Visualization (blast radius, impact analysis)
-4. Pattern Detection UI (pattern cards, anti-pattern highlights)
-5. Integration & Polish (Stage 1 linking, performance optimization)
+2. 2D Architecture Graph Components (nodes, edges, controls)
+3. 3D Knowledge Graph (Three.js/React Three Fiber)
+4. Dependency Visualization (blast radius, impact analysis)
+5. Pattern Detection UI (pattern cards, anti-pattern highlights)
+6. Integration & Polish (Stage 1 linking, performance optimization)
 
 ### Next Steps for Stage 2
 
