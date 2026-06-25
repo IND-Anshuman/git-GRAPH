@@ -3,6 +3,8 @@
 import React, { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import AnimatedCounter from './AnimatedCounter';
+import { OrbitRing } from './OrbitRing';
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -17,6 +19,8 @@ interface ScoreRingProps {
   label?: string;
   /** Override the ring color with any valid CSS color string. */
   colorOverride?: string;
+  /** Show orbiting particle rings around the score. */
+  orbiting?: boolean;
   className?: string;
 }
 
@@ -41,6 +45,7 @@ const ScoreRing = React.memo<ScoreRingProps>(function ScoreRing({
   strokeWidth = 5,
   label,
   colorOverride,
+  orbiting = false,
   className,
 }) {
   const clampedScore = Math.max(0, Math.min(100, Math.round(score)));
@@ -70,6 +75,29 @@ const ScoreRing = React.memo<ScoreRingProps>(function ScoreRing({
       role="img"
       aria-label={ariaLabel}
     >
+      {/* Outer orbiting rings (optional) */}
+      {orbiting && (
+        <>
+          <OrbitRing
+            diameter={size + 28}
+            duration={8}
+            dots={2}
+            dotProps={{ size: 3, color: color, opacity: 0.9 }}
+            className="absolute"
+            style={{ top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}
+          />
+          <OrbitRing
+            diameter={size + 50}
+            duration={14}
+            dots={1}
+            reverse
+            dotProps={{ size: 2, color: '#B026FF', opacity: 0.7 }}
+            className="absolute"
+            style={{ top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}
+          />
+        </>
+      )}
+
       {/* SVG rotated so arc starts at 12 o'clock */}
       <svg
         width={size}
@@ -120,7 +148,7 @@ const ScoreRing = React.memo<ScoreRingProps>(function ScoreRing({
           userSelect: 'none',
         }}
       >
-        {clampedScore}
+        <AnimatedCounter value={clampedScore} />
       </span>
     </motion.div>
   );
