@@ -1,198 +1,133 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
-import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import { cn } from '@/lib/utils';
-
-// ─── Types ──────────────────────────────────────────────────────────────────
-
-interface TrendInfo {
-  direction: 'up' | 'down' | 'neutral';
-  label: string;
-}
+import SpotlightCard from './SpotlightCard';
+import AnimatedCounter from './AnimatedCounter';
 
 interface MetricCardProps {
   title: string;
   value: string | number;
   subtitle?: string;
   icon?: React.ReactNode;
-  trend?: TrendInfo;
+  trend?: {
+    direction: 'up' | 'down' | 'neutral';
+    label: string;
+  };
+  sparklineData?: number[]; // custom data to draw a premium sparkline SVG
   isLoading?: boolean;
   className?: string;
 }
 
-// ─── Sub-components ──────────────────────────────────────────────────────────
-
-function SkeletonBlock({ width, height, className }: { width?: string; height?: string; className?: string }) {
-  return (
-    <span
-      aria-hidden="true"
-      className={cn('skeleton block', className)}
-      style={{
-        width: width ?? '100%',
-        height: height ?? '1rem',
-        borderRadius: 'var(--radius-md)',
-        display: 'block',
-      }}
-    />
-  );
-}
-
-const TREND_CONFIG = {
-  up: {
-    Icon: TrendingUp,
-    color: 'var(--color-success)',
-    label: 'Trending up',
-  },
-  down: {
-    Icon: TrendingDown,
-    color: 'var(--color-danger)',
-    label: 'Trending down',
-  },
-  neutral: {
-    Icon: Minus,
-    color: 'var(--color-text-tertiary)',
-    label: 'No change',
-  },
-} as const;
-
-// ─── Component ───────────────────────────────────────────────────────────────
-
-const MetricCard = React.memo<MetricCardProps>(function MetricCard({
+export default function MetricCard({
   title,
   value,
   subtitle,
   icon,
   trend,
+  sparklineData,
   isLoading = false,
   className,
-}) {
-  return (
-    <motion.article
-      className={cn('surface-card relative flex flex-col gap-3 p-4 overflow-hidden', className)}
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.25, ease: [0, 0, 0.58, 1] }}
-      whileHover={
-        isLoading
-          ? undefined
-          : {
-              y: -2,
-              boxShadow: 'var(--shadow-lg)',
-              transition: { duration: 0.15, ease: [0, 0, 0.58, 1] },
-            }
-      }
-      aria-busy={isLoading}
-      aria-label={isLoading ? 'Loading metric' : `${title}: ${value}`}
-    >
-      {/* Header row: title + icon */}
-      <div className="flex items-start justify-between gap-2">
-        <span
-          style={{
-            fontSize: '0.75rem',
-            fontWeight: 500,
-            color: 'var(--color-text-secondary)',
-            textTransform: 'uppercase',
-            letterSpacing: '0.06em',
-            lineHeight: 1.3,
-          }}
-        >
-          {isLoading ? <SkeletonBlock width="60%" height="11px" /> : title}
-        </span>
+}: MetricCardProps) {
+  // Generate sparkline path if data is provided
+  const sparklinePath = React.useMemo(() => {
+    if (!sparklineData || sparklineData.length < 2) return '';
+    const width = 80;
+    const height = 24;
+    const padding = 2;
+    const min = Math.min(...sparklineData);
+    const max = Math.max(...sparklineData);
+    const range = max - min === 0 ? 1 : max - min;
 
+    const points = sparklineData.map((val, i) => {
+      const x = (i / (sparklineData.length - 1)) * (width - padding * 2) + padding;
+      const y = height - ((val - min) / range) * (height - padding * 2) - padding;
+      return `${x},${y}`;
+    });
+
+    return `M ${points.join(' L ')}`;
+  }, [sparklineData]);
+
+  const trendColor = trend
+    ? trend.direction === 'up'
+      ? 'text-[var(--color-success)]'
+      : trend.direction === 'down'
+      ? 'text-[var(--color-danger)]'
+      : 'text-[var(--color-text-tertiary)]'
+    : '';
+
+  return (
+    <SpotlightCard
+      className={cn('p-5 flex flex-col gap-3 min-h-[120px]', className)}
+      glowColor="rgba(0, 240, 255, 0.18)"
+      cornerBrackets
+    >
+      {/* Title & Icon */}
+      <div className="flex items-center justify-between gap-2 shrink-0">
+        <span className="text-[10px] font-bold uppercase tracking-[0.16em] text-[var(--color-text-tertiary)] font-mono leading-none">
+          {isLoading ? (
+            <span className="skeleton block h-3 w-20 rounded" />
+          ) : (
+            title
+          )}
+        </span>
         {!isLoading && icon && (
-          <span
-            aria-hidden="true"
-            className="flex-shrink-0 flex items-center justify-center"
-            style={{
-              width: 32,
-              height: 32,
-              borderRadius: 'var(--radius-lg)',
-              background: 'var(--color-bg-surface-elevated)',
-              border: '1px solid var(--color-border)',
-              color: 'var(--color-primary)',
-            }}
-          >
+          <span className="text-[var(--color-text-tertiary)] flex items-center justify-center shrink-0 w-5 h-5">
             {icon}
           </span>
         )}
       </div>
 
-      {/* Primary value */}
-      <div>
+      {/* Main Metric Value */}
+      <div className="flex items-baseline justify-between gap-4 mt-1">
         {isLoading ? (
-          <SkeletonBlock width="50%" height="28px" />
+          <span className="skeleton block h-9 w-24 rounded" />
         ) : (
-          <span
-            style={{
-              fontSize: '1.625rem',
-              fontWeight: 700,
-              color: 'var(--color-text-primary)',
-              lineHeight: 1.1,
-              letterSpacing: '-0.025em',
-              fontFamily: 'var(--font-mono)',
-            }}
-          >
-            {value}
+          <span className="text-3xl font-extrabold tracking-tight text-[var(--color-text-primary)] font-mono tabular-nums leading-none">
+            {typeof value === 'number' ? <AnimatedCounter value={value} /> : value}
           </span>
+        )}
+
+        {/* Sparkline (if provided) */}
+        {!isLoading && sparklinePath && (
+          <svg className="w-20 h-6 shrink-0 overflow-visible" aria-hidden="true">
+            <path
+              d={sparklinePath}
+              fill="none"
+              stroke="var(--color-primary)"
+              strokeWidth={1.5}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="opacity-75"
+              style={{
+                filter: 'drop-shadow(0 0 2px rgba(79, 140, 255, 0.3))',
+              }}
+            />
+          </svg>
         )}
       </div>
 
-      {/* Footer row: subtitle + trend */}
-      <div className="flex items-center justify-between gap-2 mt-auto">
+      {/* Subtitle & Trend */}
+      <div className="flex items-center justify-between gap-2 mt-auto text-[10px] font-medium leading-none">
         {isLoading ? (
-          <SkeletonBlock width="70%" height="11px" />
+          <span className="skeleton block h-2.5 w-32 rounded" />
         ) : (
           <>
             {subtitle && (
-              <span
-                style={{
-                  fontSize: '0.6875rem',
-                  color: 'var(--color-text-tertiary)',
-                  lineHeight: 1.4,
-                }}
-              >
+              <span className="text-[var(--color-text-tertiary)] truncate">
                 {subtitle}
               </span>
             )}
-
             {trend && (
-              <TrendIndicator trend={trend} />
+              <span className={cn('font-mono shrink-0 flex items-center gap-0.5', trendColor)}>
+                {trend.direction === 'up' && '↑'}
+                {trend.direction === 'down' && '↓'}
+                {trend.label}
+              </span>
             )}
           </>
         )}
       </div>
-    </motion.article>
+    </SpotlightCard>
   );
-});
-
-MetricCard.displayName = 'MetricCard';
-
-// ─── Trend Indicator ─────────────────────────────────────────────────────────
-
-const TrendIndicator = React.memo<{ trend: TrendInfo }>(function TrendIndicator({ trend }) {
-  const config = TREND_CONFIG[trend.direction];
-  const { Icon } = config;
-
-  return (
-    <span
-      className="inline-flex items-center gap-1 flex-shrink-0"
-      aria-label={`${config.label}: ${trend.label}`}
-      style={{
-        fontSize: '0.6875rem',
-        fontWeight: 500,
-        color: config.color,
-        lineHeight: 1,
-      }}
-    >
-      <Icon size={12} aria-hidden="true" />
-      {trend.label}
-    </span>
-  );
-});
-
-TrendIndicator.displayName = 'TrendIndicator';
-
-export default MetricCard;
-export type { MetricCardProps, TrendInfo };
+}
