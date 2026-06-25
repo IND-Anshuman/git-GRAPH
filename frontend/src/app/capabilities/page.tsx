@@ -10,9 +10,8 @@ export default function CapabilitiesPage() {
   return (
     <AppShell>
       <div
-        className="flex w-full overflow-hidden"
+        className="max-w-[1600px] mx-auto w-full h-[calc(100vh-var(--topbar-height))] px-6 sm:px-8 py-6 flex gap-6 overflow-hidden"
         style={{
-          height: 'calc(100vh - var(--topbar-height))',
           ['--navigator-width' as any]: '320px', // set navigator width variable consumed by CapabilityNavigator
         }}
       >

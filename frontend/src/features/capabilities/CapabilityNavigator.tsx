@@ -1,9 +1,7 @@
 "use client";
 
 import React, { useState, useMemo, useCallback, useRef } from "react";
-import * as ReactWindow from "react-window";
-
-const FixedSizeList = ((ReactWindow as any).FixedSizeList || (ReactWindow as any).default?.FixedSizeList) as any;
+import { List } from "react-window";
 import Fuse from "fuse.js";
 import { Search, X, SlidersHorizontal, ChevronDown, ChevronUp } from "lucide-react";
 
@@ -162,30 +160,32 @@ export function CapabilityNavigator() {
   return (
     <aside
       aria-label="Capability navigator"
-      className="flex flex-col h-full"
+      className="flex flex-col h-full rounded-[var(--radius-2xl)] overflow-hidden"
       style={{
-        background: "var(--color-bg-surface)",
-        borderRight: "1px solid var(--color-border)",
+        background: "rgba(20, 26, 42, 0.45)",
+        backdropFilter: "blur(16px)",
+        WebkitBackdropFilter: "blur(16px)",
+        border: "1px solid var(--color-border)",
         width: "var(--navigator-width)",
         minWidth: "var(--navigator-width)",
       }}
     >
       {/* ── Header ─────────────────────────────────────────────────────────── */}
       <div
-        className="flex flex-col gap-2 px-3 py-3 shrink-0"
+        className="flex flex-col gap-3 px-4 py-4 shrink-0"
         style={{ borderBottom: "1px solid var(--color-border)" }}
       >
         {/* Search row */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2.5">
           <div
-            className="flex items-center flex-1 gap-2 px-2 rounded"
+            className="flex items-center flex-1 gap-2 px-3 rounded-md"
             style={{
               background: "var(--color-bg-base)",
               border: "1px solid var(--color-border)",
-              height: 34,
+              height: 38,
             }}
           >
-            <Search size={13} style={{ color: "var(--color-text-muted)", flexShrink: 0 }} aria-hidden />
+            <Search size={14} style={{ color: "var(--color-text-muted)", flexShrink: 0 }} aria-hidden />
             <input
               ref={searchInputRef}
               type="search"
@@ -213,10 +213,10 @@ export function CapabilityNavigator() {
             onClick={toggleFilterPanel}
             aria-expanded={filterPanelOpen}
             aria-label={`Filters${activeFilterCount > 0 ? `, ${activeFilterCount} active` : ""}`}
-            className="relative flex items-center justify-center rounded transition-colors"
+            className="relative flex items-center justify-center rounded-md transition-colors"
             style={{
-              width: 34,
-              height: 34,
+              width: 38,
+              height: 38,
               background: filterPanelOpen ? "var(--color-primary-muted)" : "var(--color-bg-base)",
               border: `1px solid ${filterPanelOpen ? "var(--color-primary)" : "var(--color-border)"}`,
               color: filterPanelOpen ? "var(--color-primary)" : "var(--color-text-secondary)",
@@ -360,7 +360,7 @@ export function CapabilityNavigator() {
   );
 }
 
-// ─── AutoSizedList — wraps FixedSizeList with container height measurement ────
+// ─── AutoSizedList — wraps List with container height measurement ────
 function AutoSizedList({
   items,
   VirtualRow,
@@ -368,7 +368,7 @@ function AutoSizedList({
   items: Capability[];
   selectedId: string | null;
   setSelectedId: (id: string | null) => void;
-  VirtualRow: React.ComponentType<{ index: number; style: React.CSSProperties }>;
+  VirtualRow: (props: { index: number; style: React.CSSProperties }) => React.ReactElement | null;
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [height, setHeight] = useState(600);
@@ -386,15 +386,14 @@ function AutoSizedList({
 
   return (
     <div ref={containerRef} style={{ height: "100%", overflow: "hidden" }}>
-      <FixedSizeList
-        height={height}
-        itemCount={items.length}
-        itemSize={72}
-        width="100%"
+      <List
+        style={{ height }}
+        rowCount={items.length}
+        rowHeight={72}
+        rowComponent={VirtualRow as any}
+        rowProps={{}}
         overscanCount={5}
-      >
-        {VirtualRow}
-      </FixedSizeList>
+      />
     </div>
   );
 }

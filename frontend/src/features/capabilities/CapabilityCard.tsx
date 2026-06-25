@@ -65,12 +65,12 @@ export const CapabilityCard = memo(function CapabilityCard({
         }
       }}
       className={cn(
-        "relative flex flex-col justify-center gap-1 px-3 cursor-pointer select-none",
+        "relative flex flex-col justify-center gap-1 px-4 cursor-pointer select-none",
         "border-b transition-colors duration-150",
         "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--color-primary)]",
         isSelected
-          ? "bg-[var(--color-bg-surface-elevated)] border-b-[var(--color-border)]"
-          : "bg-[var(--color-bg-surface)] hover:bg-[var(--color-bg-surface-elevated)] border-b-[var(--color-border-subtle)]"
+          ? "bg-white/[0.04] border-b-[var(--color-border)]"
+          : "bg-transparent hover:bg-white/[0.02] border-b-[var(--color-border-subtle)]"
       )}
       style={{
         ...style,
