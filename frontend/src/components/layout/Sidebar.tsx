@@ -43,11 +43,9 @@ type NavItem = (typeof NAV_ITEMS)[number];
 const SIDEBAR_EXPANDED_WIDTH = 220;
 const SIDEBAR_COLLAPSED_WIDTH = 60;
 
-const SPRING = {
-  type: "spring" as const,
-  stiffness: 400,
-  damping: 35,
-  mass: 0.8,
+const EASE_IN_OUT = {
+  duration: 0.3,
+  ease: [0.4, 0, 0.2, 1] as const,
 };
 
 // ─── NavItemIcon ──────────────────────────────────────────────────────────────
@@ -72,7 +70,7 @@ const ComingSoonBadge = memo(function ComingSoonBadge() {
     <span
       className={cn(
         "inline-flex items-center shrink-0",
-        "px-1.5 py-0.5 rounded",
+        "px-1.5 py-0.5 rounded-full",
         "text-[9px] font-semibold leading-none tracking-wide uppercase",
         "bg-[var(--color-bg-surface-elevated)] text-[var(--color-text-muted)]",
         "border border-[var(--color-border)]",
@@ -103,18 +101,18 @@ const NavItemButton = memo(function NavItemButton({
     <span
       className={cn(
         "group relative flex items-center gap-3 w-full",
-        "px-3 py-2.5 rounded-[var(--radius-lg)]",
+        "px-3 py-2.5 rounded-[var(--radius-xl)]",
         "text-sm font-medium",
         "transition-all duration-150 ease-out",
         "outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-1 focus-visible:ring-offset-[var(--color-bg-surface)]",
         isActive && !isDisabled && [
-          "bg-[var(--color-primary-muted)]",
-          "text-[var(--color-primary)]",
-          "shadow-[inset_0_0_0_1px_var(--color-primary-muted)]",
+          "bg-[rgba(0,240,255,0.08)]",
+          "text-[var(--neon-blue)]",
+          "shadow-[inset_0_0_0_1px_rgba(0,240,255,0.15),0_0_12px_rgba(0,240,255,0.08)]",
         ],
         !isActive && !isDisabled && [
           "text-[var(--color-text-secondary)]",
-          "hover:bg-[var(--color-bg-surface-elevated)]",
+          "hover:bg-[rgba(0,240,255,0.05)]",
           "hover:text-[var(--color-text-primary)]",
         ],
         isDisabled && [
@@ -125,10 +123,14 @@ const NavItemButton = memo(function NavItemButton({
       )}
       aria-current={isActive && !isDisabled ? "page" : undefined}
     >
-      {/* Active indicator bar */}
+      {/* Active indicator bar — neon glow line */}
       {isActive && !isDisabled && isExpanded && (
         <span
-          className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 rounded-full bg-[var(--color-primary)]"
+          className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 rounded-full"
+          style={{
+            background: 'var(--neon-blue)',
+            boxShadow: '0 0 8px var(--neon-blue), 0 0 16px rgba(0,240,255,0.5)',
+          }}
           aria-hidden="true"
         />
       )}
@@ -138,8 +140,8 @@ const NavItemButton = memo(function NavItemButton({
         className={cn(
           "shrink-0 transition-colors duration-150",
           isActive && !isDisabled
-            ? "text-[var(--color-primary)]"
-            : "text-[var(--color-text-tertiary)] group-hover:text-[var(--color-text-secondary)]",
+            ? "text-[var(--neon-blue)]"
+            : "text-[var(--color-text-tertiary)] group-hover:text-[var(--neon-blue)]",
           isDisabled && "text-[var(--color-text-muted)]",
         )}
       />
@@ -228,7 +230,7 @@ const TooltipNavItem = memo(function TooltipNavItem({
               "z-[var(--z-tooltip)]",
               "flex items-center gap-2",
               "px-3 py-1.5 rounded-[var(--radius-lg)]",
-              "bg-[var(--color-bg-surface-elevated)] border border-[var(--color-border)]",
+              "bg-[var(--color-bg-surface-elevated)] border border-[var(--color-border)] shadow-[var(--shadow-lg)]",
               "text-xs font-medium text-[var(--color-text-primary)]",
               "shadow-[var(--shadow-lg)]",
               "select-none",
@@ -277,15 +279,18 @@ export const Sidebar = memo(function Sidebar() {
   return (
     <motion.aside
       animate={{ width: sidebarWidth }}
-      transition={SPRING}
+      transition={EASE_IN_OUT}
       className={cn(
         "fixed left-0 top-0 bottom-0 z-[var(--z-sticky)]",
         "flex flex-col",
-        "bg-[var(--color-bg-surface)]",
-        "border-r border-[var(--color-border)]",
+        "bg-[rgba(5,5,16,0.75)] backdrop-blur-xl",
+        "border-r border-[rgba(0,240,255,0.12)]",
         "overflow-hidden",
       )}
-      style={{ width: sidebarWidth }}
+      style={{
+        width: sidebarWidth,
+        boxShadow: '4px 0 32px rgba(0,240,255,0.04)',
+      }}
       aria-label="Main navigation"
     >
       {/* ── Logo ─────────────────────────────────────────────────────── */}
@@ -300,14 +305,19 @@ export const Sidebar = memo(function Sidebar() {
         <span
           className={cn(
             "flex items-center justify-center shrink-0",
-            "w-7 h-7 rounded-[var(--radius-lg)]",
-            "bg-[var(--color-primary-muted)]",
+            "w-8 h-8 rounded-[var(--radius-xl)]",
+            "bg-[rgba(0,240,255,0.08)]",
           )}
+          style={{
+            border: '1px solid rgba(0,240,255,0.25)',
+            boxShadow: '0 0 12px rgba(0,240,255,0.15), inset 0 0 8px rgba(0,240,255,0.05)',
+          }}
           aria-hidden="true"
         >
           <Code2
             size={16}
-            className="text-[var(--color-primary)]"
+            className="text-[var(--neon-blue)]"
+            style={{ filter: 'drop-shadow(0 0 4px rgba(0,240,255,0.8))' }}
             aria-hidden="true"
           />
         </span>
@@ -398,7 +408,7 @@ export const Sidebar = memo(function Sidebar() {
           aria-expanded={sidebarOpen}
           className={cn(
             "flex items-center justify-center",
-            "w-8 h-8 rounded-[var(--radius-lg)]",
+            "w-9 h-9 rounded-[var(--radius-xl)]",
             "text-[var(--color-text-tertiary)]",
             "hover:bg-[var(--color-bg-surface-elevated)]",
             "hover:text-[var(--color-text-secondary)]",
