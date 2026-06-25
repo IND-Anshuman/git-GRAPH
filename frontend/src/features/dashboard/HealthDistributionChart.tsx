@@ -2,7 +2,6 @@
 
 import React from 'react';
 import { PieChart as PieIcon, ShieldAlert } from 'lucide-react';
-import { motion } from 'framer-motion';
 import {
   ResponsiveContainer,
   PieChart,
@@ -14,6 +13,7 @@ import {
 import type { Capability } from '@/types/platform';
 import { CHART_COLORS } from '@/lib/constants';
 import ErrorBoundary from '@/components/common/ErrorBoundary';
+import SpotlightCard from '@/components/common/SpotlightCard';
 
 interface HealthDistributionChartProps {
   capabilities: Capability[] | undefined;
@@ -27,6 +27,29 @@ const TYPE_LABELS: Record<string, string> = {
   INFRASTRUCTURE: 'Infrastructure',
   SECURITY: 'Security',
   INTEGRATION: 'Integration',
+};
+
+const CustomTooltip = ({ active, payload }: any) => {
+  if (active && payload && payload.length) {
+    const data = payload[0];
+    return (
+      <div className="glass-card-elevated p-2.5 shadow-2xl border border-white/10 rounded-xl text-xs font-mono">
+        <div className="flex items-center gap-2 mb-1">
+          <span
+            className="w-2 h-2 rounded-full"
+            style={{
+              backgroundColor: data.payload.color || data.color || 'var(--color-primary)',
+            }}
+          />
+          <span className="text-sip-text-primary font-bold">{data.name}</span>
+        </div>
+        <div className="text-sip-text-secondary">
+          Count: <span className="text-white font-extrabold">{data.value}</span>
+        </div>
+      </div>
+    );
+  }
+  return null;
 };
 
 function HealthDistributionInner({ capabilities = [], isLoading }: HealthDistributionChartProps) {
@@ -49,7 +72,7 @@ function HealthDistributionInner({ capabilities = [], isLoading }: HealthDistrib
 
   if (isLoading) {
     return (
-      <div className="bg-sip-surface border border-[var(--color-border)] rounded-lg p-5 flex flex-col justify-between h-[300px]">
+      <div className="glass-card p-5 flex flex-col justify-between h-[320px]">
         {/* Header Skeleton */}
         <div className="flex items-center gap-2 mb-4 border-b border-[var(--color-border)] pb-3">
           <PieIcon className="w-4 h-4 text-sip-text-tertiary" />
@@ -66,11 +89,12 @@ function HealthDistributionInner({ capabilities = [], isLoading }: HealthDistrib
   const showEmpty = chartData.length === 0;
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
+    <SpotlightCard
+      initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3, delay: 0.2 }}
-      className="bg-sip-surface border border-[var(--color-border)] rounded-lg p-5 flex flex-col h-[300px]"
+      transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1], delay: 0.24 }}
+      glowColor="rgba(124, 140, 255, 0.15)"
+      className="p-5 flex flex-col h-[320px]"
     >
       {/* Header */}
       <div className="flex items-center justify-between mb-4 border-b border-[var(--color-border)] pb-3 shrink-0">
@@ -114,19 +138,7 @@ function HealthDistributionInner({ capabilities = [], isLoading }: HealthDistrib
                   />
                 ))}
               </Pie>
-              <Tooltip
-                contentStyle={{
-                  backgroundColor: '#161A22',
-                  borderColor: 'var(--color-border)',
-                  borderRadius: 'var(--radius-lg)',
-                }}
-                itemStyle={{
-                  color: 'var(--color-text-primary)',
-                  fontSize: '11px',
-                  fontFamily: 'var(--font-mono)',
-                }}
-                labelStyle={{ display: 'none' }}
-              />
+              <Tooltip content={<CustomTooltip />} />
               <Legend
                 verticalAlign="bottom"
                 height={36}
@@ -142,7 +154,7 @@ function HealthDistributionInner({ capabilities = [], isLoading }: HealthDistrib
           </ResponsiveContainer>
         )}
       </div>
-    </motion.div>
+    </SpotlightCard>
   );
 }
 
