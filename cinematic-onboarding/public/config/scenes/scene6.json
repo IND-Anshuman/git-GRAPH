@@ -1,0 +1,293 @@
+{
+  "sceneNumber": 6,
+  "name": "Rings of Decisions",
+  "progressRange": [0.83, 1.0],
+  "camera": {
+    "keyframes": [
+      {
+        "progress": 0.0,
+        "position": [0, 40, 110],
+        "rotation": [0, 0, 0],
+        "fov": 75,
+        "easing": "easeInOut"
+      },
+      {
+        "progress": 0.5,
+        "position": [40, 30, 90],
+        "rotation": [0, 0, 0],
+        "fov": 75,
+        "easing": "linear"
+      },
+      {
+        "progress": 1.0,
+        "position": [-30, 35, 85],
+        "rotation": [0, 0, 0],
+        "fov": 70,
+        "easing": "easeInOut"
+      }
+    ],
+    "lookAtTarget": [0, 5, -10]
+  },
+  "particles": {
+    "enabled": true,
+    "count": {
+      "ultra": 800,
+      "high": 600,
+      "medium": 400,
+      "low": 150
+    },
+    "geometry": {
+      "type": "sphere",
+      "size": 0.15,
+      "segments": 8
+    },
+    "material": {
+      "color": "#90caf9",
+      "opacity": 0.3,
+      "transparent": true
+    },
+    "behavior": {
+      "animation": "drift",
+      "drift": {
+        "velocity": [
+          [-2, -1, -2],
+          [2, 1, 2]
+        ],
+        "turbulence": 0.5
+      }
+    }
+  },
+  "rings": [
+    {
+      "planetId": "planet-auth",
+      "innerRadius": 13.0,
+      "outerRadius": 15.0,
+      "rotationSpeed": 0.2,
+      "rotationAxis": [0.1, 0.98, 0.15],
+      "decisionNodes": [
+        {
+          "id": "adr-auth-jwt",
+          "anglePosition": 0.8,
+          "distanceFromCenter": 14.0,
+          "status": "accepted",
+          "metadata": {
+            "type": "decision",
+            "title": "ADR-04: JWT Sessions",
+            "description": "Adopt JWT token verification for microservice routing.",
+            "details": {
+              "Status": "Accepted",
+              "Decided Date": "2026-04-12",
+              "Impact": "High"
+            }
+          }
+        },
+        {
+          "id": "adr-auth-session",
+          "anglePosition": 3.5,
+          "distanceFromCenter": 14.0,
+          "status": "deprecated",
+          "metadata": {
+            "type": "decision",
+            "title": "ADR-01: Stateful Sessions",
+            "description": "Deprecated cookie-based session state stored in DB.",
+            "details": {
+              "Status": "Deprecated",
+              "Decided Date": "2024-02-15",
+              "Replacement": "ADR-04"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "planetId": "planet-data",
+      "innerRadius": 10.5,
+      "outerRadius": 12.5,
+      "rotationSpeed": -0.15,
+      "rotationAxis": [0.05, 0.95, 0.3],
+      "decisionNodes": [
+        {
+          "id": "adr-data-parquet",
+          "anglePosition": 1.5,
+          "distanceFromCenter": 11.5,
+          "status": "accepted",
+          "metadata": {
+            "type": "decision",
+            "title": "ADR-07: Parquet Lakehouse",
+            "description": "Adopt Apache Parquet format for serverless analytics storage.",
+            "details": {
+              "Status": "Accepted",
+              "Decided Date": "2026-05-20",
+              "Storage Savings": "65%"
+            }
+          }
+        },
+        {
+          "id": "adr-data-avro",
+          "anglePosition": 4.8,
+          "distanceFromCenter": 11.5,
+          "status": "superseded",
+          "metadata": {
+            "type": "decision",
+            "title": "ADR-03: Avro Lakehouse",
+            "description": "Avro used as the primary analytics lake format.",
+            "details": {
+              "Status": "Superseded",
+              "Superseded By": "ADR-07",
+              "Decided Date": "2025-01-10"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "planetId": "planet-ui",
+      "innerRadius": 15.0,
+      "outerRadius": 17.5,
+      "rotationSpeed": 0.1,
+      "rotationAxis": [0.2, 0.9, 0.38],
+      "decisionNodes": [
+        {
+          "id": "adr-ui-nextjs",
+          "anglePosition": 0.3,
+          "distanceFromCenter": 16.25,
+          "status": "accepted",
+          "metadata": {
+            "type": "decision",
+            "title": "ADR-10: Next.js SSR Router",
+            "description": "Adopt Next.js App Router for SEO-optimized Server-Side Rendering.",
+            "details": {
+              "Status": "Accepted",
+              "Decided Date": "2026-06-01",
+              "Core Framework": "Next.js 15"
+            }
+          }
+        },
+        {
+          "id": "adr-ui-spa",
+          "anglePosition": 3.9,
+          "distanceFromCenter": 16.25,
+          "status": "deprecated",
+          "metadata": {
+            "type": "decision",
+            "title": "ADR-02: React Client SPA",
+            "description": "Single Page App using Client-Side Rendering.",
+            "details": {
+              "Status": "Deprecated",
+              "Decided Date": "2024-05-18",
+              "Replacement": "ADR-10"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "planetId": "planet-api",
+      "innerRadius": 8.5,
+      "outerRadius": 10.5,
+      "rotationSpeed": 0.25,
+      "rotationAxis": [-0.15, 0.97, 0.2],
+      "decisionNodes": [
+        {
+          "id": "adr-api-graphql",
+          "anglePosition": 2.2,
+          "distanceFromCenter": 9.5,
+          "status": "accepted",
+          "metadata": {
+            "type": "decision",
+            "title": "ADR-09: Federated GraphQL",
+            "description": "Expose federated GraphQL schema via Apollo Gateway.",
+            "details": {
+              "Status": "Accepted",
+              "Decided Date": "2026-05-30",
+              "API Protocol": "GraphQL"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "planetId": "planet-storage",
+      "innerRadius": 9.5,
+      "outerRadius": 11.5,
+      "rotationSpeed": -0.2,
+      "rotationAxis": [0.1, 0.98, -0.1],
+      "decisionNodes": [
+        {
+          "id": "adr-storage-redis",
+          "anglePosition": 2.0,
+          "distanceFromCenter": 10.5,
+          "status": "accepted",
+          "metadata": {
+            "type": "decision",
+            "title": "ADR-08: Redis Caching",
+            "description": "Implement Redis write-through cache for DB entities.",
+            "details": {
+              "Status": "Accepted",
+              "Decided Date": "2026-05-25",
+              "Latency SLA": "< 5ms"
+            }
+          }
+        },
+        {
+          "id": "adr-storage-postgres",
+          "anglePosition": 5.2,
+          "distanceFromCenter": 10.5,
+          "status": "accepted",
+          "metadata": {
+            "type": "decision",
+            "title": "ADR-05: Postgres RDBMS",
+            "description": "Use PostgreSQL as core relational storage backend.",
+            "details": {
+              "Status": "Accepted",
+              "Decided Date": "2025-06-12",
+              "DB Engine": "PostgreSQL 16"
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "decisionConnections": [
+    {
+      "fromDecisionId": "adr-auth-jwt",
+      "toPlanetIds": ["planet-api", "planet-ui"],
+      "lineStyle": "dashed"
+    },
+    {
+      "fromDecisionId": "adr-api-graphql",
+      "toPlanetIds": ["planet-ui", "planet-data"],
+      "lineStyle": "solid"
+    },
+    {
+      "fromDecisionId": "adr-storage-redis",
+      "toPlanetIds": ["planet-api"],
+      "lineStyle": "dotted"
+    }
+  ],
+  "interactions": [],
+  "lighting": {
+    "ambient": { "color": "#181824", "intensity": 0.3 },
+    "point": [
+      { "color": "#90caf9", "intensity": 1.2, "position": [0, 40, 20], "distance": 150 },
+      { "color": "#f48fb1", "intensity": 0.8, "position": [-50, -20, -10], "distance": 150 }
+    ]
+  },
+  "postProcessing": {
+    "bloom": {
+      "strength": 0.7,
+      "radius": 0.8,
+      "threshold": 0.4
+    },
+    "depthOfField": {
+      "focusDistance": 90.0,
+      "focalLength": 60.0,
+      "bokehScale": 1.5
+    }
+  },
+  "text": {
+    "title": "Rings of Decisions",
+    "subtitle": "Evolution & ADRs",
+    "description": "Planetary rings hold the history of Architectural Decision Records. Glowing status orbits indicate active, superseded, or deprecated paths."
+  }
+}

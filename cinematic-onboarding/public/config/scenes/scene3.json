@@ -1,0 +1,203 @@
+{
+  "sceneNumber": 3,
+  "name": "Knowledge Constellations",
+  "progressRange": [0.33, 0.50],
+  
+  "camera": {
+    "keyframes": [
+      {
+        "progress": 0.0,
+        "position": [0, 35, 90],
+        "rotation": [0, 0, 0],
+        "fov": 75,
+        "easing": "easeInOut"
+      },
+      {
+        "progress": 0.5,
+        "position": [30, 20, 50],
+        "rotation": [0.1, 0.3, 0],
+        "fov": 75,
+        "easing": "linear"
+      },
+      {
+        "progress": 1.0,
+        "position": [0, 15, 70],
+        "rotation": [0, 0, 0],
+        "fov": 75,
+        "easing": "easeOut"
+      }
+    ],
+    "lookAtTarget": "origin"
+  },
+  
+  "particles": {
+    "enabled": true,
+    "count": {
+      "ultra": 30000,
+      "high": 20000,
+      "medium": 10000,
+      "low": 5000
+    },
+    "geometry": {
+      "type": "sphere",
+      "size": 0.3,
+      "segments": 8
+    },
+    "material": {
+      "color": "#4fc3f7",
+      "opacity": 0.8,
+      "transparent": true,
+      "emissive": "#0288d1",
+      "emissiveIntensity": 0.6
+    },
+    "behavior": {
+      "animation": "cluster",
+      "cluster": {
+        "centers": [
+          [-40, 0, -20],
+          [40, 0, -20],
+          [0, 30, -10],
+          [-30, -20, 0],
+          [30, -20, 0]
+        ],
+        "attractionStrength": 2.5,
+        "clusterRadius": 15.0
+      }
+    },
+    "initialDistribution": {
+      "type": "sphere"
+    }
+  },
+  
+  "constellations": [
+    {
+      "name": "Authentication",
+      "center": [-40, 0, -20],
+      "entityCount": 127,
+      "color": "#ff1744"
+    },
+    {
+      "name": "Data Processing",
+      "center": [40, 0, -20],
+      "entityCount": 89,
+      "color": "#00e676"
+    },
+    {
+      "name": "User Interface",
+      "center": [0, 30, -10],
+      "entityCount": 203,
+      "color": "#2979ff"
+    },
+    {
+      "name": "API Gateway",
+      "center": [-30, -20, 0],
+      "entityCount": 64,
+      "color": "#d500f9"
+    },
+    {
+      "name": "Storage Layer",
+      "center": [30, -20, 0],
+      "entityCount": 112,
+      "color": "#ffea00"
+    }
+  ],
+  
+  "interactions": [
+    {
+      "id": "constellation-auth",
+      "position": [-40, 0, -20],
+      "radius": 18.0,
+      "type": "constellation",
+      "metadata": {
+        "type": "constellation",
+        "title": "Authentication Constellation",
+        "description": "Clusters all auth-related code segments",
+        "details": {
+          "Entities": 127,
+          "Scope": "JWT, OAuth2, Cryptography"
+        }
+      }
+    },
+    {
+      "id": "constellation-data",
+      "position": [40, 0, -20],
+      "radius": 18.0,
+      "type": "constellation",
+      "metadata": {
+        "type": "constellation",
+        "title": "Data Processing Constellation",
+        "description": "Orchestrates pipelines and data streams",
+        "details": {
+          "Entities": 89,
+          "Scope": "ETL, MapReduce, Serializers"
+        }
+      }
+    },
+    {
+      "id": "constellation-ui",
+      "position": [0, 30, -10],
+      "radius": 18.0,
+      "type": "constellation",
+      "metadata": {
+        "type": "constellation",
+        "title": "User Interface Constellation",
+        "description": "Clusters rendering layers and component views",
+        "details": {
+          "Entities": 203,
+          "Scope": "React Elements, Hydration, Style sheets"
+        }
+      }
+    },
+    {
+      "id": "constellation-api",
+      "position": [-30, -20, 0],
+      "radius": 18.0,
+      "type": "constellation",
+      "metadata": {
+        "type": "constellation",
+        "title": "API Gateway Constellation",
+        "description": "Directs incoming routing, reverse proxy, and rate limits",
+        "details": {
+          "Entities": 64,
+          "Scope": "Routing, Proxy, Traffic throttle"
+        }
+      }
+    },
+    {
+      "id": "constellation-storage",
+      "position": [30, -20, 0],
+      "radius": 18.0,
+      "type": "constellation",
+      "metadata": {
+        "type": "constellation",
+        "title": "Storage Layer Constellation",
+        "description": "Integrates databases and key-value cache networks",
+        "details": {
+          "Entities": 112,
+          "Scope": "Postgres pools, Redis cache eviction"
+        }
+      }
+    }
+  ],
+  
+  "lighting": {
+    "ambient": { "color": "#404060", "intensity": 0.4 },
+    "point": [
+      { "color": "#ffffff", "intensity": 1.2, "position": [0, 50, 50], "distance": 200 }
+    ]
+  },
+  
+  "postProcessing": {
+    "bloom": {
+      "strength": 0.6,
+      "radius": 0.8,
+      "threshold": 0.3
+    }
+  },
+  
+  "text": {
+    "title": "Knowledge Constellations",
+    "subtitle": "Conceptual Clustering",
+    "description": "Particles converge into clusters based on shared functional domain. Clusters are analyzed for local code density and connections."
+  }
+}

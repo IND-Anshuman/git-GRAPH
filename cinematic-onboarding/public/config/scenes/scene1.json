@@ -1,0 +1,105 @@
+{
+  "sceneNumber": 1,
+  "name": "The Chaos",
+  "progressRange": [0.0, 0.17],
+  
+  "camera": {
+    "keyframes": [
+      {
+        "progress": 0.0,
+        "position": [0, 0, -50],
+        "rotation": [0, 0, 0],
+        "fov": 75,
+        "easing": "easeInOut"
+      },
+      {
+        "progress": 0.5,
+        "position": [30, 20, -30],
+        "rotation": [0.2, 0.4, 0],
+        "fov": 75,
+        "easing": "linear"
+      },
+      {
+        "progress": 1.0,
+        "position": [0, 10, -10],
+        "rotation": [0, 0, 0],
+        "fov": 75,
+        "easing": "easeOut"
+      }
+    ],
+    "lookAtTarget": "origin"
+  },
+  
+  "particles": {
+    "enabled": true,
+    "count": {
+      "ultra": 100000,
+      "high": 80000,
+      "medium": 50000,
+      "low": 25000
+    },
+    "geometry": {
+      "type": "box",
+      "size": 0.3
+    },
+    "material": {
+      "color": "#8b5cf6",
+      "opacity": 0.6,
+      "transparent": true,
+      "emissive": "#6366f1",
+      "emissiveIntensity": 0.3
+    },
+    "behavior": {
+      "animation": "drift",
+      "drift": {
+        "velocity": [[-0.5, -0.5, -0.5], [0.5, 0.5, 0.5]],
+        "turbulence": 2.0
+      }
+    },
+    "initialDistribution": {
+      "type": "box",
+      "bounds": [[-100, -100, -100], [100, 100, 100]]
+    }
+  },
+  
+  "interactions": [
+    {
+      "id": "code-fragment-1",
+      "position": [15, 10, -20],
+      "radius": 5.0,
+      "type": "particle",
+      "metadata": {
+        "type": "particle",
+        "title": "main.py",
+        "description": "Python source file",
+        "details": {
+          "Lines": 342,
+          "Functions": 15,
+          "Classes": 3
+        }
+      }
+    }
+  ],
+  
+  "lighting": {
+    "ambient": { "color": "#ffffff", "intensity": 0.3 },
+    "point": [
+      { "color": "#8b5cf6", "intensity": 1.5, "position": [50, 50, 50], "distance": 200 },
+      { "color": "#3b82f6", "intensity": 1.0, "position": [-50, -50, -50], "distance": 200 }
+    ]
+  },
+  
+  "postProcessing": {
+    "bloom": {
+      "strength": 0.4,
+      "radius": 0.8,
+      "threshold": 0.85
+    }
+  },
+  
+  "text": {
+    "title": "The Chaos",
+    "subtitle": "Raw Code Universe",
+    "description": "Millions of code fragments scattered across repositories. Files, services, commits drift in infinite complexity."
+  }
+}
