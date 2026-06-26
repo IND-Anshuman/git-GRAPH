@@ -1,0 +1,20 @@
+{
+  "entries": {
+    "circle": {
+      "uvOffset": [0.0, 0.0],
+      "uvSize": [0.5, 0.5]
+    },
+    "star": {
+      "uvOffset": [0.5, 0.0],
+      "uvSize": [0.5, 0.5]
+    },
+    "ring": {
+      "uvOffset": [0.0, 0.5],
+      "uvSize": [0.5, 0.5]
+    },
+    "spark": {
+      "uvOffset": [0.5, 0.5],
+      "uvSize": [0.5, 0.5]
+    }
+  }
+}
