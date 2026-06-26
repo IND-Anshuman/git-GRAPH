@@ -1,0 +1,77 @@
+{
+  "scenes": [
+    {
+      "sceneNumber": 1,
+      "name": "The Chaos",
+      "progressRange": [0.0, 0.17],
+      "description": "Millions of code fragments floating in chaos"
+    },
+    {
+      "sceneNumber": 2,
+      "name": "Stardust of Code",
+      "progressRange": [0.17, 0.33],
+      "description": "Repository decomposed into semantic particles"
+    },
+    {
+      "sceneNumber": 3,
+      "name": "Knowledge Constellations",
+      "progressRange": [0.33, 0.5],
+      "description": "Particles clustering into concept constellations"
+    },
+    {
+      "sceneNumber": 4,
+      "name": "Planets of Capability",
+      "progressRange": [0.5, 0.67],
+      "description": "Constellations forming capability planets"
+    },
+    {
+      "sceneNumber": 5,
+      "name": "Solar Systems of Architecture",
+      "progressRange": [0.67, 0.83],
+      "description": "Capabilities organized into architecture domains"
+    },
+    {
+      "sceneNumber": 6,
+      "name": "Rings of Decisions",
+      "progressRange": [0.83, 1.0],
+      "description": "Architectural decisions orbiting capabilities"
+    },
+    {
+      "sceneNumber": 7,
+      "name": "Constellation of Reasoning",
+      "progressRange": [1.0, 1.0],
+      "description": "Neural network of evidence-backed reasoning"
+    },
+    {
+      "sceneNumber": 8,
+      "name": "The Software Universe",
+      "progressRange": [1.0, 1.0],
+      "description": "Complete knowledge universe visualization"
+    }
+  ],
+  "performance": {
+    "targetFPS": 60,
+    "qualityTiers": {
+      "ultra": {
+        "minFPS": 60,
+        "particleMultiplier": 1.0,
+        "enablePostProcessing": true
+      },
+      "high": {
+        "minFPS": 50,
+        "particleMultiplier": 0.8,
+        "enablePostProcessing": true
+      },
+      "medium": {
+        "minFPS": 30,
+        "particleMultiplier": 0.5,
+        "enablePostProcessing": false
+      },
+      "low": {
+        "minFPS": 0,
+        "particleMultiplier": 0.3,
+        "enablePostProcessing": false
+      }
+    }
+  }
+}
