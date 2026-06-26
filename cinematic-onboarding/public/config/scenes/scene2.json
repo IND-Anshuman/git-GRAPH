@@ -1,0 +1,112 @@
+{
+  "sceneNumber": 2,
+  "name": "Stardust of Code",
+  "progressRange": [0.17, 0.33],
+  
+  "camera": {
+    "keyframes": [
+      {
+        "progress": 0.0,
+        "position": [0, 10, -10],
+        "rotation": [0, 0, 0],
+        "fov": 75,
+        "easing": "easeIn"
+      },
+      {
+        "progress": 0.3,
+        "position": [0, 0, 0],
+        "rotation": [0, 0, 0],
+        "fov": 90,
+        "easing": "easeOut"
+      },
+      {
+        "progress": 0.7,
+        "position": [20, 15, 30],
+        "rotation": [-0.3, 0.5, 0],
+        "fov": 75,
+        "easing": "linear"
+      },
+      {
+        "progress": 1.0,
+        "position": [40, 20, 40],
+        "rotation": [-0.2, 0.3, 0],
+        "fov": 70,
+        "easing": "easeInOut"
+      }
+    ]
+  },
+  
+  "particles": {
+    "enabled": true,
+    "count": {
+      "ultra": 50000,
+      "high": 40000,
+      "medium": 25000,
+      "low": 15000
+    },
+    "geometry": {
+      "type": "sphere",
+      "size": 0.4
+    },
+    "material": {
+      "color": "#3b82f6",
+      "opacity": 0.8,
+      "transparent": true
+    },
+    "behavior": {
+      "animation": "explosion",
+      "explosion": {
+        "origin": [0, 0, 0],
+        "force": [3.0, 8.0],
+        "gravity": [0, -0.5, 0],
+        "damping": 0.3
+      }
+    },
+    "entityTypes": {
+      "function": { "color": "#3b82f6", "size": 0.4, "ratio": 0.4 },
+      "class": { "color": "#8b5cf6", "size": 0.6, "ratio": 0.25 },
+      "method": { "color": "#10b981", "size": 0.3, "ratio": 0.2 },
+      "variable": { "color": "#f59e0b", "size": 0.2, "ratio": 0.15 }
+    }
+  },
+  
+  "interactions": [
+    {
+      "id": "entity-function-1",
+      "position": [25, 10, 15],
+      "radius": 3.0,
+      "type": "particle",
+      "metadata": {
+        "type": "particle",
+        "title": "authenticate_user()",
+        "description": "Function - Authentication logic",
+        "details": {
+          "Type": "Function",
+          "Lines": 45,
+          "Complexity": "Medium"
+        }
+      }
+    }
+  ],
+  
+  "lighting": {
+    "ambient": { "color": "#ffffff", "intensity": 0.4 },
+    "directional": [
+      { "color": "#ffffff", "intensity": 0.8, "position": [10, 20, 10] }
+    ]
+  },
+  
+  "postProcessing": {
+    "bloom": {
+      "strength": 0.6,
+      "radius": 1.0,
+      "threshold": 0.8
+    }
+  },
+  
+  "text": {
+    "title": "Stardust of Code",
+    "subtitle": "Extraction & Understanding",
+    "description": "SEEE breaks down code into semantic units. Functions, classes, methods, and variables emerge as individual particles."
+  }
+}

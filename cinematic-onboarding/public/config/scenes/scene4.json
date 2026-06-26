@@ -1,0 +1,219 @@
+{
+  "sceneNumber": 4,
+  "name": "Planets of Capability",
+  "progressRange": [0.50, 0.67],
+  
+  "camera": {
+    "keyframes": [
+      {
+        "progress": 0.0,
+        "position": [0, 80, 120],
+        "rotation": [0, 0, 0],
+        "fov": 75,
+        "easing": "easeInOut"
+      },
+      {
+        "progress": 0.5,
+        "position": [100, 20, 0],
+        "rotation": [0, -1.0, 0],
+        "fov": 75,
+        "easing": "linear"
+      },
+      {
+        "progress": 1.0,
+        "position": [-80, 10, -50],
+        "rotation": [0, 1.2, 0],
+        "fov": 70,
+        "easing": "easeOut"
+      }
+    ]
+  },
+  
+  "particles": {
+    "enabled": false,
+    "count": {
+      "ultra": 0,
+      "high": 0,
+      "medium": 0,
+      "low": 0
+    },
+    "geometry": {
+      "type": "sphere",
+      "size": 0.1
+    },
+    "material": {
+      "color": "#ffffff",
+      "opacity": 0.1
+    },
+    "behavior": {
+      "animation": "static"
+    }
+  },
+  
+  "planets": [
+    {
+      "id": "planet-auth",
+      "name": "Authentication",
+      "position": [-40, 0, -20],
+      "size": 10.0,
+      "health": 0.90,
+      "importance": 0.80,
+      "entityCount": 127,
+      "linesOfCode": 15430,
+      "color": "#ff1744"
+    },
+    {
+      "id": "planet-data",
+      "name": "Data Processing",
+      "position": [40, 0, -20],
+      "size": 8.0,
+      "health": 0.75,
+      "importance": 0.70,
+      "entityCount": 89,
+      "linesOfCode": 9820,
+      "color": "#00e676"
+    },
+    {
+      "id": "planet-ui",
+      "name": "User Interface",
+      "position": [0, 30, -10],
+      "size": 12.0,
+      "health": 0.95,
+      "importance": 0.90,
+      "entityCount": 203,
+      "linesOfCode": 24500,
+      "color": "#2979ff"
+    },
+    {
+      "id": "planet-api",
+      "name": "API Gateway",
+      "position": [-30, -20, 0],
+      "size": 6.0,
+      "health": 0.45,
+      "importance": 0.60,
+      "entityCount": 64,
+      "linesOfCode": 5210,
+      "color": "#d500f9"
+    },
+    {
+      "id": "planet-storage",
+      "name": "Storage Layer",
+      "position": [30, -20, 0],
+      "size": 7.0,
+      "health": 0.82,
+      "importance": 0.65,
+      "entityCount": 112,
+      "linesOfCode": 12840,
+      "color": "#ffea00"
+    }
+  ],
+  
+  "interactions": [
+    {
+      "id": "planet-auth",
+      "position": [-40, 0, -20],
+      "radius": 15.0,
+      "type": "planet",
+      "metadata": {
+        "type": "planet",
+        "title": "Authentication Planet",
+        "description": "Auth and Session Capability Module",
+        "details": {
+          "Health": "90% (Healthy)",
+          "Entities": 127,
+          "Lines of Code": 15430
+        }
+      }
+    },
+    {
+      "id": "planet-data",
+      "position": [40, 0, -20],
+      "radius": 15.0,
+      "type": "planet",
+      "metadata": {
+        "type": "planet",
+        "title": "Data Processing Planet",
+        "description": "ETL, parsing, and pipeline orchestration",
+        "details": {
+          "Health": "75% (Warning)",
+          "Entities": 89,
+          "Lines of Code": 9820
+        }
+      }
+    },
+    {
+      "id": "planet-ui",
+      "position": [0, 30, -10],
+      "radius": 18.0,
+      "type": "planet",
+      "metadata": {
+        "type": "planet",
+        "title": "User Interface Planet",
+        "description": "Main application layout and style drivers",
+        "details": {
+          "Health": "95% (Healthy)",
+          "Entities": 203,
+          "Lines of Code": 24500
+        }
+      }
+    },
+    {
+      "id": "planet-api",
+      "position": [-30, -20, 0],
+      "radius": 15.0,
+      "type": "planet",
+      "metadata": {
+        "type": "planet",
+        "title": "API Gateway Planet",
+        "description": "Reverse proxies and request load routing",
+        "details": {
+          "Health": "45% (Critical)",
+          "Entities": 64,
+          "Lines of Code": 5210
+        }
+      }
+    },
+    {
+      "id": "planet-storage",
+      "position": [30, -20, 0],
+      "radius": 15.0,
+      "type": "planet",
+      "metadata": {
+        "type": "planet",
+        "title": "Storage Layer Planet",
+        "description": "Persistent databases and Redis cache evictions",
+        "details": {
+          "Health": "82% (Healthy)",
+          "Entities": 112,
+          "Lines of Code": 12840
+        }
+      }
+    }
+  ],
+  
+  "lighting": {
+    "ambient": { "color": "#303040", "intensity": 0.3 },
+    "point": [
+      { "color": "#ffffff", "intensity": 1.5, "position": [0, 50, 50], "distance": 300 }
+    ]
+  },
+  
+  "postProcessing": {
+    "bloom": {
+      "strength": 0.7,
+      "radius": 1.0,
+      "threshold": 0.4
+    },
+    "depthOfField": {
+      "focusDistance": 80.0,
+      "focalLength": 50.0,
+      "bokehScale": 2.0
+    }
+  },
+  
+  "text": {
+    "title": "Planets of Capability",
+    "subtitle": "Modular Understanding",
+    "description": "Constellation clusters collapse into dense planets representing software capabilities. Health indexes highlight module risks."
+  }
+}

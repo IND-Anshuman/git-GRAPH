@@ -1,0 +1,3072 @@
+{
+  "sceneNumber": 7,
+  "name": "Constellation of Reasoning",
+  "progressRange": [
+    1,
+    1
+  ],
+  "camera": {
+    "keyframes": [
+      {
+        "progress": 0,
+        "position": [
+          120,
+          80,
+          120
+        ],
+        "rotation": [
+          -0.6,
+          0.7,
+          0.4
+        ],
+        "fov": 75,
+        "easing": "easeInOut"
+      },
+      {
+        "progress": 0.3,
+        "position": [
+          50,
+          30,
+          50
+        ],
+        "rotation": [
+          -0.4,
+          0.6,
+          0.3
+        ],
+        "fov": 85,
+        "easing": "easeInOut"
+      },
+      {
+        "progress": 0.7,
+        "position": [
+          15,
+          8,
+          15
+        ],
+        "rotation": [
+          -0.2,
+          0.4,
+          0.1
+        ],
+        "fov": 85,
+        "easing": "easeInOut"
+      },
+      {
+        "progress": 1,
+        "position": [
+          -120,
+          80,
+          -120
+        ],
+        "rotation": [
+          -0.6,
+          -0.7,
+          -0.4
+        ],
+        "fov": 75,
+        "easing": "easeInOut"
+      }
+    ],
+    "lookAtTarget": [
+      0,
+      0,
+      0
+    ]
+  },
+  "particles": {
+    "enabled": false,
+    "count": {
+      "ultra": 0,
+      "high": 0,
+      "medium": 0,
+      "low": 0
+    },
+    "geometry": {
+      "type": "sphere"
+    },
+    "material": {},
+    "behavior": {
+      "animation": "static"
+    }
+  },
+  "interactions": [
+    {
+      "id": "evidence-node-000",
+      "position": [
+        -25.89,
+        35.42,
+        -9.27
+      ],
+      "radius": 5.7,
+      "type": "node",
+      "metadata": {
+        "type": "node",
+        "title": "Disaster Recovery Playbook (#1)",
+        "description": "Step-by-step procedures for cross-region database failover.",
+        "details": {
+          "type": "documentation",
+          "confidenceScore": 0.959,
+          "sourceReference": "src/documentation/evidence-node-000.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-001",
+      "position": [
+        11.55,
+        -13.88,
+        -22.99
+      ],
+      "radius": 5.63,
+      "type": "node",
+      "metadata": {
+        "type": "node",
+        "title": "Disaster Recovery Playbook (#2)",
+        "description": "Step-by-step procedures for cross-region database failover.",
+        "details": {
+          "type": "documentation",
+          "confidenceScore": 0.94,
+          "sourceReference": "src/documentation/evidence-node-001.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-002",
+      "position": [
+        16.58,
+        11.91,
+        21.5
+      ],
+      "radius": 4.83,
+      "type": "node",
+      "metadata": {
+        "type": "node",
+        "title": "ADR-018: Use Redis for Sessions (#3)",
+        "description": "Adopted for low-latency session validation and shared stores.",
+        "details": {
+          "type": "decision_record",
+          "confidenceScore": 0.962,
+          "sourceReference": "src/decision_record/evidence-node-002.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-003",
+      "position": [
+        -14.53,
+        15.55,
+        -18.55
+      ],
+      "radius": 5.38,
+      "type": "node",
+      "metadata": {
+        "type": "node",
+        "title": "ADR-025: Implement TLS 1.3 (#4)",
+        "description": "Enforced to deprecate legacy secure protocols and cypher suites.",
+        "details": {
+          "type": "decision_record",
+          "confidenceScore": 0.977,
+          "sourceReference": "src/decision_record/evidence-node-003.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-004",
+      "position": [
+        -2.97,
+        11.88,
+        -53.84
+      ],
+      "radius": 5.27,
+      "type": "node",
+      "metadata": {
+        "type": "node",
+        "title": "ADR-025: Implement TLS 1.3 (#5)",
+        "description": "Enforced to deprecate legacy secure protocols and cypher suites.",
+        "details": {
+          "type": "decision_record",
+          "confidenceScore": 0.949,
+          "sourceReference": "src/decision_record/evidence-node-004.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-005",
+      "position": [
+        33.35,
+        -12.2,
+        15.91
+      ],
+      "radius": 2.75,
+      "type": "node",
+      "metadata": {
+        "type": "node",
+        "title": "OAuth2 Flow Architecture Diagram (#6)",
+        "description": "Details token exchange sequence between client and auth server.",
+        "details": {
+          "type": "documentation",
+          "confidenceScore": 0.722,
+          "sourceReference": "src/documentation/evidence-node-005.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-006",
+      "position": [
+        23.4,
+        -18.46,
+        -2.94
+      ],
+      "radius": 4.25,
+      "type": "node",
+      "metadata": {
+        "type": "node",
+        "title": "CPU Saturation Alert Profile (#7)",
+        "description": "Average CPU utilization sits at 24% under standard production load.",
+        "details": {
+          "type": "metric",
+          "confidenceScore": 0.478,
+          "sourceReference": "src/metric/evidence-node-006.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-007",
+      "position": [
+        1.81,
+        7.83,
+        -25.01
+      ],
+      "radius": 4.41,
+      "type": "node",
+      "metadata": {
+        "type": "node",
+        "title": "ADR-025: Implement TLS 1.3 (#8)",
+        "description": "Enforced to deprecate legacy secure protocols and cypher suites.",
+        "details": {
+          "type": "decision_record",
+          "confidenceScore": 0.69,
+          "sourceReference": "src/decision_record/evidence-node-007.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-008",
+      "position": [
+        -10.81,
+        -1.16,
+        -4.64
+      ],
+      "radius": 3.36,
+      "type": "node",
+      "metadata": {
+        "type": "node",
+        "title": "Auth Token Validation Test (#9)",
+        "description": "100% of integration test suites for token validation passed.",
+        "details": {
+          "type": "test_result",
+          "confidenceScore": 0.424,
+          "sourceReference": "src/test_result/evidence-node-008.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-009",
+      "position": [
+        28.78,
+        -32.71,
+        21.88
+      ],
+      "radius": 4.41,
+      "type": "node",
+      "metadata": {
+        "type": "node",
+        "title": "SQL Injection Vulnerability Scanner (#10)",
+        "description": "0 vulnerabilities detected during static code analysis execution.",
+        "details": {
+          "type": "test_result",
+          "confidenceScore": 0.424,
+          "sourceReference": "src/test_result/evidence-node-009.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-010",
+      "position": [
+        -54.64,
+        -12.09,
+        6.7
+      ],
+      "radius": 3.88,
+      "type": "node",
+      "metadata": {
+        "type": "node",
+        "title": "Memory Usage Leak Check (#11)",
+        "description": "Heap memory usage flatlines at 180MB over 48 hours.",
+        "details": {
+          "type": "metric",
+          "confidenceScore": 0.531,
+          "sourceReference": "src/metric/evidence-node-010.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-011",
+      "position": [
+        -12.23,
+        -39.61,
+        35.63
+      ],
+      "radius": 3.82,
+      "type": "node",
+      "metadata": {
+        "type": "node",
+        "title": "ADR-012: Migrate to Next.js (#12)",
+        "description": "Chosen for Server-Side Rendering (SSR) and routing performance.",
+        "details": {
+          "type": "decision_record",
+          "confidenceScore": 0.504,
+          "sourceReference": "src/decision_record/evidence-node-011.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-012",
+      "position": [
+        17.26,
+        -52.29,
+        16.44
+      ],
+      "radius": 2.72,
+      "type": "node",
+      "metadata": {
+        "type": "node",
+        "title": "ADR-025: Implement TLS 1.3 (#13)",
+        "description": "Enforced to deprecate legacy secure protocols and cypher suites.",
+        "details": {
+          "type": "decision_record",
+          "confidenceScore": 0.821,
+          "sourceReference": "src/decision_record/evidence-node-012.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-013",
+      "position": [
+        -11.16,
+        -38.52,
+        -4.3
+      ],
+      "radius": 3.79,
+      "type": "node",
+      "metadata": {
+        "type": "node",
+        "title": "JWT Secret Rotation Middleware (#14)",
+        "description": "Validates symmetric key expiration and rollbacks.",
+        "details": {
+          "type": "code_reference",
+          "confidenceScore": 0.727,
+          "sourceReference": "src/code_reference/evidence-node-013.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-014",
+      "position": [
+        47.15,
+        -2.85,
+        -13.86
+      ],
+      "radius": 4.39,
+      "type": "node",
+      "metadata": {
+        "type": "node",
+        "title": "Load Test: 10k RPS Profile (#15)",
+        "description": "Average response times maintained at 14ms under peak throughput.",
+        "details": {
+          "type": "test_result",
+          "confidenceScore": 0.555,
+          "sourceReference": "src/test_result/evidence-node-014.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-015",
+      "position": [
+        19.41,
+        16.28,
+        -28.12
+      ],
+      "radius": 3.37,
+      "type": "node",
+      "metadata": {
+        "type": "node",
+        "title": "ADR-012: Migrate to Next.js (#16)",
+        "description": "Chosen for Server-Side Rendering (SSR) and routing performance.",
+        "details": {
+          "type": "decision_record",
+          "confidenceScore": 0.742,
+          "sourceReference": "src/decision_record/evidence-node-015.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-016",
+      "position": [
+        -38.01,
+        -19.08,
+        -13.81
+      ],
+      "radius": 4.44,
+      "type": "node",
+      "metadata": {
+        "type": "node",
+        "title": "ADR-012: Migrate to Next.js (#17)",
+        "description": "Chosen for Server-Side Rendering (SSR) and routing performance.",
+        "details": {
+          "type": "decision_record",
+          "confidenceScore": 0.689,
+          "sourceReference": "src/decision_record/evidence-node-016.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-017",
+      "position": [
+        -7.71,
+        -1.15,
+        13.98
+      ],
+      "radius": 4.36,
+      "type": "node",
+      "metadata": {
+        "type": "node",
+        "title": "Redis Cache Eviction Policy (#18)",
+        "description": "Implements LRU cache eviction and key TTL checks.",
+        "details": {
+          "type": "code_reference",
+          "confidenceScore": 0.724,
+          "sourceReference": "src/code_reference/evidence-node-017.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-018",
+      "position": [
+        -20.49,
+        -33.98,
+        13.2
+      ],
+      "radius": 2.6,
+      "type": "node",
+      "metadata": {
+        "type": "node",
+        "title": "ADR-018: Use Redis for Sessions (#19)",
+        "description": "Adopted for low-latency session validation and shared stores.",
+        "details": {
+          "type": "decision_record",
+          "confidenceScore": 0.401,
+          "sourceReference": "src/decision_record/evidence-node-018.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-019",
+      "position": [
+        -27.17,
+        17.1,
+        -22.83
+      ],
+      "radius": 2.93,
+      "type": "node",
+      "metadata": {
+        "type": "node",
+        "title": "API Integration Specifications v2 (#20)",
+        "description": "Specifies JSON schemas, query params, and HTTP status codes.",
+        "details": {
+          "type": "documentation",
+          "confidenceScore": 0.464,
+          "sourceReference": "src/documentation/evidence-node-019.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-020",
+      "position": [
+        20.74,
+        48.57,
+        8.33
+      ],
+      "radius": 3.58,
+      "type": "node",
+      "metadata": {
+        "type": "node",
+        "title": "OAuth2 Flow Architecture Diagram (#21)",
+        "description": "Details token exchange sequence between client and auth server.",
+        "details": {
+          "type": "documentation",
+          "confidenceScore": 0.688,
+          "sourceReference": "src/documentation/evidence-node-020.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-021",
+      "position": [
+        -7.55,
+        33.73,
+        9.84
+      ],
+      "radius": 4.3,
+      "type": "node",
+      "metadata": {
+        "type": "node",
+        "title": "Database Connection Pool Pooler (#22)",
+        "description": "Manages max connections and idle timeouts for PostgreSQL.",
+        "details": {
+          "type": "code_reference",
+          "confidenceScore": 0.681,
+          "sourceReference": "src/code_reference/evidence-node-021.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-022",
+      "position": [
+        -28.68,
+        17.03,
+        -17.51
+      ],
+      "radius": 5.56,
+      "type": "node",
+      "metadata": {
+        "type": "node",
+        "title": "Load Test: 10k RPS Profile (#23)",
+        "description": "Average response times maintained at 14ms under peak throughput.",
+        "details": {
+          "type": "test_result",
+          "confidenceScore": 0.864,
+          "sourceReference": "src/test_result/evidence-node-022.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-023",
+      "position": [
+        15.68,
+        -5.68,
+        12.17
+      ],
+      "radius": 2.66,
+      "type": "node",
+      "metadata": {
+        "type": "node",
+        "title": "Load Test: 10k RPS Profile (#24)",
+        "description": "Average response times maintained at 14ms under peak throughput.",
+        "details": {
+          "type": "test_result",
+          "confidenceScore": 0.522,
+          "sourceReference": "src/test_result/evidence-node-023.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-024",
+      "position": [
+        5.26,
+        -10.38,
+        2.99
+      ],
+      "radius": 2.45,
+      "type": "node",
+      "metadata": {
+        "type": "node",
+        "title": "API Integration Specifications v2 (#25)",
+        "description": "Specifies JSON schemas, query params, and HTTP status codes.",
+        "details": {
+          "type": "documentation",
+          "confidenceScore": 0.789,
+          "sourceReference": "src/documentation/evidence-node-024.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-025",
+      "position": [
+        -45.64,
+        -1.28,
+        -8.82
+      ],
+      "radius": 2.78,
+      "type": "node",
+      "metadata": {
+        "type": "node",
+        "title": "Load Test: 10k RPS Profile (#26)",
+        "description": "Average response times maintained at 14ms under peak throughput.",
+        "details": {
+          "type": "test_result",
+          "confidenceScore": 0.589,
+          "sourceReference": "src/test_result/evidence-node-025.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-026",
+      "position": [
+        -13.69,
+        -19.28,
+        -44.4
+      ],
+      "radius": 3.32,
+      "type": "node",
+      "metadata": {
+        "type": "node",
+        "title": "Disaster Recovery Playbook (#27)",
+        "description": "Step-by-step procedures for cross-region database failover.",
+        "details": {
+          "type": "documentation",
+          "confidenceScore": 0.753,
+          "sourceReference": "src/documentation/evidence-node-026.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-027",
+      "position": [
+        -18.41,
+        -27.92,
+        -18.96
+      ],
+      "radius": 3.24,
+      "type": "node",
+      "metadata": {
+        "type": "node",
+        "title": "Redis Cache Eviction Policy (#28)",
+        "description": "Implements LRU cache eviction and key TTL checks.",
+        "details": {
+          "type": "code_reference",
+          "confidenceScore": 0.628,
+          "sourceReference": "src/code_reference/evidence-node-027.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-028",
+      "position": [
+        -22.03,
+        50.72,
+        -14.99
+      ],
+      "radius": 3.29,
+      "type": "node",
+      "metadata": {
+        "type": "node",
+        "title": "OAuth2 Flow Architecture Diagram (#29)",
+        "description": "Details token exchange sequence between client and auth server.",
+        "details": {
+          "type": "documentation",
+          "confidenceScore": 0.424,
+          "sourceReference": "src/documentation/evidence-node-028.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-029",
+      "position": [
+        -9.14,
+        10.47,
+        6.84
+      ],
+      "radius": 2.61,
+      "type": "node",
+      "metadata": {
+        "type": "node",
+        "title": "Load Test: 10k RPS Profile (#30)",
+        "description": "Average response times maintained at 14ms under peak throughput.",
+        "details": {
+          "type": "test_result",
+          "confidenceScore": 0.765,
+          "sourceReference": "src/test_result/evidence-node-029.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-030",
+      "position": [
+        21.41,
+        18.82,
+        0.56
+      ],
+      "radius": 3.97,
+      "type": "node",
+      "metadata": {
+        "type": "node",
+        "title": "Auth Token Validation Test (#31)",
+        "description": "100% of integration test suites for token validation passed.",
+        "details": {
+          "type": "test_result",
+          "confidenceScore": 0.741,
+          "sourceReference": "src/test_result/evidence-node-030.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-031",
+      "position": [
+        -24.87,
+        -31.97,
+        -44.17
+      ],
+      "radius": 4.93,
+      "type": "node",
+      "metadata": {
+        "type": "node",
+        "title": "Disaster Recovery Playbook (#32)",
+        "description": "Step-by-step procedures for cross-region database failover.",
+        "details": {
+          "type": "documentation",
+          "confidenceScore": 0.872,
+          "sourceReference": "src/documentation/evidence-node-031.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-032",
+      "position": [
+        -18.97,
+        -17.68,
+        -1.24
+      ],
+      "radius": 4.09,
+      "type": "node",
+      "metadata": {
+        "type": "node",
+        "title": "OAuth2 Flow Architecture Diagram (#33)",
+        "description": "Details token exchange sequence between client and auth server.",
+        "details": {
+          "type": "documentation",
+          "confidenceScore": 0.795,
+          "sourceReference": "src/documentation/evidence-node-032.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-033",
+      "position": [
+        3.2,
+        -10.22,
+        6.68
+      ],
+      "radius": 4.81,
+      "type": "node",
+      "metadata": {
+        "type": "node",
+        "title": "ADR-025: Implement TLS 1.3 (#34)",
+        "description": "Enforced to deprecate legacy secure protocols and cypher suites.",
+        "details": {
+          "type": "decision_record",
+          "confidenceScore": 0.897,
+          "sourceReference": "src/decision_record/evidence-node-033.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-034",
+      "position": [
+        -21.69,
+        -27.14,
+        17.42
+      ],
+      "radius": 3.89,
+      "type": "node",
+      "metadata": {
+        "type": "node",
+        "title": "Redis Cache Eviction Policy (#35)",
+        "description": "Implements LRU cache eviction and key TTL checks.",
+        "details": {
+          "type": "code_reference",
+          "confidenceScore": 0.647,
+          "sourceReference": "src/code_reference/evidence-node-034.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-035",
+      "position": [
+        2.35,
+        10.59,
+        -4.91
+      ],
+      "radius": 3.49,
+      "type": "node",
+      "metadata": {
+        "type": "node",
+        "title": "Auth Token Validation Test (#36)",
+        "description": "100% of integration test suites for token validation passed.",
+        "details": {
+          "type": "test_result",
+          "confidenceScore": 0.665,
+          "sourceReference": "src/test_result/evidence-node-035.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-036",
+      "position": [
+        4.69,
+        -6.79,
+        58.76
+      ],
+      "radius": 3.54,
+      "type": "node",
+      "metadata": {
+        "type": "node",
+        "title": "ADR-018: Use Redis for Sessions (#37)",
+        "description": "Adopted for low-latency session validation and shared stores.",
+        "details": {
+          "type": "decision_record",
+          "confidenceScore": 0.811,
+          "sourceReference": "src/decision_record/evidence-node-036.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-037",
+      "position": [
+        -11.65,
+        11.05,
+        -7.93
+      ],
+      "radius": 3.35,
+      "type": "node",
+      "metadata": {
+        "type": "node",
+        "title": "Disaster Recovery Playbook (#38)",
+        "description": "Step-by-step procedures for cross-region database failover.",
+        "details": {
+          "type": "documentation",
+          "confidenceScore": 0.411,
+          "sourceReference": "src/documentation/evidence-node-037.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-038",
+      "position": [
+        11.01,
+        15.31,
+        5.58
+      ],
+      "radius": 3.19,
+      "type": "node",
+      "metadata": {
+        "type": "node",
+        "title": "ADR-018: Use Redis for Sessions (#39)",
+        "description": "Adopted for low-latency session validation and shared stores.",
+        "details": {
+          "type": "decision_record",
+          "confidenceScore": 0.639,
+          "sourceReference": "src/decision_record/evidence-node-038.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-039",
+      "position": [
+        2.77,
+        6.22,
+        20.07
+      ],
+      "radius": 2.49,
+      "type": "node",
+      "metadata": {
+        "type": "node",
+        "title": "Database Connection Pool Pooler (#40)",
+        "description": "Manages max connections and idle timeouts for PostgreSQL.",
+        "details": {
+          "type": "code_reference",
+          "confidenceScore": 0.54,
+          "sourceReference": "src/code_reference/evidence-node-039.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-040",
+      "position": [
+        28.74,
+        -0.32,
+        -48.39
+      ],
+      "radius": 3.38,
+      "type": "node",
+      "metadata": {
+        "type": "node",
+        "title": "Database Connection Pool Pooler (#41)",
+        "description": "Manages max connections and idle timeouts for PostgreSQL.",
+        "details": {
+          "type": "code_reference",
+          "confidenceScore": 0.709,
+          "sourceReference": "src/code_reference/evidence-node-040.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-041",
+      "position": [
+        47.28,
+        21.39,
+        -15.02
+      ],
+      "radius": 4.27,
+      "type": "node",
+      "metadata": {
+        "type": "node",
+        "title": "CPU Saturation Alert Profile (#42)",
+        "description": "Average CPU utilization sits at 24% under standard production load.",
+        "details": {
+          "type": "metric",
+          "confidenceScore": 0.485,
+          "sourceReference": "src/metric/evidence-node-041.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-042",
+      "position": [
+        -3.91,
+        8.77,
+        -21.86
+      ],
+      "radius": 2.28,
+      "type": "node",
+      "metadata": {
+        "type": "node",
+        "title": "ADR-018: Use Redis for Sessions (#43)",
+        "description": "Adopted for low-latency session validation and shared stores.",
+        "details": {
+          "type": "decision_record",
+          "confidenceScore": 0.751,
+          "sourceReference": "src/decision_record/evidence-node-042.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-043",
+      "position": [
+        2.99,
+        24.9,
+        17.65
+      ],
+      "radius": 3.04,
+      "type": "node",
+      "metadata": {
+        "type": "node",
+        "title": "SQL Injection Vulnerability Scanner (#44)",
+        "description": "0 vulnerabilities detected during static code analysis execution.",
+        "details": {
+          "type": "test_result",
+          "confidenceScore": 0.663,
+          "sourceReference": "src/test_result/evidence-node-043.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-044",
+      "position": [
+        32.25,
+        -45.08,
+        -6.25
+      ],
+      "radius": 3.01,
+      "type": "node",
+      "metadata": {
+        "type": "node",
+        "title": "Memory Usage Leak Check (#45)",
+        "description": "Heap memory usage flatlines at 180MB over 48 hours.",
+        "details": {
+          "type": "metric",
+          "confidenceScore": 0.776,
+          "sourceReference": "src/metric/evidence-node-044.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-045",
+      "position": [
+        -5.05,
+        -8.67,
+        -8.38
+      ],
+      "radius": 2.62,
+      "type": "node",
+      "metadata": {
+        "type": "node",
+        "title": "API Integration Specifications v2 (#46)",
+        "description": "Specifies JSON schemas, query params, and HTTP status codes.",
+        "details": {
+          "type": "documentation",
+          "confidenceScore": 0.822,
+          "sourceReference": "src/documentation/evidence-node-045.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-046",
+      "position": [
+        25.3,
+        34.23,
+        29.58
+      ],
+      "radius": 3.1,
+      "type": "node",
+      "metadata": {
+        "type": "node",
+        "title": "API Integration Specifications v2 (#47)",
+        "description": "Specifies JSON schemas, query params, and HTTP status codes.",
+        "details": {
+          "type": "documentation",
+          "confidenceScore": 0.678,
+          "sourceReference": "src/documentation/evidence-node-046.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-047",
+      "position": [
+        -4.75,
+        -8.8,
+        -4.85
+      ],
+      "radius": 4.5,
+      "type": "node",
+      "metadata": {
+        "type": "node",
+        "title": "API Gateway Latency 99th Percentile (#48)",
+        "description": "P99 latency recorded at 42ms across all REST endpoints.",
+        "details": {
+          "type": "metric",
+          "confidenceScore": 0.525,
+          "sourceReference": "src/metric/evidence-node-047.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-048",
+      "position": [
+        42.32,
+        -5.74,
+        38.88
+      ],
+      "radius": 3.72,
+      "type": "node",
+      "metadata": {
+        "type": "node",
+        "title": "Memory Usage Leak Check (#49)",
+        "description": "Heap memory usage flatlines at 180MB over 48 hours.",
+        "details": {
+          "type": "metric",
+          "confidenceScore": 0.561,
+          "sourceReference": "src/metric/evidence-node-048.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-049",
+      "position": [
+        -15.67,
+        -22.91,
+        1.79
+      ],
+      "radius": 2.63,
+      "type": "node",
+      "metadata": {
+        "type": "node",
+        "title": "Auth Token Validation Test (#50)",
+        "description": "100% of integration test suites for token validation passed.",
+        "details": {
+          "type": "test_result",
+          "confidenceScore": 0.431,
+          "sourceReference": "src/test_result/evidence-node-049.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-050",
+      "position": [
+        -35.61,
+        12.46,
+        -12.13
+      ],
+      "radius": 3.08,
+      "type": "node",
+      "metadata": {
+        "type": "node",
+        "title": "Auth Token Validation Test (#51)",
+        "description": "100% of integration test suites for token validation passed.",
+        "details": {
+          "type": "test_result",
+          "confidenceScore": 0.533,
+          "sourceReference": "src/test_result/evidence-node-050.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-051",
+      "position": [
+        15.77,
+        0.61,
+        -26.18
+      ],
+      "radius": 3.92,
+      "type": "node",
+      "metadata": {
+        "type": "node",
+        "title": "API Integration Specifications v2 (#52)",
+        "description": "Specifies JSON schemas, query params, and HTTP status codes.",
+        "details": {
+          "type": "documentation",
+          "confidenceScore": 0.833,
+          "sourceReference": "src/documentation/evidence-node-051.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-052",
+      "position": [
+        -41.53,
+        -9.24,
+        18.6
+      ],
+      "radius": 2.8,
+      "type": "node",
+      "metadata": {
+        "type": "node",
+        "title": "Disaster Recovery Playbook (#53)",
+        "description": "Step-by-step procedures for cross-region database failover.",
+        "details": {
+          "type": "documentation",
+          "confidenceScore": 0.658,
+          "sourceReference": "src/documentation/evidence-node-052.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-053",
+      "position": [
+        4.91,
+        -12.62,
+        5.73
+      ],
+      "radius": 2.5,
+      "type": "node",
+      "metadata": {
+        "type": "node",
+        "title": "Load Test: 10k RPS Profile (#54)",
+        "description": "Average response times maintained at 14ms under peak throughput.",
+        "details": {
+          "type": "test_result",
+          "confidenceScore": 0.792,
+          "sourceReference": "src/test_result/evidence-node-053.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-054",
+      "position": [
+        -14.79,
+        0.56,
+        11.38
+      ],
+      "radius": 4.11,
+      "type": "node",
+      "metadata": {
+        "type": "node",
+        "title": "OAuth2 Flow Architecture Diagram (#55)",
+        "description": "Details token exchange sequence between client and auth server.",
+        "details": {
+          "type": "documentation",
+          "confidenceScore": 0.524,
+          "sourceReference": "src/documentation/evidence-node-054.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-055",
+      "position": [
+        -2.11,
+        -31.85,
+        -22.93
+      ],
+      "radius": 2.81,
+      "type": "node",
+      "metadata": {
+        "type": "node",
+        "title": "Auth Token Validation Test (#56)",
+        "description": "100% of integration test suites for token validation passed.",
+        "details": {
+          "type": "test_result",
+          "confidenceScore": 0.694,
+          "sourceReference": "src/test_result/evidence-node-055.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-056",
+      "position": [
+        39.79,
+        31.06,
+        8.4
+      ],
+      "radius": 3.74,
+      "type": "node",
+      "metadata": {
+        "type": "node",
+        "title": "OAuth2 Flow Architecture Diagram (#57)",
+        "description": "Details token exchange sequence between client and auth server.",
+        "details": {
+          "type": "documentation",
+          "confidenceScore": 0.582,
+          "sourceReference": "src/documentation/evidence-node-056.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-057",
+      "position": [
+        6.51,
+        42.34,
+        -9.85
+      ],
+      "radius": 3.11,
+      "type": "node",
+      "metadata": {
+        "type": "node",
+        "title": "Database Connection Pool Pooler (#58)",
+        "description": "Manages max connections and idle timeouts for PostgreSQL.",
+        "details": {
+          "type": "code_reference",
+          "confidenceScore": 0.636,
+          "sourceReference": "src/code_reference/evidence-node-057.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-058",
+      "position": [
+        8.36,
+        5.15,
+        23.21
+      ],
+      "radius": 4.34,
+      "type": "node",
+      "metadata": {
+        "type": "node",
+        "title": "JWT Secret Rotation Middleware (#59)",
+        "description": "Validates symmetric key expiration and rollbacks.",
+        "details": {
+          "type": "code_reference",
+          "confidenceScore": 0.778,
+          "sourceReference": "src/code_reference/evidence-node-058.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-059",
+      "position": [
+        39.98,
+        40.47,
+        -3.42
+      ],
+      "radius": 2.64,
+      "type": "node",
+      "metadata": {
+        "type": "node",
+        "title": "API Integration Specifications v2 (#60)",
+        "description": "Specifies JSON schemas, query params, and HTTP status codes.",
+        "details": {
+          "type": "documentation",
+          "confidenceScore": 0.498,
+          "sourceReference": "src/documentation/evidence-node-059.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-060",
+      "position": [
+        -4.15,
+        -31.12,
+        -19.66
+      ],
+      "radius": 2.92,
+      "type": "node",
+      "metadata": {
+        "type": "node",
+        "title": "API Integration Specifications v2 (#61)",
+        "description": "Specifies JSON schemas, query params, and HTTP status codes.",
+        "details": {
+          "type": "documentation",
+          "confidenceScore": 0.727,
+          "sourceReference": "src/documentation/evidence-node-060.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-061",
+      "position": [
+        -22.93,
+        10.96,
+        13.24
+      ],
+      "radius": 4.19,
+      "type": "node",
+      "metadata": {
+        "type": "node",
+        "title": "ADR-012: Migrate to Next.js (#62)",
+        "description": "Chosen for Server-Side Rendering (SSR) and routing performance.",
+        "details": {
+          "type": "decision_record",
+          "confidenceScore": 0.795,
+          "sourceReference": "src/decision_record/evidence-node-061.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-062",
+      "position": [
+        4.98,
+        -8.25,
+        -5.15
+      ],
+      "radius": 3.26,
+      "type": "node",
+      "metadata": {
+        "type": "node",
+        "title": "SQL Injection Vulnerability Scanner (#63)",
+        "description": "0 vulnerabilities detected during static code analysis execution.",
+        "details": {
+          "type": "test_result",
+          "confidenceScore": 0.783,
+          "sourceReference": "src/test_result/evidence-node-062.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-063",
+      "position": [
+        -38.91,
+        -3.04,
+        5.58
+      ],
+      "radius": 3.15,
+      "type": "node",
+      "metadata": {
+        "type": "node",
+        "title": "Memory Usage Leak Check (#64)",
+        "description": "Heap memory usage flatlines at 180MB over 48 hours.",
+        "details": {
+          "type": "metric",
+          "confidenceScore": 0.667,
+          "sourceReference": "src/metric/evidence-node-063.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-064",
+      "position": [
+        19.21,
+        7.84,
+        -18.2
+      ],
+      "radius": 3.22,
+      "type": "node",
+      "metadata": {
+        "type": "node",
+        "title": "Load Test: 10k RPS Profile (#65)",
+        "description": "Average response times maintained at 14ms under peak throughput.",
+        "details": {
+          "type": "test_result",
+          "confidenceScore": 0.839,
+          "sourceReference": "src/test_result/evidence-node-064.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-065",
+      "position": [
+        21.28,
+        7.22,
+        6.86
+      ],
+      "radius": 4.08,
+      "type": "node",
+      "metadata": {
+        "type": "node",
+        "title": "ADR-025: Implement TLS 1.3 (#66)",
+        "description": "Enforced to deprecate legacy secure protocols and cypher suites.",
+        "details": {
+          "type": "decision_record",
+          "confidenceScore": 0.589,
+          "sourceReference": "src/decision_record/evidence-node-065.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-066",
+      "position": [
+        5.31,
+        12.99,
+        9.06
+      ],
+      "radius": 5.08,
+      "type": "node",
+      "metadata": {
+        "type": "node",
+        "title": "Memory Usage Leak Check (#67)",
+        "description": "Heap memory usage flatlines at 180MB over 48 hours.",
+        "details": {
+          "type": "metric",
+          "confidenceScore": 0.876,
+          "sourceReference": "src/metric/evidence-node-066.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-067",
+      "position": [
+        2.99,
+        24.45,
+        1.01
+      ],
+      "radius": 3.71,
+      "type": "node",
+      "metadata": {
+        "type": "node",
+        "title": "ADR-018: Use Redis for Sessions (#68)",
+        "description": "Adopted for low-latency session validation and shared stores.",
+        "details": {
+          "type": "decision_record",
+          "confidenceScore": 0.611,
+          "sourceReference": "src/decision_record/evidence-node-067.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-068",
+      "position": [
+        -4.65,
+        15.12,
+        -0.75
+      ],
+      "radius": 3.69,
+      "type": "node",
+      "metadata": {
+        "type": "node",
+        "title": "ADR-025: Implement TLS 1.3 (#69)",
+        "description": "Enforced to deprecate legacy secure protocols and cypher suites.",
+        "details": {
+          "type": "decision_record",
+          "confidenceScore": 0.657,
+          "sourceReference": "src/decision_record/evidence-node-068.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-069",
+      "position": [
+        42.9,
+        9.8,
+        -35.08
+      ],
+      "radius": 3.05,
+      "type": "node",
+      "metadata": {
+        "type": "node",
+        "title": "OAuth2 Flow Architecture Diagram (#70)",
+        "description": "Details token exchange sequence between client and auth server.",
+        "details": {
+          "type": "documentation",
+          "confidenceScore": 0.733,
+          "sourceReference": "src/documentation/evidence-node-069.ts"
+        }
+      }
+    }
+  ],
+  "lighting": {
+    "ambient": {
+      "color": "#101020",
+      "intensity": 0.15
+    },
+    "point": [
+      {
+        "color": "#9C27B0",
+        "intensity": 0.85,
+        "position": [
+          -25.887850705663897,
+          35.41757671111819,
+          -9.271670628773139
+        ],
+        "distance": 60
+      },
+      {
+        "color": "#9C27B0",
+        "intensity": 0.85,
+        "position": [
+          11.549156832030565,
+          -13.879976599769627,
+          -22.985619568446545
+        ],
+        "distance": 60
+      },
+      {
+        "color": "#00BCD4",
+        "intensity": 0.85,
+        "position": [
+          16.5819737600376,
+          11.906066773394098,
+          21.500556307990056
+        ],
+        "distance": 60
+      },
+      {
+        "color": "#00BCD4",
+        "intensity": 0.85,
+        "position": [
+          -14.527382558012258,
+          15.548162841200154,
+          -18.553991745278516
+        ],
+        "distance": 60
+      },
+      {
+        "color": "#00BCD4",
+        "intensity": 0.85,
+        "position": [
+          -2.972443384859204,
+          11.883202368658376,
+          -53.84054213219249
+        ],
+        "distance": 60
+      }
+    ]
+  },
+  "postProcessing": {
+    "bloom": {
+      "strength": 1,
+      "threshold": 0.25,
+      "radius": 1.2
+    }
+  },
+  "networkNodes": [
+    {
+      "id": "evidence-node-000",
+      "position": [
+        -25.89,
+        35.42,
+        -9.27
+      ],
+      "type": "documentation",
+      "confidenceScore": 0.959,
+      "size": 3.8,
+      "metadata": {
+        "type": "node",
+        "title": "Disaster Recovery Playbook (#1)",
+        "description": "Step-by-step procedures for cross-region database failover.",
+        "details": {
+          "type": "documentation",
+          "confidenceScore": 0.959,
+          "sourceReference": "src/documentation/evidence-node-000.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-001",
+      "position": [
+        11.55,
+        -13.88,
+        -22.99
+      ],
+      "type": "documentation",
+      "confidenceScore": 0.94,
+      "size": 3.76,
+      "metadata": {
+        "type": "node",
+        "title": "Disaster Recovery Playbook (#2)",
+        "description": "Step-by-step procedures for cross-region database failover.",
+        "details": {
+          "type": "documentation",
+          "confidenceScore": 0.94,
+          "sourceReference": "src/documentation/evidence-node-001.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-002",
+      "position": [
+        16.58,
+        11.91,
+        21.5
+      ],
+      "type": "decision_record",
+      "confidenceScore": 0.962,
+      "size": 3.22,
+      "metadata": {
+        "type": "node",
+        "title": "ADR-018: Use Redis for Sessions (#3)",
+        "description": "Adopted for low-latency session validation and shared stores.",
+        "details": {
+          "type": "decision_record",
+          "confidenceScore": 0.962,
+          "sourceReference": "src/decision_record/evidence-node-002.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-003",
+      "position": [
+        -14.53,
+        15.55,
+        -18.55
+      ],
+      "type": "decision_record",
+      "confidenceScore": 0.977,
+      "size": 3.58,
+      "metadata": {
+        "type": "node",
+        "title": "ADR-025: Implement TLS 1.3 (#4)",
+        "description": "Enforced to deprecate legacy secure protocols and cypher suites.",
+        "details": {
+          "type": "decision_record",
+          "confidenceScore": 0.977,
+          "sourceReference": "src/decision_record/evidence-node-003.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-004",
+      "position": [
+        -2.97,
+        11.88,
+        -53.84
+      ],
+      "type": "decision_record",
+      "confidenceScore": 0.949,
+      "size": 3.51,
+      "metadata": {
+        "type": "node",
+        "title": "ADR-025: Implement TLS 1.3 (#5)",
+        "description": "Enforced to deprecate legacy secure protocols and cypher suites.",
+        "details": {
+          "type": "decision_record",
+          "confidenceScore": 0.949,
+          "sourceReference": "src/decision_record/evidence-node-004.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-005",
+      "position": [
+        33.35,
+        -12.2,
+        15.91
+      ],
+      "type": "documentation",
+      "confidenceScore": 0.722,
+      "size": 1.83,
+      "metadata": {
+        "type": "node",
+        "title": "OAuth2 Flow Architecture Diagram (#6)",
+        "description": "Details token exchange sequence between client and auth server.",
+        "details": {
+          "type": "documentation",
+          "confidenceScore": 0.722,
+          "sourceReference": "src/documentation/evidence-node-005.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-006",
+      "position": [
+        23.4,
+        -18.46,
+        -2.94
+      ],
+      "type": "metric",
+      "confidenceScore": 0.478,
+      "size": 2.83,
+      "metadata": {
+        "type": "node",
+        "title": "CPU Saturation Alert Profile (#7)",
+        "description": "Average CPU utilization sits at 24% under standard production load.",
+        "details": {
+          "type": "metric",
+          "confidenceScore": 0.478,
+          "sourceReference": "src/metric/evidence-node-006.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-007",
+      "position": [
+        1.81,
+        7.83,
+        -25.01
+      ],
+      "type": "decision_record",
+      "confidenceScore": 0.69,
+      "size": 2.94,
+      "metadata": {
+        "type": "node",
+        "title": "ADR-025: Implement TLS 1.3 (#8)",
+        "description": "Enforced to deprecate legacy secure protocols and cypher suites.",
+        "details": {
+          "type": "decision_record",
+          "confidenceScore": 0.69,
+          "sourceReference": "src/decision_record/evidence-node-007.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-008",
+      "position": [
+        -10.81,
+        -1.16,
+        -4.64
+      ],
+      "type": "test_result",
+      "confidenceScore": 0.424,
+      "size": 2.24,
+      "metadata": {
+        "type": "node",
+        "title": "Auth Token Validation Test (#9)",
+        "description": "100% of integration test suites for token validation passed.",
+        "details": {
+          "type": "test_result",
+          "confidenceScore": 0.424,
+          "sourceReference": "src/test_result/evidence-node-008.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-009",
+      "position": [
+        28.78,
+        -32.71,
+        21.88
+      ],
+      "type": "test_result",
+      "confidenceScore": 0.424,
+      "size": 2.94,
+      "metadata": {
+        "type": "node",
+        "title": "SQL Injection Vulnerability Scanner (#10)",
+        "description": "0 vulnerabilities detected during static code analysis execution.",
+        "details": {
+          "type": "test_result",
+          "confidenceScore": 0.424,
+          "sourceReference": "src/test_result/evidence-node-009.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-010",
+      "position": [
+        -54.64,
+        -12.09,
+        6.7
+      ],
+      "type": "metric",
+      "confidenceScore": 0.531,
+      "size": 2.59,
+      "metadata": {
+        "type": "node",
+        "title": "Memory Usage Leak Check (#11)",
+        "description": "Heap memory usage flatlines at 180MB over 48 hours.",
+        "details": {
+          "type": "metric",
+          "confidenceScore": 0.531,
+          "sourceReference": "src/metric/evidence-node-010.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-011",
+      "position": [
+        -12.23,
+        -39.61,
+        35.63
+      ],
+      "type": "decision_record",
+      "confidenceScore": 0.504,
+      "size": 2.55,
+      "metadata": {
+        "type": "node",
+        "title": "ADR-012: Migrate to Next.js (#12)",
+        "description": "Chosen for Server-Side Rendering (SSR) and routing performance.",
+        "details": {
+          "type": "decision_record",
+          "confidenceScore": 0.504,
+          "sourceReference": "src/decision_record/evidence-node-011.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-012",
+      "position": [
+        17.26,
+        -52.29,
+        16.44
+      ],
+      "type": "decision_record",
+      "confidenceScore": 0.821,
+      "size": 1.82,
+      "metadata": {
+        "type": "node",
+        "title": "ADR-025: Implement TLS 1.3 (#13)",
+        "description": "Enforced to deprecate legacy secure protocols and cypher suites.",
+        "details": {
+          "type": "decision_record",
+          "confidenceScore": 0.821,
+          "sourceReference": "src/decision_record/evidence-node-012.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-013",
+      "position": [
+        -11.16,
+        -38.52,
+        -4.3
+      ],
+      "type": "code_reference",
+      "confidenceScore": 0.727,
+      "size": 2.52,
+      "metadata": {
+        "type": "node",
+        "title": "JWT Secret Rotation Middleware (#14)",
+        "description": "Validates symmetric key expiration and rollbacks.",
+        "details": {
+          "type": "code_reference",
+          "confidenceScore": 0.727,
+          "sourceReference": "src/code_reference/evidence-node-013.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-014",
+      "position": [
+        47.15,
+        -2.85,
+        -13.86
+      ],
+      "type": "test_result",
+      "confidenceScore": 0.555,
+      "size": 2.93,
+      "metadata": {
+        "type": "node",
+        "title": "Load Test: 10k RPS Profile (#15)",
+        "description": "Average response times maintained at 14ms under peak throughput.",
+        "details": {
+          "type": "test_result",
+          "confidenceScore": 0.555,
+          "sourceReference": "src/test_result/evidence-node-014.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-015",
+      "position": [
+        19.41,
+        16.28,
+        -28.12
+      ],
+      "type": "decision_record",
+      "confidenceScore": 0.742,
+      "size": 2.25,
+      "metadata": {
+        "type": "node",
+        "title": "ADR-012: Migrate to Next.js (#16)",
+        "description": "Chosen for Server-Side Rendering (SSR) and routing performance.",
+        "details": {
+          "type": "decision_record",
+          "confidenceScore": 0.742,
+          "sourceReference": "src/decision_record/evidence-node-015.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-016",
+      "position": [
+        -38.01,
+        -19.08,
+        -13.81
+      ],
+      "type": "decision_record",
+      "confidenceScore": 0.689,
+      "size": 2.96,
+      "metadata": {
+        "type": "node",
+        "title": "ADR-012: Migrate to Next.js (#17)",
+        "description": "Chosen for Server-Side Rendering (SSR) and routing performance.",
+        "details": {
+          "type": "decision_record",
+          "confidenceScore": 0.689,
+          "sourceReference": "src/decision_record/evidence-node-016.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-017",
+      "position": [
+        -7.71,
+        -1.15,
+        13.98
+      ],
+      "type": "code_reference",
+      "confidenceScore": 0.724,
+      "size": 2.91,
+      "metadata": {
+        "type": "node",
+        "title": "Redis Cache Eviction Policy (#18)",
+        "description": "Implements LRU cache eviction and key TTL checks.",
+        "details": {
+          "type": "code_reference",
+          "confidenceScore": 0.724,
+          "sourceReference": "src/code_reference/evidence-node-017.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-018",
+      "position": [
+        -20.49,
+        -33.98,
+        13.2
+      ],
+      "type": "decision_record",
+      "confidenceScore": 0.401,
+      "size": 1.73,
+      "metadata": {
+        "type": "node",
+        "title": "ADR-018: Use Redis for Sessions (#19)",
+        "description": "Adopted for low-latency session validation and shared stores.",
+        "details": {
+          "type": "decision_record",
+          "confidenceScore": 0.401,
+          "sourceReference": "src/decision_record/evidence-node-018.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-019",
+      "position": [
+        -27.17,
+        17.1,
+        -22.83
+      ],
+      "type": "documentation",
+      "confidenceScore": 0.464,
+      "size": 1.95,
+      "metadata": {
+        "type": "node",
+        "title": "API Integration Specifications v2 (#20)",
+        "description": "Specifies JSON schemas, query params, and HTTP status codes.",
+        "details": {
+          "type": "documentation",
+          "confidenceScore": 0.464,
+          "sourceReference": "src/documentation/evidence-node-019.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-020",
+      "position": [
+        20.74,
+        48.57,
+        8.33
+      ],
+      "type": "documentation",
+      "confidenceScore": 0.688,
+      "size": 2.39,
+      "metadata": {
+        "type": "node",
+        "title": "OAuth2 Flow Architecture Diagram (#21)",
+        "description": "Details token exchange sequence between client and auth server.",
+        "details": {
+          "type": "documentation",
+          "confidenceScore": 0.688,
+          "sourceReference": "src/documentation/evidence-node-020.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-021",
+      "position": [
+        -7.55,
+        33.73,
+        9.84
+      ],
+      "type": "code_reference",
+      "confidenceScore": 0.681,
+      "size": 2.86,
+      "metadata": {
+        "type": "node",
+        "title": "Database Connection Pool Pooler (#22)",
+        "description": "Manages max connections and idle timeouts for PostgreSQL.",
+        "details": {
+          "type": "code_reference",
+          "confidenceScore": 0.681,
+          "sourceReference": "src/code_reference/evidence-node-021.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-022",
+      "position": [
+        -28.68,
+        17.03,
+        -17.51
+      ],
+      "type": "test_result",
+      "confidenceScore": 0.864,
+      "size": 3.71,
+      "metadata": {
+        "type": "node",
+        "title": "Load Test: 10k RPS Profile (#23)",
+        "description": "Average response times maintained at 14ms under peak throughput.",
+        "details": {
+          "type": "test_result",
+          "confidenceScore": 0.864,
+          "sourceReference": "src/test_result/evidence-node-022.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-023",
+      "position": [
+        15.68,
+        -5.68,
+        12.17
+      ],
+      "type": "test_result",
+      "confidenceScore": 0.522,
+      "size": 1.78,
+      "metadata": {
+        "type": "node",
+        "title": "Load Test: 10k RPS Profile (#24)",
+        "description": "Average response times maintained at 14ms under peak throughput.",
+        "details": {
+          "type": "test_result",
+          "confidenceScore": 0.522,
+          "sourceReference": "src/test_result/evidence-node-023.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-024",
+      "position": [
+        5.26,
+        -10.38,
+        2.99
+      ],
+      "type": "documentation",
+      "confidenceScore": 0.789,
+      "size": 1.63,
+      "metadata": {
+        "type": "node",
+        "title": "API Integration Specifications v2 (#25)",
+        "description": "Specifies JSON schemas, query params, and HTTP status codes.",
+        "details": {
+          "type": "documentation",
+          "confidenceScore": 0.789,
+          "sourceReference": "src/documentation/evidence-node-024.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-025",
+      "position": [
+        -45.64,
+        -1.28,
+        -8.82
+      ],
+      "type": "test_result",
+      "confidenceScore": 0.589,
+      "size": 1.85,
+      "metadata": {
+        "type": "node",
+        "title": "Load Test: 10k RPS Profile (#26)",
+        "description": "Average response times maintained at 14ms under peak throughput.",
+        "details": {
+          "type": "test_result",
+          "confidenceScore": 0.589,
+          "sourceReference": "src/test_result/evidence-node-025.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-026",
+      "position": [
+        -13.69,
+        -19.28,
+        -44.4
+      ],
+      "type": "documentation",
+      "confidenceScore": 0.753,
+      "size": 2.21,
+      "metadata": {
+        "type": "node",
+        "title": "Disaster Recovery Playbook (#27)",
+        "description": "Step-by-step procedures for cross-region database failover.",
+        "details": {
+          "type": "documentation",
+          "confidenceScore": 0.753,
+          "sourceReference": "src/documentation/evidence-node-026.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-027",
+      "position": [
+        -18.41,
+        -27.92,
+        -18.96
+      ],
+      "type": "code_reference",
+      "confidenceScore": 0.628,
+      "size": 2.16,
+      "metadata": {
+        "type": "node",
+        "title": "Redis Cache Eviction Policy (#28)",
+        "description": "Implements LRU cache eviction and key TTL checks.",
+        "details": {
+          "type": "code_reference",
+          "confidenceScore": 0.628,
+          "sourceReference": "src/code_reference/evidence-node-027.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-028",
+      "position": [
+        -22.03,
+        50.72,
+        -14.99
+      ],
+      "type": "documentation",
+      "confidenceScore": 0.424,
+      "size": 2.19,
+      "metadata": {
+        "type": "node",
+        "title": "OAuth2 Flow Architecture Diagram (#29)",
+        "description": "Details token exchange sequence between client and auth server.",
+        "details": {
+          "type": "documentation",
+          "confidenceScore": 0.424,
+          "sourceReference": "src/documentation/evidence-node-028.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-029",
+      "position": [
+        -9.14,
+        10.47,
+        6.84
+      ],
+      "type": "test_result",
+      "confidenceScore": 0.765,
+      "size": 1.74,
+      "metadata": {
+        "type": "node",
+        "title": "Load Test: 10k RPS Profile (#30)",
+        "description": "Average response times maintained at 14ms under peak throughput.",
+        "details": {
+          "type": "test_result",
+          "confidenceScore": 0.765,
+          "sourceReference": "src/test_result/evidence-node-029.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-030",
+      "position": [
+        21.41,
+        18.82,
+        0.56
+      ],
+      "type": "test_result",
+      "confidenceScore": 0.741,
+      "size": 2.64,
+      "metadata": {
+        "type": "node",
+        "title": "Auth Token Validation Test (#31)",
+        "description": "100% of integration test suites for token validation passed.",
+        "details": {
+          "type": "test_result",
+          "confidenceScore": 0.741,
+          "sourceReference": "src/test_result/evidence-node-030.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-031",
+      "position": [
+        -24.87,
+        -31.97,
+        -44.17
+      ],
+      "type": "documentation",
+      "confidenceScore": 0.872,
+      "size": 3.29,
+      "metadata": {
+        "type": "node",
+        "title": "Disaster Recovery Playbook (#32)",
+        "description": "Step-by-step procedures for cross-region database failover.",
+        "details": {
+          "type": "documentation",
+          "confidenceScore": 0.872,
+          "sourceReference": "src/documentation/evidence-node-031.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-032",
+      "position": [
+        -18.97,
+        -17.68,
+        -1.24
+      ],
+      "type": "documentation",
+      "confidenceScore": 0.795,
+      "size": 2.72,
+      "metadata": {
+        "type": "node",
+        "title": "OAuth2 Flow Architecture Diagram (#33)",
+        "description": "Details token exchange sequence between client and auth server.",
+        "details": {
+          "type": "documentation",
+          "confidenceScore": 0.795,
+          "sourceReference": "src/documentation/evidence-node-032.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-033",
+      "position": [
+        3.2,
+        -10.22,
+        6.68
+      ],
+      "type": "decision_record",
+      "confidenceScore": 0.897,
+      "size": 3.21,
+      "metadata": {
+        "type": "node",
+        "title": "ADR-025: Implement TLS 1.3 (#34)",
+        "description": "Enforced to deprecate legacy secure protocols and cypher suites.",
+        "details": {
+          "type": "decision_record",
+          "confidenceScore": 0.897,
+          "sourceReference": "src/decision_record/evidence-node-033.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-034",
+      "position": [
+        -21.69,
+        -27.14,
+        17.42
+      ],
+      "type": "code_reference",
+      "confidenceScore": 0.647,
+      "size": 2.59,
+      "metadata": {
+        "type": "node",
+        "title": "Redis Cache Eviction Policy (#35)",
+        "description": "Implements LRU cache eviction and key TTL checks.",
+        "details": {
+          "type": "code_reference",
+          "confidenceScore": 0.647,
+          "sourceReference": "src/code_reference/evidence-node-034.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-035",
+      "position": [
+        2.35,
+        10.59,
+        -4.91
+      ],
+      "type": "test_result",
+      "confidenceScore": 0.665,
+      "size": 2.33,
+      "metadata": {
+        "type": "node",
+        "title": "Auth Token Validation Test (#36)",
+        "description": "100% of integration test suites for token validation passed.",
+        "details": {
+          "type": "test_result",
+          "confidenceScore": 0.665,
+          "sourceReference": "src/test_result/evidence-node-035.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-036",
+      "position": [
+        4.69,
+        -6.79,
+        58.76
+      ],
+      "type": "decision_record",
+      "confidenceScore": 0.811,
+      "size": 2.36,
+      "metadata": {
+        "type": "node",
+        "title": "ADR-018: Use Redis for Sessions (#37)",
+        "description": "Adopted for low-latency session validation and shared stores.",
+        "details": {
+          "type": "decision_record",
+          "confidenceScore": 0.811,
+          "sourceReference": "src/decision_record/evidence-node-036.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-037",
+      "position": [
+        -11.65,
+        11.05,
+        -7.93
+      ],
+      "type": "documentation",
+      "confidenceScore": 0.411,
+      "size": 2.23,
+      "metadata": {
+        "type": "node",
+        "title": "Disaster Recovery Playbook (#38)",
+        "description": "Step-by-step procedures for cross-region database failover.",
+        "details": {
+          "type": "documentation",
+          "confidenceScore": 0.411,
+          "sourceReference": "src/documentation/evidence-node-037.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-038",
+      "position": [
+        11.01,
+        15.31,
+        5.58
+      ],
+      "type": "decision_record",
+      "confidenceScore": 0.639,
+      "size": 2.13,
+      "metadata": {
+        "type": "node",
+        "title": "ADR-018: Use Redis for Sessions (#39)",
+        "description": "Adopted for low-latency session validation and shared stores.",
+        "details": {
+          "type": "decision_record",
+          "confidenceScore": 0.639,
+          "sourceReference": "src/decision_record/evidence-node-038.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-039",
+      "position": [
+        2.77,
+        6.22,
+        20.07
+      ],
+      "type": "code_reference",
+      "confidenceScore": 0.54,
+      "size": 1.66,
+      "metadata": {
+        "type": "node",
+        "title": "Database Connection Pool Pooler (#40)",
+        "description": "Manages max connections and idle timeouts for PostgreSQL.",
+        "details": {
+          "type": "code_reference",
+          "confidenceScore": 0.54,
+          "sourceReference": "src/code_reference/evidence-node-039.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-040",
+      "position": [
+        28.74,
+        -0.32,
+        -48.39
+      ],
+      "type": "code_reference",
+      "confidenceScore": 0.709,
+      "size": 2.25,
+      "metadata": {
+        "type": "node",
+        "title": "Database Connection Pool Pooler (#41)",
+        "description": "Manages max connections and idle timeouts for PostgreSQL.",
+        "details": {
+          "type": "code_reference",
+          "confidenceScore": 0.709,
+          "sourceReference": "src/code_reference/evidence-node-040.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-041",
+      "position": [
+        47.28,
+        21.39,
+        -15.02
+      ],
+      "type": "metric",
+      "confidenceScore": 0.485,
+      "size": 2.84,
+      "metadata": {
+        "type": "node",
+        "title": "CPU Saturation Alert Profile (#42)",
+        "description": "Average CPU utilization sits at 24% under standard production load.",
+        "details": {
+          "type": "metric",
+          "confidenceScore": 0.485,
+          "sourceReference": "src/metric/evidence-node-041.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-042",
+      "position": [
+        -3.91,
+        8.77,
+        -21.86
+      ],
+      "type": "decision_record",
+      "confidenceScore": 0.751,
+      "size": 1.52,
+      "metadata": {
+        "type": "node",
+        "title": "ADR-018: Use Redis for Sessions (#43)",
+        "description": "Adopted for low-latency session validation and shared stores.",
+        "details": {
+          "type": "decision_record",
+          "confidenceScore": 0.751,
+          "sourceReference": "src/decision_record/evidence-node-042.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-043",
+      "position": [
+        2.99,
+        24.9,
+        17.65
+      ],
+      "type": "test_result",
+      "confidenceScore": 0.663,
+      "size": 2.03,
+      "metadata": {
+        "type": "node",
+        "title": "SQL Injection Vulnerability Scanner (#44)",
+        "description": "0 vulnerabilities detected during static code analysis execution.",
+        "details": {
+          "type": "test_result",
+          "confidenceScore": 0.663,
+          "sourceReference": "src/test_result/evidence-node-043.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-044",
+      "position": [
+        32.25,
+        -45.08,
+        -6.25
+      ],
+      "type": "metric",
+      "confidenceScore": 0.776,
+      "size": 2.01,
+      "metadata": {
+        "type": "node",
+        "title": "Memory Usage Leak Check (#45)",
+        "description": "Heap memory usage flatlines at 180MB over 48 hours.",
+        "details": {
+          "type": "metric",
+          "confidenceScore": 0.776,
+          "sourceReference": "src/metric/evidence-node-044.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-045",
+      "position": [
+        -5.05,
+        -8.67,
+        -8.38
+      ],
+      "type": "documentation",
+      "confidenceScore": 0.822,
+      "size": 1.75,
+      "metadata": {
+        "type": "node",
+        "title": "API Integration Specifications v2 (#46)",
+        "description": "Specifies JSON schemas, query params, and HTTP status codes.",
+        "details": {
+          "type": "documentation",
+          "confidenceScore": 0.822,
+          "sourceReference": "src/documentation/evidence-node-045.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-046",
+      "position": [
+        25.3,
+        34.23,
+        29.58
+      ],
+      "type": "documentation",
+      "confidenceScore": 0.678,
+      "size": 2.07,
+      "metadata": {
+        "type": "node",
+        "title": "API Integration Specifications v2 (#47)",
+        "description": "Specifies JSON schemas, query params, and HTTP status codes.",
+        "details": {
+          "type": "documentation",
+          "confidenceScore": 0.678,
+          "sourceReference": "src/documentation/evidence-node-046.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-047",
+      "position": [
+        -4.75,
+        -8.8,
+        -4.85
+      ],
+      "type": "metric",
+      "confidenceScore": 0.525,
+      "size": 3,
+      "metadata": {
+        "type": "node",
+        "title": "API Gateway Latency 99th Percentile (#48)",
+        "description": "P99 latency recorded at 42ms across all REST endpoints.",
+        "details": {
+          "type": "metric",
+          "confidenceScore": 0.525,
+          "sourceReference": "src/metric/evidence-node-047.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-048",
+      "position": [
+        42.32,
+        -5.74,
+        38.88
+      ],
+      "type": "metric",
+      "confidenceScore": 0.561,
+      "size": 2.48,
+      "metadata": {
+        "type": "node",
+        "title": "Memory Usage Leak Check (#49)",
+        "description": "Heap memory usage flatlines at 180MB over 48 hours.",
+        "details": {
+          "type": "metric",
+          "confidenceScore": 0.561,
+          "sourceReference": "src/metric/evidence-node-048.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-049",
+      "position": [
+        -15.67,
+        -22.91,
+        1.79
+      ],
+      "type": "test_result",
+      "confidenceScore": 0.431,
+      "size": 1.75,
+      "metadata": {
+        "type": "node",
+        "title": "Auth Token Validation Test (#50)",
+        "description": "100% of integration test suites for token validation passed.",
+        "details": {
+          "type": "test_result",
+          "confidenceScore": 0.431,
+          "sourceReference": "src/test_result/evidence-node-049.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-050",
+      "position": [
+        -35.61,
+        12.46,
+        -12.13
+      ],
+      "type": "test_result",
+      "confidenceScore": 0.533,
+      "size": 2.05,
+      "metadata": {
+        "type": "node",
+        "title": "Auth Token Validation Test (#51)",
+        "description": "100% of integration test suites for token validation passed.",
+        "details": {
+          "type": "test_result",
+          "confidenceScore": 0.533,
+          "sourceReference": "src/test_result/evidence-node-050.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-051",
+      "position": [
+        15.77,
+        0.61,
+        -26.18
+      ],
+      "type": "documentation",
+      "confidenceScore": 0.833,
+      "size": 2.61,
+      "metadata": {
+        "type": "node",
+        "title": "API Integration Specifications v2 (#52)",
+        "description": "Specifies JSON schemas, query params, and HTTP status codes.",
+        "details": {
+          "type": "documentation",
+          "confidenceScore": 0.833,
+          "sourceReference": "src/documentation/evidence-node-051.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-052",
+      "position": [
+        -41.53,
+        -9.24,
+        18.6
+      ],
+      "type": "documentation",
+      "confidenceScore": 0.658,
+      "size": 1.87,
+      "metadata": {
+        "type": "node",
+        "title": "Disaster Recovery Playbook (#53)",
+        "description": "Step-by-step procedures for cross-region database failover.",
+        "details": {
+          "type": "documentation",
+          "confidenceScore": 0.658,
+          "sourceReference": "src/documentation/evidence-node-052.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-053",
+      "position": [
+        4.91,
+        -12.62,
+        5.73
+      ],
+      "type": "test_result",
+      "confidenceScore": 0.792,
+      "size": 1.67,
+      "metadata": {
+        "type": "node",
+        "title": "Load Test: 10k RPS Profile (#54)",
+        "description": "Average response times maintained at 14ms under peak throughput.",
+        "details": {
+          "type": "test_result",
+          "confidenceScore": 0.792,
+          "sourceReference": "src/test_result/evidence-node-053.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-054",
+      "position": [
+        -14.79,
+        0.56,
+        11.38
+      ],
+      "type": "documentation",
+      "confidenceScore": 0.524,
+      "size": 2.74,
+      "metadata": {
+        "type": "node",
+        "title": "OAuth2 Flow Architecture Diagram (#55)",
+        "description": "Details token exchange sequence between client and auth server.",
+        "details": {
+          "type": "documentation",
+          "confidenceScore": 0.524,
+          "sourceReference": "src/documentation/evidence-node-054.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-055",
+      "position": [
+        -2.11,
+        -31.85,
+        -22.93
+      ],
+      "type": "test_result",
+      "confidenceScore": 0.694,
+      "size": 1.87,
+      "metadata": {
+        "type": "node",
+        "title": "Auth Token Validation Test (#56)",
+        "description": "100% of integration test suites for token validation passed.",
+        "details": {
+          "type": "test_result",
+          "confidenceScore": 0.694,
+          "sourceReference": "src/test_result/evidence-node-055.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-056",
+      "position": [
+        39.79,
+        31.06,
+        8.4
+      ],
+      "type": "documentation",
+      "confidenceScore": 0.582,
+      "size": 2.5,
+      "metadata": {
+        "type": "node",
+        "title": "OAuth2 Flow Architecture Diagram (#57)",
+        "description": "Details token exchange sequence between client and auth server.",
+        "details": {
+          "type": "documentation",
+          "confidenceScore": 0.582,
+          "sourceReference": "src/documentation/evidence-node-056.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-057",
+      "position": [
+        6.51,
+        42.34,
+        -9.85
+      ],
+      "type": "code_reference",
+      "confidenceScore": 0.636,
+      "size": 2.07,
+      "metadata": {
+        "type": "node",
+        "title": "Database Connection Pool Pooler (#58)",
+        "description": "Manages max connections and idle timeouts for PostgreSQL.",
+        "details": {
+          "type": "code_reference",
+          "confidenceScore": 0.636,
+          "sourceReference": "src/code_reference/evidence-node-057.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-058",
+      "position": [
+        8.36,
+        5.15,
+        23.21
+      ],
+      "type": "code_reference",
+      "confidenceScore": 0.778,
+      "size": 2.89,
+      "metadata": {
+        "type": "node",
+        "title": "JWT Secret Rotation Middleware (#59)",
+        "description": "Validates symmetric key expiration and rollbacks.",
+        "details": {
+          "type": "code_reference",
+          "confidenceScore": 0.778,
+          "sourceReference": "src/code_reference/evidence-node-058.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-059",
+      "position": [
+        39.98,
+        40.47,
+        -3.42
+      ],
+      "type": "documentation",
+      "confidenceScore": 0.498,
+      "size": 1.76,
+      "metadata": {
+        "type": "node",
+        "title": "API Integration Specifications v2 (#60)",
+        "description": "Specifies JSON schemas, query params, and HTTP status codes.",
+        "details": {
+          "type": "documentation",
+          "confidenceScore": 0.498,
+          "sourceReference": "src/documentation/evidence-node-059.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-060",
+      "position": [
+        -4.15,
+        -31.12,
+        -19.66
+      ],
+      "type": "documentation",
+      "confidenceScore": 0.727,
+      "size": 1.94,
+      "metadata": {
+        "type": "node",
+        "title": "API Integration Specifications v2 (#61)",
+        "description": "Specifies JSON schemas, query params, and HTTP status codes.",
+        "details": {
+          "type": "documentation",
+          "confidenceScore": 0.727,
+          "sourceReference": "src/documentation/evidence-node-060.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-061",
+      "position": [
+        -22.93,
+        10.96,
+        13.24
+      ],
+      "type": "decision_record",
+      "confidenceScore": 0.795,
+      "size": 2.8,
+      "metadata": {
+        "type": "node",
+        "title": "ADR-012: Migrate to Next.js (#62)",
+        "description": "Chosen for Server-Side Rendering (SSR) and routing performance.",
+        "details": {
+          "type": "decision_record",
+          "confidenceScore": 0.795,
+          "sourceReference": "src/decision_record/evidence-node-061.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-062",
+      "position": [
+        4.98,
+        -8.25,
+        -5.15
+      ],
+      "type": "test_result",
+      "confidenceScore": 0.783,
+      "size": 2.17,
+      "metadata": {
+        "type": "node",
+        "title": "SQL Injection Vulnerability Scanner (#63)",
+        "description": "0 vulnerabilities detected during static code analysis execution.",
+        "details": {
+          "type": "test_result",
+          "confidenceScore": 0.783,
+          "sourceReference": "src/test_result/evidence-node-062.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-063",
+      "position": [
+        -38.91,
+        -3.04,
+        5.58
+      ],
+      "type": "metric",
+      "confidenceScore": 0.667,
+      "size": 2.1,
+      "metadata": {
+        "type": "node",
+        "title": "Memory Usage Leak Check (#64)",
+        "description": "Heap memory usage flatlines at 180MB over 48 hours.",
+        "details": {
+          "type": "metric",
+          "confidenceScore": 0.667,
+          "sourceReference": "src/metric/evidence-node-063.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-064",
+      "position": [
+        19.21,
+        7.84,
+        -18.2
+      ],
+      "type": "test_result",
+      "confidenceScore": 0.839,
+      "size": 2.14,
+      "metadata": {
+        "type": "node",
+        "title": "Load Test: 10k RPS Profile (#65)",
+        "description": "Average response times maintained at 14ms under peak throughput.",
+        "details": {
+          "type": "test_result",
+          "confidenceScore": 0.839,
+          "sourceReference": "src/test_result/evidence-node-064.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-065",
+      "position": [
+        21.28,
+        7.22,
+        6.86
+      ],
+      "type": "decision_record",
+      "confidenceScore": 0.589,
+      "size": 2.72,
+      "metadata": {
+        "type": "node",
+        "title": "ADR-025: Implement TLS 1.3 (#66)",
+        "description": "Enforced to deprecate legacy secure protocols and cypher suites.",
+        "details": {
+          "type": "decision_record",
+          "confidenceScore": 0.589,
+          "sourceReference": "src/decision_record/evidence-node-065.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-066",
+      "position": [
+        5.31,
+        12.99,
+        9.06
+      ],
+      "type": "metric",
+      "confidenceScore": 0.876,
+      "size": 3.39,
+      "metadata": {
+        "type": "node",
+        "title": "Memory Usage Leak Check (#67)",
+        "description": "Heap memory usage flatlines at 180MB over 48 hours.",
+        "details": {
+          "type": "metric",
+          "confidenceScore": 0.876,
+          "sourceReference": "src/metric/evidence-node-066.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-067",
+      "position": [
+        2.99,
+        24.45,
+        1.01
+      ],
+      "type": "decision_record",
+      "confidenceScore": 0.611,
+      "size": 2.47,
+      "metadata": {
+        "type": "node",
+        "title": "ADR-018: Use Redis for Sessions (#68)",
+        "description": "Adopted for low-latency session validation and shared stores.",
+        "details": {
+          "type": "decision_record",
+          "confidenceScore": 0.611,
+          "sourceReference": "src/decision_record/evidence-node-067.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-068",
+      "position": [
+        -4.65,
+        15.12,
+        -0.75
+      ],
+      "type": "decision_record",
+      "confidenceScore": 0.657,
+      "size": 2.46,
+      "metadata": {
+        "type": "node",
+        "title": "ADR-025: Implement TLS 1.3 (#69)",
+        "description": "Enforced to deprecate legacy secure protocols and cypher suites.",
+        "details": {
+          "type": "decision_record",
+          "confidenceScore": 0.657,
+          "sourceReference": "src/decision_record/evidence-node-068.ts"
+        }
+      }
+    },
+    {
+      "id": "evidence-node-069",
+      "position": [
+        42.9,
+        9.8,
+        -35.08
+      ],
+      "type": "documentation",
+      "confidenceScore": 0.733,
+      "size": 2.03,
+      "metadata": {
+        "type": "node",
+        "title": "OAuth2 Flow Architecture Diagram (#70)",
+        "description": "Details token exchange sequence between client and auth server.",
+        "details": {
+          "type": "documentation",
+          "confidenceScore": 0.733,
+          "sourceReference": "src/documentation/evidence-node-069.ts"
+        }
+      }
+    }
+  ],
+  "connectionRules": {
+    "connectionThreshold": 35,
+    "minimumConfidence": 0.6,
+    "maxConnectionsPerNode": 8
+  },
+  "flowSpeed": 2,
+  "pulseFrequency": 0.6,
+  "pulseColor": "#00E5FF",
+  "exampleQuestions": [
+    "How does authentication validate sessions?",
+    "What is the system latency under 10k rps?",
+    "Where is key-value caching policy enforced?",
+    "Which decisions led to Next.js adoption?",
+    "What evidence guarantees SQL injection safety?",
+    "How is cross-region database failover executed?"
+  ],
+  "godRays": {
+    "enabled": true,
+    "sources": [
+      [
+        -25.887850705663897,
+        35.41757671111819,
+        -9.271670628773139
+      ],
+      [
+        11.549156832030565,
+        -13.879976599769627,
+        -22.985619568446545
+      ],
+      [
+        16.5819737600376,
+        11.906066773394098,
+        21.500556307990056
+      ]
+    ],
+    "intensity": 0.8,
+    "decay": 0.95,
+    "density": 0.6,
+    "weight": 0.4
+  }
+}

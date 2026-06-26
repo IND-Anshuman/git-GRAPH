@@ -1,0 +1,219 @@
+{
+  "sceneNumber": 5,
+  "name": "Solar Systems of Architecture",
+  "progressRange": [0.67, 0.83],
+  
+  "camera": {
+    "keyframes": [
+      {
+        "progress": 0.0,
+        "position": [-80, 60, 100],
+        "rotation": [0, 0, 0],
+        "fov": 75,
+        "easing": "easeInOut"
+      },
+      {
+        "progress": 0.33,
+        "position": [0, 70, 120],
+        "rotation": [0, 0, 0],
+        "fov": 75,
+        "easing": "linear"
+      },
+      {
+        "progress": 0.67,
+        "position": [80, 60, 100],
+        "rotation": [0, 0, 0],
+        "fov": 75,
+        "easing": "easeInOut"
+      },
+      {
+        "progress": 1.0,
+        "position": [0, 100, 150],
+        "rotation": [0, 0, 0],
+        "fov": 75,
+        "easing": "easeOut"
+      }
+    ],
+    "lookAtTarget": "origin"
+  },
+  
+  "particles": {
+    "enabled": false,
+    "count": {
+      "ultra": 0,
+      "high": 0,
+      "medium": 0,
+      "low": 0
+    },
+    "geometry": {
+      "type": "sphere",
+      "size": 0.1
+    },
+    "material": {
+      "color": "#ffffff",
+      "opacity": 0.1
+    },
+    "behavior": {
+      "animation": "static"
+    }
+  },
+  
+  "domains": [
+    {
+      "name": "Frontend",
+      "sunPosition": [-40, 30, -10],
+      "sunSize": 12.0,
+      "color": "#2196F3",
+      "planets": ["planet-ui"],
+      "orbitalRadius": 25.0,
+      "orbitalSpeed": 0.8
+    },
+    {
+      "name": "Backend",
+      "sunPosition": [-35, -10, -10],
+      "sunSize": 14.0,
+      "color": "#9C27B0",
+      "planets": ["planet-auth", "planet-api"],
+      "orbitalRadius": 28.0,
+      "orbitalSpeed": 1.0
+    },
+    {
+      "name": "Data",
+      "sunPosition": [40, 0, -20],
+      "sunSize": 13.0,
+      "color": "#4CAF50",
+      "planets": ["planet-data"],
+      "orbitalRadius": 26.0,
+      "orbitalSpeed": 0.6
+    },
+    {
+      "name": "Infrastructure",
+      "sunPosition": [30, -20, 0],
+      "sunSize": 12.0,
+      "color": "#FF9800",
+      "planets": ["planet-storage"],
+      "orbitalRadius": 30.0,
+      "orbitalSpeed": 0.5
+    }
+  ],
+  
+  "energyBeams": [
+    {
+      "fromPlanetId": "planet-ui",
+      "toPlanetId": "planet-api",
+      "intensity": 0.9,
+      "flowSpeed": 2.0
+    },
+    {
+      "fromPlanetId": "planet-ui",
+      "toPlanetId": "planet-auth",
+      "intensity": 0.8,
+      "flowSpeed": 1.5
+    },
+    {
+      "fromPlanetId": "planet-api",
+      "toPlanetId": "planet-data",
+      "intensity": 0.85,
+      "flowSpeed": 1.8
+    },
+    {
+      "fromPlanetId": "planet-api",
+      "toPlanetId": "planet-storage",
+      "intensity": 0.9,
+      "flowSpeed": 2.2
+    },
+    {
+      "fromPlanetId": "planet-data",
+      "toPlanetId": "planet-storage",
+      "intensity": 0.75,
+      "flowSpeed": 1.2
+    }
+  ],
+  
+  "interactions": [
+    {
+      "id": "domain-frontend",
+      "position": [-40, 30, -10],
+      "radius": 20.0,
+      "type": "node",
+      "metadata": {
+        "type": "node",
+        "title": "Frontend Domain",
+        "description": "User-facing application layers and styles",
+        "details": {
+          "Planet Count": 1,
+          "Key Capabilities": "UI rendering, client-side caching"
+        }
+      }
+    },
+    {
+      "id": "domain-backend",
+      "position": [-35, -10, -10],
+      "radius": 20.0,
+      "type": "node",
+      "metadata": {
+        "type": "node",
+        "title": "Backend Domain",
+        "description": "Business logic gateways and API authentication",
+        "details": {
+          "Planet Count": 2,
+          "Key Capabilities": "API Routing, JWT Authentication, rate-limiting"
+        }
+      }
+    },
+    {
+      "id": "domain-data",
+      "position": [40, 0, -20],
+      "radius": 20.0,
+      "type": "node",
+      "metadata": {
+        "type": "node",
+        "title": "Data Domain",
+        "description": "ETL streams, data mapping, and pipeline processing",
+        "details": {
+          "Planet Count": 1,
+          "Key Capabilities": "Stream ingestion, data serializing"
+        }
+      }
+    },
+    {
+      "id": "domain-infrastructure",
+      "position": [30, -20, 0],
+      "radius": 20.0,
+      "type": "node",
+      "metadata": {
+        "type": "node",
+        "title": "Infrastructure Domain",
+        "description": "Data storage clusters and eviction caches",
+        "details": {
+          "Planet Count": 1,
+          "Key Capabilities": "Persistent databases, caching Eviction"
+        }
+      }
+    }
+  ],
+  
+  "lighting": {
+    "ambient": { "color": "#202030", "intensity": 0.2 },
+    "point": [
+      { "color": "#2196F3", "intensity": 1.5, "position": [-40, 30, -10], "distance": 200 },
+      { "color": "#9C27B0", "intensity": 1.5, "position": [-35, -10, -10], "distance": 200 },
+      { "color": "#4CAF50", "intensity": 1.5, "position": [40, 0, -20], "distance": 200 },
+      { "color": "#FF9800", "intensity": 1.5, "position": [30, -20, 0], "distance": 200 }
+    ]
+  },
+  
+  "postProcessing": {
+    "bloom": {
+      "strength": 0.8,
+      "radius": 1.0,
+      "threshold": 0.5
+    }
+  },
+  
+  "text": {
+    "title": "Solar Systems of Architecture",
+    "subtitle": "System Organization",
+    "description": "Capability planets cluster around their architectural domain suns. Energy connections reveal dependencies."
+  }
+}

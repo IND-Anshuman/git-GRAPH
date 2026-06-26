@@ -1,0 +1,233 @@
+{
+  "sceneNumber": 8,
+  "name": "The Software Universe",
+  "progressRange": [
+    1,
+    1
+  ],
+  "isCompletionScene": true,
+  "camera": {
+    "keyframes": [
+      {
+        "progress": 0,
+        "position": [
+          240,
+          160,
+          240
+        ],
+        "rotation": [
+          -0.5,
+          0.78,
+          0.35
+        ],
+        "fov": 80,
+        "easing": "linear"
+      },
+      {
+        "progress": 0.33,
+        "position": [
+          180,
+          200,
+          -180
+        ],
+        "rotation": [
+          -0.6,
+          1.57,
+          0.4
+        ],
+        "fov": 80,
+        "easing": "linear"
+      },
+      {
+        "progress": 0.67,
+        "position": [
+          -180,
+          180,
+          180
+        ],
+        "rotation": [
+          -0.5,
+          -0.78,
+          -0.3
+        ],
+        "fov": 80,
+        "easing": "linear"
+      },
+      {
+        "progress": 1,
+        "position": [
+          230,
+          160,
+          230
+        ],
+        "rotation": [
+          -0.5,
+          0.78,
+          0.35
+        ],
+        "fov": 80,
+        "easing": "linear"
+      }
+    ],
+    "lookAtTarget": [
+      0,
+      0,
+      0
+    ]
+  },
+  "particles": {
+    "enabled": false,
+    "count": {
+      "ultra": 0,
+      "high": 0,
+      "medium": 0,
+      "low": 0
+    },
+    "geometry": {
+      "type": "sphere"
+    },
+    "material": {},
+    "behavior": {
+      "animation": "static"
+    }
+  },
+  "interactions": [],
+  "lighting": {
+    "ambient": {
+      "color": "#303045",
+      "intensity": 0.45
+    },
+    "point": [
+      {
+        "color": "#00E5FF",
+        "intensity": 0.75,
+        "position": [
+          0,
+          150,
+          0
+        ],
+        "distance": 300
+      },
+      {
+        "color": "#8E24AA",
+        "intensity": 0.65,
+        "position": [
+          150,
+          -50,
+          150
+        ],
+        "distance": 300
+      },
+      {
+        "color": "#4CAF50",
+        "intensity": 0.65,
+        "position": [
+          -150,
+          50,
+          -150
+        ],
+        "distance": 300
+      }
+    ]
+  },
+  "postProcessing": {
+    "bloom": {
+      "strength": 0.6,
+      "threshold": 0.35,
+      "radius": 1
+    }
+  },
+  "layers": [
+    {
+      "source": "scene1",
+      "particleCount": {
+        "ultra": 8000,
+        "high": 5000,
+        "medium": 3000,
+        "low": 1500
+      },
+      "scale": 0.4,
+      "opacity": 0.25,
+      "animation": "drift"
+    },
+    {
+      "source": "scene2",
+      "particleCount": {
+        "ultra": 4000,
+        "high": 2500,
+        "medium": 1200,
+        "low": 600
+      },
+      "scale": 0.5,
+      "opacity": 0.35,
+      "animation": "drift"
+    },
+    {
+      "source": "scene3",
+      "particleCount": {
+        "ultra": 2000,
+        "high": 1500,
+        "medium": 800,
+        "low": 400
+      },
+      "showConnectionLines": true,
+      "lineOpacity": 0.12,
+      "showLabels": false
+    },
+    {
+      "source": "scene4",
+      "renderPlanets": true,
+      "scale": 0.75,
+      "glowIntensity": 0.4
+    },
+    {
+      "source": "scene5",
+      "renderDomainSuns": true,
+      "sunScale": 0.6,
+      "renderEnergyBeams": true,
+      "beamOpacity": 0.25,
+      "renderOrbitalPaths": false
+    },
+    {
+      "source": "scene6",
+      "renderRings": true,
+      "ringOpacity": 0.08,
+      "renderDecisionNodes": true,
+      "nodeScale": 0.75,
+      "renderConnections": false
+    },
+    {
+      "source": "scene7",
+      "nodeCount": {
+        "ultra": 45,
+        "high": 35,
+        "medium": 20,
+        "low": 12
+      },
+      "renderConnections": true,
+      "connectionOpacity": 0.15,
+      "energyFlowEnabled": true
+    }
+  ],
+  "overlayUI": {
+    "centerText": "Your Repository as a Living Knowledge Universe",
+    "callToAction": {
+      "label": "Explore Your Universe",
+      "href": "/dashboard"
+    },
+    "navigationOptions": [
+      {
+        "label": "Architecture Studio",
+        "href": "/architecture"
+      },
+      {
+        "label": "Decision Intelligence",
+        "href": "/decisions"
+      },
+      {
+        "label": "Reasoning Layer",
+        "href": "/reasoning"
+      }
+    ]
+  }
+}
