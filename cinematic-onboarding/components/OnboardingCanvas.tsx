@@ -10,6 +10,7 @@ import { CameraController } from "@/lib/CameraController";
 import { SceneManager } from "@/lib/SceneManager";
 import { PerformanceMonitor } from "@/lib/PerformanceMonitor";
 import { ParticleSystemEngine } from "@/lib/ParticleSystemEngine";
+import { AudioSystem } from "@/lib/AudioSystem";
 import { ParticleLODManager } from "@/lib/ParticleLOD";
 import { ParticleAnimator } from "@/lib/ParticleAnimator";
 import { ChaosScene } from "./scenes/ChaosScene";
@@ -22,6 +23,7 @@ import { ReasoningNetworkScene } from "./scenes/ReasoningNetworkScene";
 import { UniverseScene } from "./scenes/UniverseScene";
 import { InteractionHandler } from "@/lib/InteractionHandler";
 import { InfoCardOverlay } from "./InfoCardOverlay";
+import { PostProcessingEffects } from "./PostProcessingEffects";
 
 /**
  * InteractionBridge invokes the centralized raycaster on every frame
@@ -81,6 +83,9 @@ function CameraRig() {
   }, [currentScene, isReady]);
 
   useFrame((state) => {
+    // Sync spatial audio listener with the camera position/rotation
+    AudioSystem.getInstance().updateListener(camera);
+
     if (!shouldAnimate || !cameraControllerRef.current) return;
 
     const store = useOnboardingStore.getState();
@@ -251,6 +256,13 @@ export function OnboardingCanvas() {
     }
   }, [currentScene, setCurrentScene]);
 
+  // Audio system transition trigger
+  useEffect(() => {
+    const audio = AudioSystem.getInstance();
+    audio.playWhoosh();
+    audio.adjustVolumeForScene(currentScene);
+  }, [currentScene]);
+
   useEffect(() => {
     try {
       const canvas = document.createElement("canvas");
@@ -289,6 +301,7 @@ export function OnboardingCanvas() {
         <PerformanceMonitorHelper />
         <InteractionBridge />
         <InfoCardOverlay />
+        <PostProcessingEffects />
       </Canvas>
     </div>
   );

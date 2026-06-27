@@ -304,15 +304,38 @@ export const useOnboardingStore = create<OnboardingState>()(
 
       setHoveredObject: (id) => set({ hoveredObjectId: id }),
 
-      expandCard: (id) => set({ 
-        expandedCardId: id,
-        cameraPaused: true, // Pause camera when card expands
-      }),
+      expandCard: (id) => {
+        set({ 
+          expandedCardId: id,
+          cameraPaused: true, // Pause camera when card expands
+        });
 
-      closeCard: () => set({ 
-        expandedCardId: null,
-        cameraPaused: false, // Resume camera when card closes
-      }),
+        if (typeof window !== "undefined") {
+          try {
+            const { AudioSystem } = require("@/lib/AudioSystem");
+            AudioSystem.getInstance().playClick();
+          } catch (err) {
+            console.warn("[OnboardingStore] Audio play failed:", err);
+          }
+        }
+      },
+
+      closeCard: () => {
+        set({ 
+          expandedCardId: null,
+          cameraPaused: false, // Resume camera when card closes
+        });
+
+        if (typeof window !== "undefined") {
+          try {
+            const { AudioSystem } = require("@/lib/AudioSystem");
+            // Play a short low blip to indicate closing
+            AudioSystem.getInstance().playHover(220);
+          } catch (err) {
+            console.warn("[OnboardingStore] Audio play failed:", err);
+          }
+        }
+      },
 
       setFocusedObject: (id) => set({ focusedObjectId: id }),
 

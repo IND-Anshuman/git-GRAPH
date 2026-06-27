@@ -7,6 +7,7 @@ import { useOnboardingStore, useShouldAnimateCamera } from "@/stores/onboardingS
 import { SceneConfig } from "@/types";
 import { InteractionHandler } from "@/lib/InteractionHandler";
 import { SelectionHighlight } from "../SelectionHighlight";
+import { AudioSystem } from "@/lib/AudioSystem";
 
 interface ReasoningNetworkSceneProps {
   active: boolean;
@@ -367,6 +368,11 @@ export function ReasoningNetworkScene({ active, config }: ReasoningNetworkSceneP
         const pulseMesh = new THREE.Mesh(pulseGeometry, pulseMaterial);
         pulseMesh.position.copy(randomConn.fromPos);
         pulsesGroupRef.current?.add(pulseMesh);
+
+        if (p === 0) {
+          // Synthesize spatial audio ping at the pulse starting position
+          AudioSystem.getInstance().playSpatialPulse(randomConn.fromPos);
+        }
 
         pulsesRef.current.push({
           mesh: pulseMesh,

@@ -5,6 +5,8 @@ import { OnboardingCanvas } from "@/components/OnboardingCanvas";
 import { getScrollController } from "@/lib/ScrollController";
 import { SceneManager } from "@/lib/SceneManager";
 import { useOnboardingStore } from "@/stores/onboardingStore";
+import { AudioToggle } from "@/components/AudioToggle";
+import { AudioSystem } from "@/lib/AudioSystem";
 
 /**
  * Home page component renders the split screen layout based on the design mockup:
@@ -19,6 +21,27 @@ export default function Home() {
 
   useEffect(() => {
     setMounted(true);
+
+    // Audio autoplay compliance sequence
+    const handleFirstInteraction = () => {
+      const audio = AudioSystem.getInstance();
+      audio.initContext();
+      
+      // Cleanup listeners once the AudioContext is activated
+      window.removeEventListener("click", handleFirstInteraction);
+      window.removeEventListener("keydown", handleFirstInteraction);
+      window.removeEventListener("scroll", handleFirstInteraction);
+    };
+
+    window.addEventListener("click", handleFirstInteraction, { passive: true });
+    window.addEventListener("keydown", handleFirstInteraction, { passive: true });
+    window.addEventListener("scroll", handleFirstInteraction, { passive: true });
+
+    return () => {
+      window.removeEventListener("click", handleFirstInteraction);
+      window.removeEventListener("keydown", handleFirstInteraction);
+      window.removeEventListener("scroll", handleFirstInteraction);
+    };
   }, []);
 
   useEffect(() => {
@@ -35,6 +58,9 @@ export default function Home() {
       const activeScene = scrollCtrl.getCurrentScene();
       sceneManager.updateSceneLifecycle(activeScene);
     });
+
+    // Preload Scene 1 and Scene 2 immediately on mount to prevent any delay
+    sceneManager.updateSceneLifecycle(1);
 
     return () => {
       unsubscribe();
@@ -297,6 +323,9 @@ export default function Home() {
           {/* Bottom spacing to ensure final scene cards can be scrolled into view */}
           <div className="h-[35vh]" />
         </main>
+
+        {/* Audio Control UI Overlay */}
+        <AudioToggle />
       </div>
     </div>
   );

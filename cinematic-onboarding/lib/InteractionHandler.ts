@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import { useOnboardingStore } from "@/stores/onboardingStore";
+import { AudioSystem } from "./AudioSystem";
 
 export interface OctreeItem {
   id: string;
@@ -242,8 +243,12 @@ export class InteractionHandler {
     const hits: OctreeItem[] = [];
     this.rootNode.queryRay(raycaster.ray, 3.5, hits);
 
+    const store = useOnboardingStore.getState();
+
     if (hits.length === 0) {
-      useOnboardingStore.getState().setHoveredObject(null);
+      if (store.hoveredObjectId) {
+        store.setHoveredObject(null);
+      }
       return null;
     }
 
@@ -255,7 +260,12 @@ export class InteractionHandler {
     });
 
     const closestHit = hits[0];
-    useOnboardingStore.getState().setHoveredObject(closestHit.id);
+    if (store.hoveredObjectId !== closestHit.id) {
+      store.setHoveredObject(closestHit.id);
+      
+      // Synthesize a quick hover blip
+      AudioSystem.getInstance().playHover();
+    }
     return closestHit;
   }
 
@@ -281,6 +291,9 @@ export class InteractionHandler {
       const activeId = this.focusList[this.focusIndex];
       store.setFocusedObject(activeId);
       store.setHoveredObject(activeId); // highlight item
+
+      // Synthesize a quick hover blip for key focus
+      AudioSystem.getInstance().playHover();
     }
 
     // Enter / Space: activate selected
