@@ -353,10 +353,135 @@ void main() {
 }
 `;
 
+const hashNoiseGLSL = `
+// Fast, lightweight 3D hash-based pseudo-random noise for gas turbulence
+float hash3(vec3 p) {
+  p = fract(p * 0.3183099 + 0.1);
+  p *= 17.0;
+  return fract(p.x * p.y * p.z * (p.x + p.y + p.z));
+}
+
+float noise3(vec3 p) {
+  vec3 i = floor(p);
+  vec3 f = fract(p);
+  vec3 u = f * f * (3.0 - 2.0 * f);
+  
+  return mix(
+    mix(mix(hash3(i + vec3(0.0,0.0,0.0)), hash3(i + vec3(1.0,0.0,0.0)), u.x),
+        mix(hash3(i + vec3(0.0,1.0,0.0)), hash3(i + vec3(1.0,1.0,0.0)), u.x), u.y),
+    mix(mix(hash3(i + vec3(0.0,0.0,1.0)), hash3(i + vec3(1.0,0.0,1.0)), u.x),
+        mix(hash3(i + vec3(0.0,1.0,1.0)), hash3(i + vec3(1.0,1.0,1.0)), u.x), u.y), u.z
+  );
+}
+`;
+
+const nebulaVertex = `
+uniform float uTime;
+uniform float uTurbulence;
+uniform vec3 uWindDirection;
+
+attribute vec3 aInitialPosition;
+attribute vec3 aVelocity;
+attribute float aPhase;
+attribute float aIsBillboard;
+attribute float aCloudType; // 0.0=Background, 1.0=Mid, 2.0=Stars
+attribute float aCustomSize;
+
+#ifndef USE_INSTANCING_COLOR
+  attribute vec3 instanceColor;
+#endif
+
+varying vec3 vColor;
+varying float vIsBillboard;
+varying vec2 vUv;
+varying float vPhase;
+varying float vCloudType;
+
+${hashNoiseGLSL}
+
+void main() {
+  vColor = instanceColor;
+  vIsBillboard = aIsBillboard;
+  vUv = uv;
+  vPhase = aPhase;
+  vCloudType = aCloudType;
+  
+  vec3 offset = aVelocity * uTime;
+  
+  // High-frequency turbulence for gas drifting
+  vec3 noisePos = (aInitialPosition + offset) * 0.02 + vec3(aPhase);
+  vec3 turbulence = vec3(
+    noise3(noisePos),
+    noise3(noisePos + vec3(80.0)),
+    noise3(noisePos + vec3(160.0))
+  ) * uTurbulence;
+  
+  offset += turbulence;
+  offset += uWindDirection * uTime * 0.05;
+  
+  #ifdef USE_INSTANCING
+    vec4 mvPosition = modelViewMatrix * instanceMatrix * vec4(position * aCustomSize + offset, 1.0);
+  #else
+    vec4 mvPosition = modelViewMatrix * vec4(position * aCustomSize + aInitialPosition + offset, 1.0);
+  #endif
+  
+  gl_Position = projectionMatrix * mvPosition;
+  
+  // Point size attenuation
+  gl_PointSize = aCustomSize * (350.0 / -mvPosition.z);
+}
+`;
+
+const nebulaFragment = `
+varying vec3 vColor;
+varying float vIsBillboard;
+varying vec2 vUv;
+varying float vPhase;
+varying float vCloudType;
+
+void main() {
+  vec2 center = vUv - vec2(0.5);
+  float dist = length(center);
+  if (dist > 0.5) discard;
+  
+  float alpha = 1.0;
+  
+  // Type-based falloffs and opacities
+  if (vCloudType < 0.5) {
+    // 1. Large background nebula: soft, wide falloff
+    alpha = pow(1.0 - dist * 2.0, 1.4) * 0.12;
+  } else if (vCloudType < 1.5) {
+    // 2. Medium nebula: moderate density
+    alpha = pow(1.0 - dist * 2.0, 1.8) * 0.22;
+  } else {
+    // 3. Small stars: tight, sharp center
+    alpha = pow(1.0 - dist * 2.0, 4.0) * 0.90;
+  }
+  
+  // Color shifting: add orange/magenta gas variance
+  vec3 finalColor = vColor;
+  if (vCloudType < 1.5) {
+    if (vPhase > 120.0) {
+      finalColor = mix(vColor, vec3(0.925, 0.282, 0.600), 0.35); // Purple -> Pink
+    } else if (vPhase > 40.0) {
+      finalColor = mix(vColor, vec3(0.976, 0.450, 0.098), 0.40); // Pink -> Orange
+    }
+  } else {
+    // Stars color shifting: white/blue twinkling
+    if (vPhase > 100.0) {
+      finalColor = mix(vColor, vec3(0.376, 0.647, 0.980), 0.30); // White -> Blue-white
+    }
+  }
+  
+  gl_FragColor = vec4(finalColor, alpha);
+}
+`;
+
 export const particleShaders = {
   drift: { vertex: driftVertex, fragment: particleFragment },
   orbit: { vertex: orbitVertex, fragment: particleFragment },
   explosion: { vertex: explosionVertex, fragment: particleFragment },
   cluster: { vertex: clusterVertex, fragment: particleFragment },
   network: { vertex: networkVertex, fragment: particleFragment },
+  nebula: { vertex: nebulaVertex, fragment: nebulaFragment },
 };

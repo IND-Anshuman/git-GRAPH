@@ -85,7 +85,7 @@ export class ParticleLODManager {
 
       // Swap geometries based on distance thresholds (20m and 50m)
       const qualityTier = useOnboardingStore.getState().qualityTier;
-      if (d < 20.0 && qualityTier !== "low") {
+      if (d < 20.0 && qualityTier !== "low" && !group.id.includes("nebula")) {
         activeMesh = group.lodMeshes.sphere;
         inactiveMesh1 = group.lodMeshes.quad;
         inactiveMesh2 = group.lodMeshes.point;
