@@ -149,7 +149,14 @@ export class ParticleSystemEngine {
       orbitPhases[i] = Math.random() * Math.PI * 2.0;
 
       // Explosion outward vectors
-      const dir = new THREE.Vector3(Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5).normalize();
+      let dir = new THREE.Vector3(Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5).normalize();
+      if (distConfig.type === "double_helix") {
+        // Cylindrical radial outward vector (pushing out from Y axis)
+        dir.set(p.x, 0.0, p.z).normalize();
+        // Add a slight vertical drift dispersion
+        dir.y = (Math.random() - 0.5) * 0.35;
+        dir.normalize();
+      }
       directions[i * 3] = dir.x;
       directions[i * 3 + 1] = dir.y;
       directions[i * 3 + 2] = dir.z;
@@ -360,6 +367,47 @@ export class ParticleSystemEngine {
         vec.x = minB[0] + Math.random() * (maxB[0] - minB[0]);
         vec.y = minB[1] + Math.random() * (maxB[1] - minB[1]);
         vec.z = minB[2] + Math.random() * (maxB[2] - minB[2]);
+      } else if (type === "galaxy") {
+        // Logarithmic spiral galaxy distribution
+        const arms = distConfig.arms ?? 2;
+        const tightness = distConfig.tightness ?? 0.12;
+        const coreRadius = distConfig.coreRadius ?? 8.0;
+
+        const armIndex = i % arms;
+        const armAngle = (armIndex * Math.PI * 2.0) / arms;
+
+        // Exponential distribution for high center density
+        const r = coreRadius + (Math.pow(Math.random(), 2.0) * size);
+        const angle = armAngle + r * tightness;
+
+        // Bounded arm thickness dispersion
+        const dispersion = size * 0.08 * (r / size + 0.1);
+        const dx = (Math.random() - 0.5) * dispersion;
+        const dy = (Math.random() - 0.5) * dispersion;
+        const dz = (Math.random() - 0.5) * dispersion;
+
+        // Galaxy disk lies in the X-Y plane, Z is the thickness axis (camera flies along Z)
+        vec.x = r * Math.cos(angle) + dx;
+        vec.y = r * Math.sin(angle) + dy;
+        vec.z = dz;
+      } else if (type === "double_helix") {
+        // Double strand helical DNA vortex winding along Y axis
+        const radius = distConfig.radius ?? 12.0;
+        const pitch = distConfig.pitch ?? 0.65;
+        const jitter = distConfig.jitter ?? 0.8;
+
+        const strand = (i % 2 === 0) ? 0.0 : Math.PI;
+        // Map progression along the length (-4PI to +4PI)
+        const t = (i / count) * Math.PI * 8.0;
+
+        vec.x = radius * Math.cos(t + strand);
+        vec.y = (t - Math.PI * 4.0) * pitch * 5.0; // centered vertically around Y=0
+        vec.z = radius * Math.sin(t + strand);
+
+        // Add small structural jitter noise
+        vec.x += (Math.random() - 0.5) * jitter;
+        vec.y += (Math.random() - 0.5) * jitter;
+        vec.z += (Math.random() - 0.5) * jitter;
       } else if (type === "sphere") {
         // Uniform spherical surface distribution
         const u = Math.random();

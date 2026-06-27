@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useEffect, useState } from "react";
+import { useFrame } from "@react-three/fiber";
 import { useOnboardingStore, useShouldAnimateCamera } from "@/stores/onboardingStore";
 import { ParticleSystemEngine } from "@/lib/ParticleSystemEngine";
 import { ParticleAnimator } from "@/lib/ParticleAnimator";
@@ -152,6 +153,13 @@ export function StardustScene({ active, config }: StardustSceneProps) {
       animator.pause("scene-2");
     }
   }, [shouldAnimate, initialized]);
+
+  // Slowly rotate the double-helix DNA vortex about the vertical Y axis
+  useFrame((state) => {
+    if (active && groupRef.current && shouldAnimate) {
+      groupRef.current.rotation.y = state.clock.getElapsedTime() * 0.045;
+    }
+  });
 
   return (
     <group ref={groupRef} visible={active}>

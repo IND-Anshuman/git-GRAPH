@@ -345,8 +345,8 @@ void main() {
     float dist = length(center);
     if (dist > 0.5) discard;
     
-    // Soft edge anti-aliased gradient
-    alpha = 1.0 - smoothstep(0.3, 0.5, dist);
+    // Sharp, anti-aliased edge to prevent blurry halo effects and keep particles precise
+    alpha = 1.0 - smoothstep(0.45, 0.48, dist);
   }
   
   gl_FragColor = vec4(vColor, alpha);

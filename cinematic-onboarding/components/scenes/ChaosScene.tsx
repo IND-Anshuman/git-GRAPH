@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useEffect, useState } from "react";
+import { useFrame } from "@react-three/fiber";
 import { useOnboardingStore, useShouldAnimateCamera } from "@/stores/onboardingStore";
 import { ParticleSystemEngine } from "@/lib/ParticleSystemEngine";
 import { ParticleAnimator } from "@/lib/ParticleAnimator";
@@ -64,6 +65,13 @@ export function ChaosScene({ active, config }: ChaosSceneProps) {
       animator.pause("scene-1");
     }
   }, [shouldAnimate, initialized]);
+
+  // Spin the entire logarithmic galaxy slowly on the Z-axis (normal axis to X-Y disk plane)
+  useFrame((state) => {
+    if (active && groupRef.current && shouldAnimate) {
+      groupRef.current.rotation.z = state.clock.getElapsedTime() * 0.035;
+    }
+  });
 
   return (
     <group ref={groupRef} visible={active}>

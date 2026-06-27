@@ -57,10 +57,16 @@
       "animation": "explosion",
       "explosion": {
         "origin": [0, 0, 0],
-        "force": [3.0, 8.0],
-        "gravity": [0, -0.5, 0],
-        "damping": 0.3
+        "force": [2.5, 6.0],
+        "gravity": [0, 0, 0],
+        "damping": 0.15
       }
+    },
+    "initialDistribution": {
+      "type": "double_helix",
+      "radius": 12.0,
+      "pitch": 0.65,
+      "jitter": 0.8
     },
     "entityTypes": {
       "function": { "color": "#3b82f6", "size": 0.4, "ratio": 0.4 },
