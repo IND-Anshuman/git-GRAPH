@@ -42,7 +42,7 @@
       "ultra": 50000,
       "high": 40000,
       "medium": 25000,
-      "low": 15000
+      "low": 10000
     },
     "geometry": {
       "type": "sphere",

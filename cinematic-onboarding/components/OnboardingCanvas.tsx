@@ -234,6 +234,7 @@ export function OnboardingCanvas() {
   const [hasWebGL, setHasWebGL] = useState<boolean | null>(null);
   const currentScene = useOnboardingStore((s) => s.currentScene);
   const setCurrentScene = useOnboardingStore((s) => s.setCurrentScene);
+  const qualityTier = useOnboardingStore((s) => s.qualityTier);
 
   // Global keyboard accessibility listener
   useEffect(() => {
@@ -292,7 +293,12 @@ export function OnboardingCanvas() {
   return (
     <div className="relative h-full w-full bg-slate-950 overflow-hidden">
       <Canvas
-        gl={{ antialias: true, alpha: false, powerPreference: "high-performance" }}
+        dpr={qualityTier === "low" ? 0.75 : qualityTier === "medium" ? 1.0 : [1, 2]}
+        gl={{
+          antialias: true, // Statically set to prevent WebGL context recreation crashes on quality change
+          alpha: false,
+          powerPreference: "high-performance"
+        }}
         camera={{ position: [0, 0, -50], fov: 75 }}
       >
         <color attach="background" args={["#020617"]} />

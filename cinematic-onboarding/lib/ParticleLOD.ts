@@ -3,6 +3,7 @@
 import * as THREE from "three";
 import { ParticleGroup } from "./ParticleSystemEngine";
 import { FrustumCuller } from "./FrustumCuller";
+import { useOnboardingStore } from "@/stores/onboardingStore";
 
 /**
  * ParticleLODManager class handles dynamic level-of-detail mapping for particle groups.
@@ -83,7 +84,8 @@ export class ParticleLODManager {
       let scaleMultiplier = 1.0;
 
       // Swap geometries based on distance thresholds (20m and 50m)
-      if (d < 20.0) {
+      const qualityTier = useOnboardingStore.getState().qualityTier;
+      if (d < 20.0 && qualityTier !== "low") {
         activeMesh = group.lodMeshes.sphere;
         inactiveMesh1 = group.lodMeshes.quad;
         inactiveMesh2 = group.lodMeshes.point;

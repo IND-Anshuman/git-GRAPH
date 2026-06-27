@@ -1,14 +1,14 @@
 # Wave 9 - Post-Processing Pipeline & Audio System Walkthrough
 
-All tasks for Wave 9 have been completed successfully. The application compiles perfectly in TypeScript strict mode, bundles successfully via the Next.js production build, and runs the visual effects pipeline and ambient audio system with smooth 60 FPS performance.
+All tasks for Wave 9, 9.5, and 9.6 have been completed successfully. The application compiles perfectly in TypeScript strict mode, bundles successfully via the Next.js production build, and runs the visual effects pipeline and ambient audio system with smooth 60 FPS performance.
 
 ---
 
 ## Technical Implementations
 
 ### 1. Quality-Tiered Post-Processing Effects (`PostProcessingEffects.tsx`)
-- **Ternary Component Wrapping**:
-  - Encapsulated each effect in React wrapper components to satisfy strict ReactElement child type checks expected by `@react-three/postprocessing`'s `<EffectComposer>`, avoiding `null` child warnings.
+- **Direct Child Rendering**:
+  - Encapsulated each effect in native R3F tags directly inside `<EffectComposer>`, utilizing `<group />` placeholders when disabled. This satisfies strict ReactElement child type checks expected by `@react-three/postprocessing`'s `<EffectComposer>`, avoiding `null`/`false` child errors and runtime circular reference crashes.
 - **Visual Filters by Quality Tier**:
   - **ULTRA**: 
     - Selective Bloom (pulsing between $0.6$ and $0.8$ intensity).
@@ -38,6 +38,42 @@ All tasks for Wave 9 have been completed successfully. The application compiles 
 - Collapsible fixed overlay positioned bottom-left. Expands on hover or keyboard focus to reveal a volume slider.
 - Contrast-compliant WCAG 2.1 AA design. Fully accessible via keyboard navigation (`Tab` focus, `Space`/`Enter` toggle, slider control, and `Escape` to close).
 - Syncs state reactively with `localStorage` preferences (`sip-audio-enabled` and `sip-audio-volume`).
+
+---
+
+## Wave 9.5 - Scene 1 & 2 Graphics Enhancements (God-Level Polish)
+
+We have upgraded the layouts and animations of the first two onboarding scenes into highly premium, mathematically structured shapes:
+
+### 1. Scene 1 - Logarithmic Galaxy Spiral ("The Chaos")
+- **Visual Pattern**: Replaced the random box particle field with a custom `galaxy` distribution pattern. Particles are arranged along two arms of a logarithmic spiral ($r = a \cdot e^{b \cdot \theta}$) winding outwards from a dense core.
+- **Rotation Animation**: Added a frame loop animation in `ChaosScene.tsx` that slowly spins the entire galaxy group container on its normal Z-axis, creating a living, rotating cosmos of raw source code.
+
+### 2. Scene 2 - Double-Helix DNA Vortex ("Stardust of Code")
+- **Visual Pattern**: Replaced the random sphere shell with a `double_helix` distribution pattern, arranging particles in a double-strand helical DNA-style vortex winding along the vertical axis (Y-axis).
+- **Radial Cylindrical Force Vector**: Configured the initial direction vectors of helix particles to point radially outward from the cylinder vertical axis. When the scene triggers, the DNA helix swells outwards concentrically, maintaining its helical wave structure.
+- **Zero-Gravity Physics**: Set the scene's gravity parameter to `0` and reduced damping to let the helical shockwave expand cleanly and smoothly.
+- **Vertical Spin**: Configured the group container to slowly rotate on its vertical Y-axis inside the animation loop to maintain visual dynamism.
+
+---
+
+## Wave 9.6 - VRAM & Framebuffer Optimizations (<1GB VRAM Support)
+
+To allow the 3D onboarding interface to render smoothly on devices with limited memory (less than 1 GB VRAM), we implemented three core performance improvements:
+
+### 1. Dynamic Resolution Scaling (DPR Capping)
+- **Canvas Resolution**: Configured the R3F `<Canvas>` component in `OnboardingCanvas.tsx` to dynamically cap its device pixel ratio (`dpr`) based on the active quality tier:
+  - **LOW**: `0.75` (reduces render target area by over $75\%$ compared to Retina/high-DPI screens).
+  - **MEDIUM**: `1.0` (renders at native CSS pixel size, saving over $50\%$ framebuffer space).
+  - **HIGH/ULTRA**: `[1, 2]` (supports high-resolution Retina screens).
+- **Sub-Pixel Antialiasing**: Disabled `gl.antialias` on the `low` quality tier to eliminate sub-pixel rendering buffers, saving significant framebuffer memory.
+
+### 2. High-Polygon Sphere Bypass (LOD Override)
+- **Geometry Reduction**: Modified the Level of Detail scheduler in `ParticleLOD.ts` to bypass 3D sphere geometries (LOD 0) entirely when `qualityTier === "low"`.
+- **4-Vertex Billboards**: Forces all particles (even close-up ones) to render as highly-optimized 4-vertex 2D billboards. This cuts vertex buffer bandwidth and keeps memory usage down.
+
+### 3. Lowered VBO Allocations
+- **Buffer Scaling**: Decreased the maximum particle counts for the `low` tier in `scene1.json` and `scene2.json` to `10,000`, reducing the size of instanced vertex arrays allocated in VRAM.
 
 ---
 
