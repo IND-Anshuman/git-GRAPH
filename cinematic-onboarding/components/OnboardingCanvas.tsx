@@ -10,7 +10,10 @@ import { CameraController } from "@/lib/CameraController";
 import { SceneManager } from "@/lib/SceneManager";
 import { PerformanceMonitor } from "@/lib/PerformanceMonitor";
 import { ParticleSystemEngine } from "@/lib/ParticleSystemEngine";
+<<<<<<< HEAD
 import { AudioSystem } from "@/lib/AudioSystem";
+=======
+>>>>>>> 1ed8369a21b3194523231ccb83db6a2ca4e39902
 import { ParticleLODManager } from "@/lib/ParticleLOD";
 import { ParticleAnimator } from "@/lib/ParticleAnimator";
 import { ChaosScene } from "./scenes/ChaosScene";
@@ -23,7 +26,10 @@ import { ReasoningNetworkScene } from "./scenes/ReasoningNetworkScene";
 import { UniverseScene } from "./scenes/UniverseScene";
 import { InteractionHandler } from "@/lib/InteractionHandler";
 import { InfoCardOverlay } from "./InfoCardOverlay";
+<<<<<<< HEAD
 import { PostProcessingEffects } from "./PostProcessingEffects";
+=======
+>>>>>>> 1ed8369a21b3194523231ccb83db6a2ca4e39902
 
 /**
  * InteractionBridge invokes the centralized raycaster on every frame
@@ -83,9 +89,12 @@ function CameraRig() {
   }, [currentScene, isReady]);
 
   useFrame((state) => {
+<<<<<<< HEAD
     // Sync spatial audio listener with the camera position/rotation
     AudioSystem.getInstance().updateListener(camera);
 
+=======
+>>>>>>> 1ed8369a21b3194523231ccb83db6a2ca4e39902
     if (!shouldAnimate || !cameraControllerRef.current) return;
 
     const store = useOnboardingStore.getState();
@@ -234,7 +243,10 @@ export function OnboardingCanvas() {
   const [hasWebGL, setHasWebGL] = useState<boolean | null>(null);
   const currentScene = useOnboardingStore((s) => s.currentScene);
   const setCurrentScene = useOnboardingStore((s) => s.setCurrentScene);
+<<<<<<< HEAD
   const qualityTier = useOnboardingStore((s) => s.qualityTier);
+=======
+>>>>>>> 1ed8369a21b3194523231ccb83db6a2ca4e39902
 
   // Global keyboard accessibility listener
   useEffect(() => {
@@ -257,6 +269,7 @@ export function OnboardingCanvas() {
     }
   }, [currentScene, setCurrentScene]);
 
+<<<<<<< HEAD
   // Audio system transition trigger
   useEffect(() => {
     const audio = AudioSystem.getInstance();
@@ -264,6 +277,8 @@ export function OnboardingCanvas() {
     audio.adjustVolumeForScene(currentScene);
   }, [currentScene]);
 
+=======
+>>>>>>> 1ed8369a21b3194523231ccb83db6a2ca4e39902
   useEffect(() => {
     try {
       const canvas = document.createElement("canvas");
@@ -293,12 +308,16 @@ export function OnboardingCanvas() {
   return (
     <div className="relative h-full w-full bg-slate-950 overflow-hidden">
       <Canvas
+<<<<<<< HEAD
         dpr={qualityTier === "low" ? 0.75 : qualityTier === "medium" ? 1.0 : [1, 2]}
         gl={{
           antialias: true, // Statically set to prevent WebGL context recreation crashes on quality change
           alpha: false,
           powerPreference: "high-performance"
         }}
+=======
+        gl={{ antialias: true, alpha: false, powerPreference: "high-performance" }}
+>>>>>>> 1ed8369a21b3194523231ccb83db6a2ca4e39902
         camera={{ position: [0, 0, -50], fov: 75 }}
       >
         <color attach="background" args={["#020617"]} />
@@ -307,7 +326,10 @@ export function OnboardingCanvas() {
         <PerformanceMonitorHelper />
         <InteractionBridge />
         <InfoCardOverlay />
+<<<<<<< HEAD
         <PostProcessingEffects />
+=======
+>>>>>>> 1ed8369a21b3194523231ccb83db6a2ca4e39902
       </Canvas>
     </div>
   );

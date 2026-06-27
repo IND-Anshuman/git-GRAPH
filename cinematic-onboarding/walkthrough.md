@@ -77,6 +77,33 @@ To allow the 3D onboarding interface to render smoothly on devices with limited 
 
 ---
 
+## Wave 9.7 - Scene 1 "The Chaos" God-Level Visual Enhancements
+
+We turned the raw code particle drift in Scene 1 into a premium, volumetric "code chaos explosion" using highly optimized instanced passes:
+
+### 1. Consolidated 2-System Particle Layout
+- **Unified Nebula System (`scene-1-nebula-unified`)**:
+  - Draws large background purple gas clouds, medium pink/orange mid-gas clouds, and sharp twinkling code stars in **a single instanced draw call** (saving up to $75\%$ draw call overhead compared to rendering them as separate layers).
+  - Employs an instance attribute `aCloudType` to dictate size, opacity falloffs, and colors for each particle tier on the GPU.
+- **Explosion Core (`scene-1-explosion-core`)**:
+  - Tightly bound central white-hot cluster animating with initial explosive outward vectors.
+
+### 2. Custom Volumetric Gas Shaders
+- **Volumetric Cloud Puffs**: Designed a custom `nebula` fragment shader that replaces sharp points with soft circular billboards using an exponential decay curve: `alpha = pow(1.0 - dist * 2.0, 1.8)`.
+- **Lightweight Noise GLSL**: Implemented a fast 3D hash-based noise function directly in the vertex shader to drive organic drifting gas turbulence without texture sampling overhead.
+- **LOD Billboarding Exclusions**: Configured the LOD culling scheduler in `ParticleLOD.ts` to bypass 3D sphere geometries (LOD 0) for any group containing `"nebula"` in its ID, guaranteeing gas clouds render as flat billboards at all zoom distances.
+
+### 3. Dynamic VSCode Editor Windows & Filename Badges
+- **Snippet Generator (`CodeSnippetRenderer.ts`)**:
+  - Dynamically paints dark-theme editor tabs with close/maximize dots, filename headers, line numbers, and token-level code syntax highlighting (keywords, strings, comments) using HTML5 Canvas.
+  - Uploads the canvas outputs as `THREE.CanvasTexture` materials and mounts them to floating sprite grids (max `8` editor windows and `15` filename badges to cap VRAM).
+- **Float Parallax**: Animates sprites with independent sine offsets and slow angular spins in the frame loop.
+
+### 4. Left Sidebar Stats Dashboard
+- **Conditional Swap**: Swaps the fixed left sidebar in `app/page.tsx` when `currentScene === 1` to render a high-contrast repository metrics panel (10,231 Files, 128,430 Functions, 342 Services, 28.7M Lines of Code) reinforcing the narrative scale of code complexity.
+
+---
+
 ## Verification Results
 
 ### TypeScript Verification
