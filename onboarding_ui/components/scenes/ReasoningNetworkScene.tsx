@@ -1,13 +1,14 @@
 "use client";
 
-import { useRef, useEffect, useMemo } from "react";
-import { useFrame, useThree } from "@react-three/fiber";
+import { useRef, useEffect, useMemo, useState } from "react";
+import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import { useOnboardingStore, useShouldAnimateCamera } from "@/stores/onboardingStore";
 import { SceneConfig } from "@/types";
 import { InteractionHandler } from "@/lib/InteractionHandler";
 import { SelectionHighlight } from "../SelectionHighlight";
 import { AudioSystem } from "@/lib/AudioSystem";
+import { Html } from "@react-three/drei";
 
 interface ReasoningNetworkSceneProps {
   active: boolean;
@@ -119,7 +120,6 @@ function GodRayShaft({ position, color, intensity }: GodRayShaftProps) {
 
 // 2. Main Scene Component
 export function ReasoningNetworkScene({ active, config }: ReasoningNetworkSceneProps) {
-  const { camera } = useThree();
   const shouldAnimate = useShouldAnimateCamera();
   const qualityTier = useOnboardingStore((s) => s.qualityTier);
   const setHoveredObject = useOnboardingStore((s) => s.setHoveredObject);
@@ -159,7 +159,7 @@ export function ReasoningNetworkScene({ active, config }: ReasoningNetworkSceneP
 
   const pulsesRef = useRef<EnergyPulse[]>([]);
   const highlightedConnsRef = useRef<{ [id: string]: number }>({}); // connId -> timer
-  const activeQuestionsRef = useRef<Array<{ id: string; sprite: THREE.Sprite; text: string; spawnTime: number }>>([]);
+  const [activeQuestions, setActiveQuestions] = useState<Array<{ id: string; position: THREE.Vector3; text: string; spawnTime: number }>>([]);
 
   const pulseGeometry = useMemo(() => new THREE.SphereGeometry(0.4, 8, 8), []);
   const pulseMaterial = useMemo(() => new THREE.MeshBasicMaterial({
@@ -280,47 +280,12 @@ export function ReasoningNetworkScene({ active, config }: ReasoningNetworkSceneP
     }
   };
 
-  // 5. Create Floating Text Billboards
-  const createQuestionSprite = (text: string): THREE.Sprite => {
-    const canvas = document.createElement("canvas");
-    canvas.width = 1024;
-    canvas.height = 256;
-    const ctx = canvas.getContext("2d")!;
+  const activeQuestionsRefLocal = useRef(activeQuestions);
+  useEffect(() => {
+    activeQuestionsRefLocal.current = activeQuestions;
+  }, [activeQuestions]);
 
-    // Background capsule shape
-    ctx.fillStyle = "rgba(10, 15, 30, 0.85)";
-    ctx.strokeStyle = "rgba(0, 229, 255, 0.4)";
-    ctx.lineWidth = 6;
-    ctx.beginPath();
-    ctx.roundRect(10, 10, 1004, 236, 118);
-    ctx.fill();
-    ctx.stroke();
-
-    // Subtle inner cyan drop shadow glow
-    ctx.shadowColor = "rgba(0, 229, 255, 0.5)";
-    ctx.shadowBlur = 15;
-
-    // Draw text
-    ctx.font = "bold 44px Outfit, Inter, sans-serif";
-    ctx.fillStyle = "#FFFFFF";
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    ctx.fillText(text, 512, 128);
-
-    const texture = new THREE.CanvasTexture(canvas);
-    const spriteMaterial = new THREE.SpriteMaterial({
-      map: texture,
-      transparent: true,
-      opacity: 0.0, // starts invisible, fades in
-      depthWrite: false
-    });
-
-    const sprite = new THREE.Sprite(spriteMaterial);
-    sprite.scale.set(38, 9.5, 1);
-    return sprite;
-  };
-
-  // 6. Spawn Question Sprites & Highlight Path triggers
+  // Spawn Question Sprites & Highlight Path triggers
   useEffect(() => {
     if (!active || !config.exampleQuestions || config.exampleQuestions.length === 0) return;
 
@@ -331,30 +296,28 @@ export function ReasoningNetworkScene({ active, config }: ReasoningNetworkSceneP
     if (highConfNodes.length === 0) return;
 
     // Distribute question positions around high-confidence nodes
-    const activeList: typeof activeQuestionsRef.current = [];
+    const activeList: Array<{ id: string; position: THREE.Vector3; text: string; spawnTime: number }> = [];
     questions.forEach((q, idx) => {
       const targetNode = highConfNodes[idx % highConfNodes.length];
-      const sprite = createQuestionSprite(q);
 
       // Offset position around node
       const angle = (idx / questions.length) * Math.PI * 2;
       const offsetRadius = 24.0;
-      sprite.position.set(
+      const pos = new THREE.Vector3(
         targetNode.position[0] + Math.cos(angle) * offsetRadius,
         targetNode.position[1] + randomRange(-8, 8),
         targetNode.position[2] + Math.sin(angle) * offsetRadius
       );
 
-      groupRef.current?.add(sprite);
       activeList.push({
         id: `q-${idx}`,
-        sprite,
+        position: pos,
         text: q,
         spawnTime: idx * 2.0 // Staggered spawn timings
       });
     });
 
-    activeQuestionsRef.current = activeList;
+    setActiveQuestions(activeList);
 
     // Pulse Timer to spawn sparks
     const pulseInterval = setInterval(() => {
@@ -386,14 +349,12 @@ export function ReasoningNetworkScene({ active, config }: ReasoningNetworkSceneP
 
     // Pathfinding reasoning trigger (every 4 seconds, highlight reasoning path to random question)
     const pathTimer = setInterval(() => {
-      if (activeQuestionsRef.current.length === 0 || highConfNodes.length === 0) return;
+      const currentQs = activeQuestionsRefLocal.current;
+      if (currentQs.length === 0 || highConfNodes.length === 0) return;
 
-      const activeQs = activeQuestionsRef.current.filter(q => q.sprite.material.opacity > 0.5);
-      if (activeQs.length === 0) return;
-
-      const randQ = activeQs[Math.floor(Math.random() * activeQs.length)];
+      const randQ = currentQs[Math.floor(Math.random() * currentQs.length)];
       // Find closest node to question position
-      const qPos = randQ.sprite.position;
+      const qPos = randQ.position;
       let closestNode = nodesData[0];
       let minDist = Infinity;
       nodesData.forEach((node) => {
@@ -416,13 +377,7 @@ export function ReasoningNetworkScene({ active, config }: ReasoningNetworkSceneP
     return () => {
       clearInterval(pulseInterval);
       clearInterval(pathTimer);
-      // Clean up sprites
-      activeList.forEach((q) => {
-        groupRef.current?.remove(q.sprite);
-        if (q.sprite.material.map) q.sprite.material.map.dispose();
-        q.sprite.material.dispose();
-      });
-      activeQuestionsRef.current = [];
+      setActiveQuestions([]);
 
       // Clean up pulses
       pulsesRef.current.forEach((pulse) => {
@@ -436,10 +391,8 @@ export function ReasoningNetworkScene({ active, config }: ReasoningNetworkSceneP
   const randomRange = (min: number, max: number) => Math.random() * (max - min) + min;
 
   // 7. Render Loop Animations
-  useFrame((state, delta) => {
+  useFrame((_state, delta) => {
     if (!active) return;
-
-    const time = state.clock.getElapsedTime();
 
     // A. Animate Connection Line Highlight Fading
     Object.keys(connectionLinesRef.current).forEach((pairId) => {
@@ -490,33 +443,6 @@ export function ReasoningNetworkScene({ active, config }: ReasoningNetworkSceneP
       });
 
       pulsesRef.current = remainingPulses;
-    }
-
-    // C. Floating Questions sequential fade & gentle drift
-    activeQuestionsRef.current.forEach((q) => {
-      // Fade in after their designated spawn delay
-      if (time >= q.spawnTime) {
-        q.sprite.material.opacity = THREE.MathUtils.lerp(
-          q.sprite.material.opacity,
-          1.0,
-          0.05
-        );
-      }
-
-      // Gentle floating motion
-      if (shouldAnimate) {
-        q.sprite.position.y += Math.sin(time * 0.8 + q.sprite.id) * 0.015;
-      }
-    });
-
-    // D. Billboard scale corrections based on camera distance (LOD readability)
-    if (camera) {
-      activeQuestionsRef.current.forEach((q) => {
-        const dist = camera.position.distanceTo(q.sprite.position);
-        // Rescale sprites slightly based on distance to keep text readable
-        const targetScale = THREE.MathUtils.clamp(dist * 0.28, 18, 55);
-        q.sprite.scale.set(targetScale, targetScale * 0.25, 1);
-      });
     }
   });
 
@@ -664,6 +590,69 @@ export function ReasoningNetworkScene({ active, config }: ReasoningNetworkSceneP
           </group>
         );
       })}
+
+      {/* Render Floating HTML Question Pills */}
+      {active && activeQuestions.map((q) => (
+        <FloatingQuestion
+          key={q.id}
+          text={q.text}
+          position={q.position}
+          spawnTime={q.spawnTime}
+          shouldAnimate={shouldAnimate}
+        />
+      ))}
+    </group>
+  );
+}
+
+// 8. Modular sub-component for crisp vector HTML/CSS Question Pills
+function FloatingQuestion({
+  text,
+  position,
+  spawnTime,
+  shouldAnimate
+}: {
+  text: string;
+  position: THREE.Vector3;
+  spawnTime: number;
+  shouldAnimate: boolean;
+}) {
+  const [opacity, setOpacity] = useState(0);
+  const [floatY, setFloatY] = useState(0);
+  const startTimeRef = useRef<number | null>(null);
+
+  // Fade in animation synced with clock time
+  useFrame((state) => {
+    const time = state.clock.getElapsedTime();
+    if (startTimeRef.current === null) {
+      startTimeRef.current = time;
+    }
+
+    const elapsed = time - startTimeRef.current;
+    if (elapsed >= spawnTime) {
+      setOpacity((prev) => THREE.MathUtils.lerp(prev, 1.0, 0.05));
+    }
+
+    if (shouldAnimate) {
+      setFloatY(Math.sin(time * 0.8 + spawnTime) * 1.5);
+    }
+  });
+
+  return (
+    <group position={[position.x, position.y + floatY, position.z]}>
+      <Html
+        distanceFactor={60} // Matches camera scaling matrix
+        center
+        style={{
+          transition: "opacity 0.25s ease-out",
+          opacity: opacity,
+          pointerEvents: "none"
+        }}
+      >
+        <div className="whitespace-nowrap rounded-full border border-cyan-500/40 bg-slate-950/90 px-6 py-3.5 text-center text-sm font-bold text-white shadow-[0_0_20px_rgba(0,229,255,0.25)] select-none">
+          {text}
+        </div>
+      </Html>
     </group>
   );
 }
