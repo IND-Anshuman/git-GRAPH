@@ -7,6 +7,50 @@ import { SceneManager } from "@/lib/SceneManager";
 import { useOnboardingStore } from "@/stores/onboardingStore";
 import { AudioToggle } from "@/components/AudioToggle";
 import { AudioSystem } from "@/lib/AudioSystem";
+import Lenis from "lenis";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+// Suppress the THREE.Clock deprecation warning from the console globally in the browser
+if (typeof window !== "undefined") {
+  const originalWarn = console.warn;
+  console.warn = (...args: any[]) => {
+    if (args[0] && typeof args[0] === "string" && (args[0].includes("THREE.Clock") || args[0].includes("Clock has been deprecated"))) {
+      return;
+    }
+    originalWarn.apply(console, args);
+  };
+}
+
+const FolderIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+    <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12.75V12A2.25 2.25 0 0 1 4.5 9.75h15A2.25 2.25 0 0 1 21.75 12v.75m-19.5 0A2.25 2.25 0 0 0 4.5 15h15a2.25 2.25 0 0 0 2.25-2.25m-19.5 0v.25A2.25 2.25 0 0 0 4.5 15.25h15a2.25 2.25 0 0 0 2.25-2.25v-.25M9 3h1.378a2.249 2.249 0 0 1 1.747.836l1.28 1.542a2.25 2.25 0 0 0 1.747.836H19.5A2.25 2.25 0 0 1 21.75 8.25v1.5H2.25V8.25A2.25 2.25 0 0 1 4.5 6H9V3z" />
+  </svg>
+);
+
+const CodeIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+    <path strokeLinecap="round" strokeLinejoin="round" d="M17.25 6.75 22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3-4.5 16.5" />
+  </svg>
+);
+
+const CubeIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+    <path strokeLinecap="round" strokeLinejoin="round" d="M21 7.5l-9-5.25L3 7.5m18 0l-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9" />
+  </svg>
+);
+
+const DocumentIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+    <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9z" />
+  </svg>
+);
+
+const MouseIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 animate-bounce">
+    <path strokeLinecap="round" strokeLinejoin="round" d="M9 9V6a3 3 0 1 1 6 0v3m-6 0a3 3 0 0 0 6 0m-6 0h6m-6 9a6 6 0 0 0 12 0v-3a6 6 0 0 0-12 0v3z" />
+  </svg>
+);
 
 /**
  * Home page component renders the split screen layout based on the design mockup:
@@ -41,6 +85,39 @@ export default function Home() {
       window.removeEventListener("click", handleFirstInteraction);
       window.removeEventListener("keydown", handleFirstInteraction);
       window.removeEventListener("scroll", handleFirstInteraction);
+    };
+  }, []);
+
+  // Initialize Lenis smooth scroll and connect with GSAP ScrollTrigger
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    // Register GSAP Plugin
+    gsap.registerPlugin(ScrollTrigger);
+
+    const lenis = new Lenis({
+      duration: 1.2,
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), // smooth exponential ease-out
+      orientation: "vertical",
+      gestureOrientation: "vertical",
+      smoothWheel: true
+    });
+
+    // Notify ScrollTrigger on Lenis scroll updates
+    lenis.on("scroll", () => {
+      ScrollTrigger.update();
+    });
+
+    // Hook Lenis render loops into GSAP's optimized ticker loop
+    const rafCallback = (time: number) => {
+      lenis.raf(time * 1000);
+    };
+    gsap.ticker.add(rafCallback);
+    gsap.ticker.lagSmoothing(0);
+
+    return () => {
+      lenis.destroy();
+      gsap.ticker.remove(rafCallback);
     };
   }, []);
 
@@ -148,42 +225,46 @@ export default function Home() {
         {/* Left Fixed Sidebar (Glassmorphic) */}
         <aside className="fixed left-0 top-0 z-20 h-screen w-[380px] bg-slate-950/85 backdrop-blur-md border-r border-slate-900 p-6 overflow-y-auto flex flex-col justify-between select-none">
           {currentScene === 1 ? (
-            <div className="flex flex-col gap-6 select-none transition-all duration-300">
-              <div>
-                <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-purple-400">
-                  Workspace Discovery
+            <div className="flex flex-col gap-5 select-none transition-all duration-300">
+              <div className="stats-header">
+                <span className="text-[11px] font-bold uppercase tracking-[0.3em] text-purple-400 mb-2 block">
+                  THE CHAOS
                 </span>
-                <h1 className="text-3xl font-black text-white mt-1 tracking-tight leading-tight">
-                  The Chaos of <br />Raw Code
+                <h1 className="text-3xl font-extrabold text-white leading-tight mb-3 tracking-tight">
+                  Modern software<br />is <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-500 font-black">too complex.</span>
                 </h1>
-                <p className="text-xs text-slate-400 mt-3 leading-relaxed">
-                  Modern software is growing exponentially. Overwhelming lines of code, legacy microservices, and untracked files drift in disorganized confusion.
+                <p className="text-xs leading-relaxed text-slate-400">
+                  Billions of lines of code scattered across countless files, services, and systems.
                 </p>
               </div>
 
               {/* Repository Metrics Panel */}
-              <div className="flex flex-col gap-3 mt-4 bg-slate-900/40 border border-slate-900 p-4 rounded-xl">
+              <div className="flex flex-col gap-4 mt-2 bg-slate-900/25 border border-slate-900/60 p-5 rounded-2xl backdrop-blur-sm shadow-xl">
                 {[
-                  { label: "Files", val: "10,231", desc: "Source files & configurations", color: "text-purple-400" },
-                  { label: "Functions", val: "128,430", desc: "Compiled methods & call blocks", color: "text-pink-400" },
-                  { label: "Services", val: "342", desc: "Microservices & bounded APIs", color: "text-orange-400" },
-                  { label: "Lines of Code", val: "28.7M", desc: "Raw source syntax lines", color: "text-cyan-400" }
+                  { label: "Files", val: "10,231", icon: <FolderIcon />, color: "text-purple-400" },
+                  { label: "Functions", val: "128,430", icon: <CodeIcon />, color: "text-pink-400" },
+                  { label: "Services", val: "342", icon: <CubeIcon />, color: "text-orange-400" },
+                  { label: "Lines of Code", val: "28.7M", icon: <DocumentIcon />, color: "text-cyan-400" }
                 ].map((stat) => (
-                  <div key={stat.label} className="flex justify-between items-center py-1.5 border-b border-slate-950/40 last:border-0">
-                    <div>
-                      <div className="text-xs font-bold text-slate-200">{stat.label}</div>
-                      <div className="text-[9px] text-slate-500 mt-0.5">{stat.desc}</div>
+                  <div key={stat.label} className="flex items-center gap-4 py-1.5 first:pt-0 last:pb-0 border-b border-slate-900/40 last:border-0">
+                    <div className={`${stat.color} p-2 bg-slate-950/60 rounded-xl border border-slate-800/45`}>
+                      {stat.icon}
                     </div>
-                    <div className={`text-xl font-extrabold tracking-tight ${stat.color}`}>
-                      {stat.val}
+                    <div>
+                      <div className={`text-2xl font-extrabold tracking-tight ${stat.color}`}>
+                        {stat.val}
+                      </div>
+                      <div className="text-[10px] uppercase tracking-wider font-semibold text-slate-500 mt-0.5">
+                        {stat.label}
+                      </div>
                     </div>
                   </div>
                 ))}
               </div>
 
               <div className="text-[10px] text-slate-500 flex items-center gap-2 mt-4">
-                <span className="animate-pulse h-1.5 w-1.5 rounded-full bg-purple-500" />
-                Scroll down to observe SEEE extract structure from chaos
+                <MouseIcon />
+                <span className="tracking-wide">Scroll to explore the journey</span>
               </div>
             </div>
           ) : (
@@ -282,10 +363,10 @@ export default function Home() {
         <main ref={scrollContainerRef} className="ml-[380px] w-[calc(100%-380px)] min-h-screen relative z-10 flex flex-col items-center">
           
           {/* Spacer to push first card down */}
-          <div className="h-[25vh]" />
+          <div className="h-[55vh]" />
 
           {/* Scrollable scene cards list */}
-          <div className="w-full max-w-xl px-6 flex flex-col gap-[35vh]">
+          <div className="w-full max-w-xl px-6 flex flex-col gap-[75vh]">
             {scenes.map((scene) => {
               // Highlight scene card if active in store (supports scene 7 & 8 mapping to final slide)
               const isActive = currentScene === scene.num || (scene.num === 7 && currentScene === 8);
@@ -362,7 +443,7 @@ export default function Home() {
           </div>
 
           {/* Bottom spacing to ensure final scene cards can be scrolled into view */}
-          <div className="h-[35vh]" />
+          <div className="h-[60vh]" />
         </main>
 
         {/* Audio Control UI Overlay */}
