@@ -206,7 +206,9 @@ void main() {
   // Apply exponential damping drag force
   vec3 dampedVelocity = velocity * exp(-uDamping * t);
   
-  vec3 explosionPos = uOrigin + dampedVelocity * t + 0.5 * uGravity * t * t;
+  // Add a small constant drift component that persists after the explosion dampens
+  vec3 drift = aDirection * aSpeed * 0.08;
+  vec3 explosionPos = uOrigin + (dampedVelocity + drift) * t + 0.5 * uGravity * t * t;
   
   // Offset relative to aInitialPosition (since instanceMatrix translates by aInitialPosition)
   vec3 offset = explosionPos - aInitialPosition;
@@ -419,11 +421,21 @@ void main() {
   offset += turbulence;
   offset += uWindDirection * uTime * 0.05;
   
-  #ifdef USE_INSTANCING
-    vec4 mvPosition = modelViewMatrix * instanceMatrix * vec4(position * aCustomSize + offset, 1.0);
-  #else
-    vec4 mvPosition = modelViewMatrix * vec4(position * aCustomSize + aInitialPosition + offset, 1.0);
-  #endif
+  vec3 localPos = position * aCustomSize;
+  vec3 worldPos = aInitialPosition + offset;
+  
+  // Apply rotation around Z-axis based on cloud type (creates orbital parallax)
+  float angle = uTime * (aCloudType < 0.5 ? 0.015 : (aCloudType < 1.5 ? 0.025 : 0.008));
+  float cosA = cos(angle);
+  float sinA = sin(angle);
+  
+  vec3 rotatedCenter = vec3(
+    worldPos.x * cosA - worldPos.y * sinA,
+    worldPos.x * sinA + worldPos.y * cosA,
+    worldPos.z
+  );
+  
+  vec4 mvPosition = modelViewMatrix * vec4(rotatedCenter + localPos, 1.0);
   
   gl_Position = projectionMatrix * mvPosition;
   
@@ -433,6 +445,7 @@ void main() {
 `;
 
 const nebulaFragment = `
+uniform float uTime;
 varying vec3 vColor;
 varying float vIsBillboard;
 varying vec2 vUv;
@@ -454,8 +467,9 @@ void main() {
     // 2. Medium nebula: moderate density
     alpha = pow(1.0 - dist * 2.0, 1.8) * 0.22;
   } else {
-    // 3. Small stars: tight, sharp center
-    alpha = pow(1.0 - dist * 2.0, 4.0) * 0.90;
+    // 3. Small stars: tight, sharp center + independent twinkling
+    float twinkle = 0.5 + 0.5 * sin(uTime * 3.0 + vPhase);
+    alpha = pow(1.0 - dist * 2.0, 4.5) * 0.95 * twinkle;
   }
   
   // Color shifting: add orange/magenta gas variance
@@ -485,3 +499,4 @@ export const particleShaders = {
   network: { vertex: networkVertex, fragment: particleFragment },
   nebula: { vertex: nebulaVertex, fragment: nebulaFragment },
 };
+
