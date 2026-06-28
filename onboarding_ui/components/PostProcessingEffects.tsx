@@ -36,15 +36,19 @@ export function PostProcessingEffects() {
 
   // Performance degradation rules
   const shouldRenderSSAO = qualityTier === "ultra";
-  const shouldRenderDOF = (qualityTier === "ultra" || qualityTier === "high") && currentScene !== 8;
+  const shouldRenderDOF = (qualityTier === "ultra" || (qualityTier === "high" && currentScene !== 1)) && currentScene !== 8;
   const shouldRenderBloom = qualityTier !== "low";
   const shouldRenderColorGrading = qualityTier !== "low";
 
   // Dynamic pulsing bloom intensity on ULTRA settings to create "living" gas elements
   useFrame((state) => {
-    if (bloomRef.current && qualityTier === "ultra") {
-      const time = state.clock.getElapsedTime();
-      bloomRef.current.intensity = 0.7 + Math.sin(time * 1.5) * 0.1;
+    if (bloomRef.current) {
+      if (currentScene === 1) {
+        bloomRef.current.intensity = qualityTier === "ultra" ? 0.95 : qualityTier === "high" ? 0.8 : 0.55;
+      } else if (qualityTier === "ultra") {
+        const time = state.clock.getElapsedTime();
+        bloomRef.current.intensity = 0.7 + Math.sin(time * 1.5) * 0.1;
+      }
     }
   });
 
@@ -56,13 +60,21 @@ export function PostProcessingEffects() {
   // Define shadow color for SSAO
   const ssaoColor = new THREE.Color("black");
 
+  const bloomIntensity = currentScene === 1
+    ? (qualityTier === "ultra" ? 0.95 : qualityTier === "high" ? 0.8 : 0.55)
+    : (qualityTier === "ultra" ? 0.7 : qualityTier === "high" ? 0.6 : 0.5);
+
+  const bloomThreshold = currentScene === 1
+    ? (qualityTier === "ultra" ? 0.25 : qualityTier === "high" ? 0.35 : 0.45)
+    : (qualityTier === "ultra" ? 0.3 : qualityTier === "high" ? 0.4 : 0.5);
+
   return (
     <EffectComposer enableNormalPass={qualityTier === "ultra"}>
       {shouldRenderBloom ? (
         <Bloom
           ref={bloomRef}
-          intensity={qualityTier === "ultra" ? 0.7 : qualityTier === "high" ? 0.6 : 0.5}
-          luminanceThreshold={qualityTier === "ultra" ? 0.3 : qualityTier === "high" ? 0.4 : 0.5}
+          intensity={bloomIntensity}
+          luminanceThreshold={bloomThreshold}
           luminanceSmoothing={0.9}
           mipmapBlur={true}
         />

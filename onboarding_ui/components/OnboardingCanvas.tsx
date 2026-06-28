@@ -293,7 +293,7 @@ export function OnboardingCanvas() {
   return (
     <div className="relative h-full w-full bg-slate-950 overflow-hidden">
       <Canvas
-        dpr={qualityTier === "low" ? 0.75 : qualityTier === "medium" ? 1.0 : [1, 2]}
+        dpr={qualityTier === "low" ? 1.0 : qualityTier === "medium" ? 1.0 : qualityTier === "high" ? 1.25 : [1, 1.5]}
         gl={{
           antialias: true, // Statically set to prevent WebGL context recreation crashes on quality change
           alpha: false,
