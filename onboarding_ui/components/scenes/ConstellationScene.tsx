@@ -5,6 +5,7 @@ import { useFrame } from "@react-three/fiber";
 import { useOnboardingStore, useShouldAnimateCamera } from "@/stores/onboardingStore";
 import { ParticleSystemEngine } from "@/lib/ParticleSystemEngine";
 import { ParticleAnimator } from "@/lib/ParticleAnimator";
+import { Text } from "@react-three/drei";
 import { SceneConfig } from "@/types";
 import * as THREE from "three";
 import gsap from "gsap";
@@ -21,12 +22,29 @@ export function ConstellationScene({ active, config }: ConstellationSceneProps) 
   const qualityTier = useOnboardingStore((s) => s.qualityTier);
 
   const connectionLinesRef = useRef<THREE.LineSegments | null>(null);
-  const labelsRef = useRef<THREE.Sprite[]>([]);
+  const [labelOpacity, setLabelOpacity] = useState(0);
 
   // Lazy Initialization: Only create particles when scene becomes active for the first time
   useEffect(() => {
     if (active && !initialized) {
       setInitialized(true);
+    }
+  }, [active, initialized]);
+
+  // Label fade-in animation timer synced with clustering duration
+  useEffect(() => {
+    if (active && initialized) {
+      const animObj = { val: 0 };
+      const tween = gsap.to(animObj, {
+        val: 0.9,
+        duration: 1.5,
+        delay: 1.5,
+        onUpdate: () => setLabelOpacity(animObj.val)
+      });
+      return () => {
+        tween.kill();
+        setLabelOpacity(0);
+      };
     }
   }, [active, initialized]);
 
@@ -118,69 +136,6 @@ export function ConstellationScene({ active, config }: ConstellationSceneProps) 
     });
   };
 
-  // Create floating canvas billboard sprite labels above constellation centers
-  const createConstellationLabels = () => {
-    if (!groupRef.current || !config.constellations) return;
-
-    // Dispose old labels
-    labelsRef.current.forEach((label) => {
-      if (groupRef.current) groupRef.current.remove(label);
-      label.material.dispose();
-      label.material.map?.dispose();
-    });
-    labelsRef.current = [];
-
-    const labels: THREE.Sprite[] = [];
-
-    config.constellations.forEach((constellation) => {
-      const canvas = document.createElement("canvas");
-      canvas.width = 512;
-      canvas.height = 128;
-      const ctx = canvas.getContext("2d");
-
-      if (ctx) {
-        ctx.clearRect(0, 0, 512, 128);
-
-        // Add soft typography glow
-        ctx.shadowColor = constellation.color;
-        ctx.shadowBlur = 12;
-
-        ctx.fillStyle = "#ffffff";
-        ctx.font = "bold 42px Arial, sans-serif";
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-        ctx.fillText(constellation.name.toUpperCase(), 256, 64);
-
-        const texture = new THREE.CanvasTexture(canvas);
-        const spriteMat = new THREE.SpriteMaterial({
-          map: texture,
-          transparent: true,
-          opacity: 0,
-          depthWrite: false,
-        });
-
-        const sprite = new THREE.Sprite(spriteMat);
-        const center = constellation.center;
-        
-        // Position labels float 20 units above constellation center
-        sprite.position.set(center[0], center[1] + 20, center[2]);
-        sprite.scale.set(24, 6, 1);
-
-        groupRef.current?.add(sprite);
-        labels.push(sprite);
-
-        // Fade in labels after clustering completes
-        gsap.to(spriteMat, {
-          opacity: 0.9,
-          duration: 1.5,
-          delay: 1.5,
-        });
-      }
-    });
-
-    labelsRef.current = labels;
-  };
-
   useEffect(() => {
     if (!initialized) return;
 
@@ -214,7 +169,6 @@ export function ConstellationScene({ active, config }: ConstellationSceneProps) 
 
     // Create visual overlays
     createConnectionLines(group, paddedCenters);
-    createConstellationLabels();
 
     return () => {
       animator.stop("scene-3");
@@ -225,12 +179,6 @@ export function ConstellationScene({ active, config }: ConstellationSceneProps) 
         connectionLinesRef.current.geometry.dispose();
         (connectionLinesRef.current.material as THREE.Material).dispose();
       }
-
-      labelsRef.current.forEach((label) => {
-        if (groupRef.current) groupRef.current.remove(label);
-        label.material.dispose();
-        label.material.map?.dispose();
-      });
     };
   }, [initialized, config]);
 
@@ -299,6 +247,28 @@ export function ConstellationScene({ active, config }: ConstellationSceneProps) 
           distance={light.distance}
         />
       ))}
+
+      {/* Vector-sharp Constellation Labels */}
+      {active && config.constellations?.map((constellation) => {
+        const center = constellation.center;
+        return (
+          <Text
+            key={constellation.name}
+            position={[center[0], center[1] + 20, center[2]]}
+            fontSize={5.0}
+            color="#ffffff"
+            font="https://fonts.gstatic.com/s/outfit/v11/QGYxz_oLhx70648tMSsL.woff"
+            anchorX="center"
+            anchorY="middle"
+            outlineWidth={0.25}
+            outlineColor={constellation.color}
+            outlineOpacity={labelOpacity}
+            fillOpacity={labelOpacity}
+          >
+            {constellation.name.toUpperCase()}
+          </Text>
+        );
+      })}
     </group>
   );
 }
