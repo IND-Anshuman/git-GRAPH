@@ -5,11 +5,8 @@ import { OnboardingCanvas } from "@/components/OnboardingCanvas";
 import { getScrollController } from "@/lib/ScrollController";
 import { SceneManager } from "@/lib/SceneManager";
 import { useOnboardingStore } from "@/stores/onboardingStore";
-<<<<<<< HEAD
 import { AudioToggle } from "@/components/AudioToggle";
 import { AudioSystem } from "@/lib/AudioSystem";
-=======
->>>>>>> 1ed8369a21b3194523231ccb83db6a2ca4e39902
 
 /**
  * Home page component renders the split screen layout based on the design mockup:
@@ -24,7 +21,6 @@ export default function Home() {
 
   useEffect(() => {
     setMounted(true);
-<<<<<<< HEAD
 
     // Audio autoplay compliance sequence
     const handleFirstInteraction = () => {
@@ -46,8 +42,6 @@ export default function Home() {
       window.removeEventListener("keydown", handleFirstInteraction);
       window.removeEventListener("scroll", handleFirstInteraction);
     };
-=======
->>>>>>> 1ed8369a21b3194523231ccb83db6a2ca4e39902
   }, []);
 
   useEffect(() => {
@@ -65,12 +59,9 @@ export default function Home() {
       sceneManager.updateSceneLifecycle(activeScene);
     });
 
-<<<<<<< HEAD
     // Preload Scene 1 and Scene 2 immediately on mount to prevent any delay
     sceneManager.updateSceneLifecycle(1);
 
-=======
->>>>>>> 1ed8369a21b3194523231ccb83db6a2ca4e39902
     return () => {
       unsubscribe();
       scrollCtrl.destroy();
@@ -156,7 +147,6 @@ export default function Home() {
         
         {/* Left Fixed Sidebar (Glassmorphic) */}
         <aside className="fixed left-0 top-0 z-20 h-screen w-[380px] bg-slate-950/85 backdrop-blur-md border-r border-slate-900 p-6 overflow-y-auto flex flex-col justify-between select-none">
-<<<<<<< HEAD
           {currentScene === 1 ? (
             <div className="flex flex-col gap-6 select-none transition-all duration-300">
               <div>
@@ -254,64 +244,6 @@ export default function Home() {
               </div>
             </div>
           )}
-=======
-          <div>
-            <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-purple-400">Onboarding Experience</span>
-            <h1 className="text-3xl font-extrabold tracking-tight text-white mt-1">Space Universe Journey</h1>
-            <p className="text-xs text-slate-400 mt-2 leading-relaxed">
-              A 3D scrollable experience that takes users on a journey from raw code to deep understanding.
-            </p>
-
-            {/* Concept Overview */}
-            <div className="mt-6">
-              <h3 className="text-[10px] font-bold uppercase tracking-wider text-slate-300 border-b border-slate-900 pb-1">Concept Overview</h3>
-              <p className="text-[11px] text-slate-400 mt-2 leading-relaxed">
-                The universe represents your codebase. As the user scrolls, we zoom out from chaos to clarity, revealing layers of intelligence and understanding.
-              </p>
-            </div>
-
-            {/* Tech Stack */}
-            <div className="mt-6">
-              <h3 className="text-[10px] font-bold uppercase tracking-wider text-slate-300 border-b border-slate-900 pb-1">Tech Stack</h3>
-              <div className="grid grid-cols-2 gap-2 mt-2">
-                {[
-                  { name: "React Three Fiber", color: "bg-cyan-500" },
-                  { name: "Three.js", color: "bg-emerald-500" },
-                  { name: "GSAP ScrollTrigger", color: "bg-teal-500" },
-                  { name: "Drei", color: "bg-indigo-500" },
-                  { name: "Framer Motion", color: "bg-pink-500" }
-                ].map((tech) => (
-                  <div key={tech.name} className="flex items-center gap-1.5 bg-slate-900/60 px-2 py-1 rounded border border-slate-900">
-                    <span className={`h-1.5 w-1.5 rounded-full ${tech.color} shadow-sm`} />
-                    <span className="text-[10px] font-medium text-slate-300">{tech.name}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Data Flow vertical chart */}
-            <div className="mt-6">
-              <h3 className="text-[10px] font-bold uppercase tracking-wider text-slate-300 border-b border-slate-900 pb-1">Data Flow</h3>
-              <div className="flex flex-col gap-1 mt-2 pl-2.5 border-l border-cyan-500/20">
-                {[
-                  { title: "Repository", desc: "Git, Files, Commits" },
-                  { title: "SEEE Processing", desc: "Extraction & Analysis" },
-                  { title: "Knowledge Graph", desc: "Entities, Relations, Events" },
-                  { title: "Intelligence Layers", desc: "Capabilities, Architecture, Decisions" },
-                  { title: "Insights & Actions", desc: "Understanding & Impact" }
-                ].map((step, idx) => (
-                  <div key={step.title} className="relative py-1">
-                    <div className="text-[10px] font-bold text-slate-200">{step.title}</div>
-                    <div className="text-[9px] text-slate-500">{step.desc}</div>
-                    {idx < 4 && (
-                      <span className="absolute -left-[14px] top-[70%] text-[8px] text-cyan-400">↓</span>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
->>>>>>> 1ed8369a21b3194523231ccb83db6a2ca4e39902
 
           {/* Bottom Performance and Controls */}
           <div className="mt-6 pt-4 border-t border-slate-900">
@@ -432,12 +364,9 @@ export default function Home() {
           {/* Bottom spacing to ensure final scene cards can be scrolled into view */}
           <div className="h-[35vh]" />
         </main>
-<<<<<<< HEAD
 
         {/* Audio Control UI Overlay */}
         <AudioToggle />
-=======
->>>>>>> 1ed8369a21b3194523231ccb83db6a2ca4e39902
       </div>
     </div>
   );
