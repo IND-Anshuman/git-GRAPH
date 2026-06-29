@@ -376,66 +376,135 @@ export function OnboardingCanvas() {
         <InfoCardOverlay />
         <PostProcessingEffects />
       </Canvas>
-      <SceneOneExplanationHUD />
+      <UniversalExplanationHUD />
     </div>
   );
 }
 
-
+// Static dictionary of scene explanation metadata
+const sceneExplanations: Record<number, { title: string; subtitle: string; desc: string; reason: string; logs: string[] }> = {
+  1: {
+    title: "Why We Are Building Git-Graph",
+    subtitle: "The Chaos of Code",
+    desc: "Modern enterprise codebases have become too vast to navigate mentally. We build Git-Graph to compile this chaotic drift of isolated source files into an interactive, visible semantic map.",
+    reason: "Drifting files represent the cognitive overload that developers face daily before structural compilation.",
+    logs: ["SCANNING REPOSITORY FILES...", "FOUND: 10,231 COMPONENT NODES", "STATUS: COGNITIVE OVERLOAD", "READY FOR SEMANTIC COMPILATION"]
+  },
+  2: {
+    title: "Decomposing to Stardust",
+    subtitle: "Semantic Extraction",
+    desc: "To map software intelligence, we must decompose code into its atomic blocks—classes, functions, APIs, and database schemas. This is the raw stardust of repository evidence.",
+    reason: "By breaking code into granular semantic particles, we can index, connect, and analyze the entire architecture flow.",
+    logs: ["DECOMPOSING FILE STRUCTURES...", "EXTRACTING CLASSES & METHODS", "NODES INDEXED: 128,430 UNITS", "EMITTING SEMANTIC PARTICLES"]
+  },
+  3: {
+    title: "Assembling Capability Planets",
+    subtitle: "Mapping What Code Does",
+    desc: "Individual code nodes form functional clusters. Related code files orbit together to form capabilities—such as Authentication or Payments—that deliver real business value.",
+    reason: "Capabilities are represented as solid planetary bodies, visualizing code functional groupings as constellations.",
+    logs: ["CLUSTERING BUSINESS LOGIC...", "FOUND CONSTELLATION: AUTH_SERVER", "HEALTH METRICS COMPILED", "ORBITAL SHELLS GENERATED"]
+  },
+  4: {
+    title: "Structuring Solar Systems",
+    subtitle: "Domain Architecture Mapping",
+    desc: "Capabilities do not exist in isolation; they form complex systems. We organize these systems into distinct architectural domains, forming solar systems of software topology.",
+    reason: "Solar systems show bounded contexts and domain boundaries, mapping how systems communicate structurally.",
+    logs: ["RESOLVING BOUNDED CONTEXTS...", "SYSTEMS CONNECTED: 8 DOMAINS", "ARCHITECTURE MAP COMPILED", "INTER-DOMAIN PATHWAYS ACTIVE"]
+  },
+  5: {
+    title: "Uncovering Decision Rings",
+    subtitle: "Evolutionary History (ADRs)",
+    desc: "A codebase is a history of human choices. We compile architectural decisions (ADRs) and map them as orbiting rings around capability planets, showing the reasoning behind the structure.",
+    reason: "Orbiting rings represent why capabilities evolved, exposing historical trade-offs directly over the code shape.",
+    logs: ["IMPORTING ADR DOCUMENTS...", "MAPPED DECISIONS: 147 ADRs", "EVOLUTION SHAPE GENERATED", "DECISION RING BIND COMPLETE"]
+  },
+  6: {
+    title: "Constellation of Reasoning",
+    subtitle: "Interactive Impact Analysis",
+    desc: "We run a reasoning neural network over the unified knowledge graph to answer questions, analyze architectural impact, and surface critical code health insights.",
+    reason: "Neural sparks show active query pathways traveling between evidence nodes to resolve complex questions.",
+    logs: ["INITIALIZING NEURAL GRAPH...", "COMPILING EVOLVED INSIGHTS", "REASONING PATHWAYS ACTIVE", "ANALYSIS PIPELINE READY"]
+  },
+  7: {
+    title: "The Knowledge Universe",
+    subtitle: "Unified Software Intelligence",
+    desc: "Everything converges into a living knowledge universe. Code, systems, decisions, and reasoning are integrated into a single interactive map of software intelligence.",
+    reason: "This unified space is the final state—your entire enterprise architecture turned searchable and visible.",
+    logs: ["UNIVERSE SYNCHRONIZATION COMPLETED", "SEMANTIC INTEL MAP ACTIVE", "SYSTEM STATUS: 100% ONLINE", "READY FOR OPERATOR COMMANDS"]
+  }
+};
 
 /**
  * Animated Holographic HUD overlay that displays explanatory logs and introduction metadata
- * for Scene 1 (The Chaos). It automatically fades out when the user scrolls to subsequent scenes.
+ * for each scene. Its position and scale animate in response to scroll progress.
  */
-function SceneOneExplanationHUD() {
+function UniversalExplanationHUD() {
   const currentScene = useOnboardingStore((s) => s.currentScene);
-  const [visible, setVisible] = useState(false);
+  const scrollProgress = useOnboardingStore((s) => s.scrollProgress);
   const [logs, setLogs] = useState<string[]>([]);
 
-  // Fade in HUD on mount/scene active
-  useEffect(() => {
-    if (currentScene === 1) {
-      const timer = setTimeout(() => setVisible(true), 600);
-      return () => clearTimeout(timer);
-    } else {
-      setVisible(false);
-    }
-  }, [currentScene]);
+  // Dynamically query boundaries for the active scene
+  const activeInfo = sceneExplanations[currentScene];
+  const boundaries = useOnboardingStore.getState().getSceneBoundaries(currentScene);
+  const range = boundaries.end - boundaries.start;
+  const localProgress = range === 0 ? 1.0 : (scrollProgress - boundaries.start) / range;
+  const clampedProgress = Math.max(0.0, Math.min(1.0, localProgress));
 
-  // Type simulated system log lines sequentially
+  // Typewriter effect for system monitor logs
   useEffect(() => {
-    if (currentScene !== 1) {
-      setLogs([]);
-      return;
-    }
-
-    const logMessages = [
-      "INITIALIZING INTEL SCAN...",
-      "FOUND: 10,231 COMPONENT NODES",
-      "STATUS: COGNITIVE OVERLOAD",
-      "READY FOR SEMANTIC COMPILATION"
-    ];
+    setLogs([]);
+    if (!activeInfo) return;
 
     let currentLogIndex = 0;
     const interval = setInterval(() => {
-      if (currentLogIndex < logMessages.length) {
-        setLogs((prev) => [...prev, logMessages[currentLogIndex]]);
+      if (currentLogIndex < activeInfo.logs.length) {
+        setLogs((prev) => [...prev, activeInfo.logs[currentLogIndex]]);
         currentLogIndex++;
       } else {
         clearInterval(interval);
       }
-    }, 1200);
+    }, 600);
 
     return () => clearInterval(interval);
-  }, [currentScene]);
+  }, [currentScene, activeInfo]);
 
-  if (!visible) return null;
+  if (!activeInfo) return null;
+
+  // Calculate scroll transitions (Slide-in -> Floating -> Slide-out)
+  let opacity = 1.0;
+  let translateX = 0;
+  let translateY = 0;
+  let scale = 1.0;
+
+  if (clampedProgress < 0.20) {
+    // 0% -> 20%: Enter and slide in from the right
+    const t = clampedProgress / 0.20;
+    opacity = t;
+    translateX = (1 - t) * 60; // offset in px
+    scale = 0.92 + t * 0.08;
+  } else if (clampedProgress > 0.80) {
+    // 80% -> 100%: Exit and slide up/fade out
+    const t = (clampedProgress - 0.80) / 0.20;
+    opacity = 1 - t;
+    translateY = -t * 40; // slide up in px
+    scale = 1.0 - t * 0.04;
+  } else {
+    // 20% -> 80%: Zero-gravity floating sine oscillation
+    const floatProgress = (clampedProgress - 0.20) / 0.60;
+    translateY = Math.sin(floatProgress * Math.PI) * 12;
+  }
 
   return (
-    <div className="absolute top-[48%] left-[62%] -translate-x-1/2 -translate-y-1/2 z-30 w-full max-w-md px-4 transition-all duration-700 ease-out pointer-events-none select-none">
+    <div 
+      className="absolute top-[48%] left-[62%] -translate-x-1/2 -translate-y-1/2 z-30 w-full max-w-md px-4 pointer-events-none select-none"
+      style={{
+        opacity,
+        transform: `translate(-50%, -50%) translate3d(${translateX}px, ${translateY}px, 0) scale(${scale})`,
+        transition: "opacity 0.05s ease-out, transform 0.05s ease-out"
+      }}
+    >
       {/* Holographic container */}
-      <div className="relative bg-slate-950/80 backdrop-blur-lg border border-cyan-500/20 rounded-xl p-6 shadow-2xl shadow-cyan-500/5 animate-fade-in flex flex-col gap-4">
-        
+      <div className="relative bg-slate-950/80 backdrop-blur-lg border border-cyan-500/20 rounded-xl p-6 shadow-2xl shadow-cyan-500/5 flex flex-col gap-4">
         {/* Animated laser line */}
         <div className="absolute inset-x-0 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-cyan-400 to-transparent animate-scan" />
 
@@ -450,21 +519,21 @@ function SceneOneExplanationHUD() {
           <div className="flex items-center gap-2">
             <span className="h-1.5 w-1.5 rounded-full bg-cyan-400 animate-ping" />
             <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-cyan-400 font-mono">
-              System Monitor: raw chaos
+              System Monitor: {activeInfo.subtitle}
             </h3>
           </div>
-          <span className="text-[9px] font-bold text-slate-650 font-mono">
-            SEC_LOG // 01
+          <span className="text-[9px] font-bold text-slate-500 font-mono">
+            SEC_LOG // 0{currentScene}
           </span>
         </div>
 
         {/* Content details */}
         <div className="flex flex-col gap-1.5">
-          <h2 className="text-base font-extrabold tracking-tight text-white leading-snug">
-            Why We Are Building Git-Graph
+          <h2 className="text-sm font-extrabold tracking-tight text-white leading-snug">
+            {activeInfo.title}
           </h2>
-          <p className="text-xs text-slate-300 leading-relaxed font-medium">
-            Modern enterprise repositories are too vast to comprehend. We are building Git-Graph to compile this chaotic drift of isolated source files into a unified, interactive semantic map. By automatically mapping dependencies and resolving relations, we turn raw code into searchable, visible structural intelligence.
+          <p className="text-[11px] text-slate-300 leading-relaxed font-normal">
+            {activeInfo.desc}
           </p>
         </div>
 
@@ -485,12 +554,8 @@ function SceneOneExplanationHUD() {
         {/* HUD control hotkeys */}
         <div className="border-t border-slate-900 pt-2.5 flex justify-between items-center text-[9px] font-mono text-slate-500">
           <div className="flex items-center gap-1.5">
-            <span className="text-cyan-400/75 font-semibold">[MOUSE]</span>
-            <span>Hover files to query node</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <span className="text-indigo-400/75 font-semibold">[SCROLL]</span>
-            <span>Scroll down to build order</span>
+            <span className="text-cyan-400/75 font-semibold">[DIAGNOSTIC]</span>
+            <span>{activeInfo.reason}</span>
           </div>
         </div>
       </div>
