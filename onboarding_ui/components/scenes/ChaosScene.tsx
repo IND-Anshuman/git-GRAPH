@@ -61,11 +61,38 @@ function buildScatteredSlots(count: number): ScatteredSlot[] {
   return slots;
 }
 
+function createRealisticPlanetTexture(): THREE.CanvasTexture {
+  const W = 1024, H = 1024;
+  const canvas = document.createElement("canvas");
+  canvas.width = W; canvas.height = H;
+  const ctx = canvas.getContext("2d")!;
+  ctx.clearRect(0, 0, W, H);
+
+  // Placeholder flat background
+  ctx.fillStyle = "#b45309";
+  ctx.fillRect(0, 0, W, H);
+
+  // Write "YOUR REPO" on the planet
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.font = "bold 48px sans-serif";
+  ctx.fillStyle = "#ffffff";
+  ctx.fillText("YOUR REPO", W / 2, H / 2);
+
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  return tex;
+}
+
 export function ChaosScene({ active, config: _config }: ChaosSceneProps) {
   const groupRef     = useRef<THREE.Group>(null);
+  const planetGroup  = useRef<THREE.Group>(null);
   const windowsGroup = useRef<THREE.Group>(null);
+  const planetMesh   = useRef<THREE.Mesh>(null);
+  const ringMesh     = useRef<THREE.Mesh>(null);
 
   const [initialized, setInitialized] = useState(false);
+  const [planetTex,   setPlanetTex]   = useState<THREE.CanvasTexture | null>(null);
 
   const shouldAnimate    = useShouldAnimateCamera();
   const qualityTier      = useOnboardingStore((s) => s.qualityTier);
@@ -74,6 +101,13 @@ export function ChaosScene({ active, config: _config }: ChaosSceneProps) {
   const expandCard       = useOnboardingStore((s) => s.expandCard);
 
   useEffect(() => { if (active && !initialized) setInitialized(true); }, [active, initialized]);
+
+  useEffect(() => {
+    if (!initialized || typeof window === "undefined") return;
+    const pTex = createRealisticPlanetTexture();
+    setPlanetTex(pTex);
+    return () => { pTex.dispose(); };
+  }, [initialized]);
 
   const windowCount = useMemo(() => {
     switch (qualityTier) {
@@ -95,6 +129,28 @@ export function ChaosScene({ active, config: _config }: ChaosSceneProps) {
       return { id: `scene-1-window-${i}`, filename: snip.filename, lang: snip.lang, codeLength: snip.code.length, texture: tex, slot: scatteredSlots[i] };
     });
   }, [initialized, windowCount, scatteredSlots]);
+
+  useEffect(() => {
+    if (!initialized) return;
+    const handler = InteractionHandler.getInstance();
+    codeWindowsData.forEach((win, i) => {
+      handler.registerObject(win.id, PLANET_POS.clone(), 16.0, {
+        type: "Code Fragment", title: win.filename,
+        description: `A raw source code fragment containing ${win.codeLength} lines, floating in the chaos before semantic compilation.`,
+        details: {
+          Language: languages[win.lang] || win.lang,
+          Complexity: i % 3 === 0 ? "High" : i % 3 === 1 ? "Medium" : "Critical",
+          Status: "Orbiting / Untracked",
+          Size: `${(win.codeLength * 0.15 + 0.5).toFixed(2)} KB`
+        }
+      });
+    });
+    return () => { codeWindowsData.forEach((win) => handler.unregisterObject(win.id)); };
+  }, [initialized, codeWindowsData]);
+
+  useEffect(() => {
+    return () => { codeWindowsData.forEach((win) => win.texture.dispose()); };
+  }, [codeWindowsData]);
 
   useFrame((state) => {
     if (!active || !initialized || !shouldAnimate) return;
@@ -120,6 +176,7 @@ export function ChaosScene({ active, config: _config }: ChaosSceneProps) {
         const wz = PLANET_POS.z + lz + dz;
 
         child.position.set(wx, wy, wz);
+        InteractionHandler.getInstance().updateObjectPosition(win.id, new THREE.Vector3(wx, wy, wz));
 
         const distToCam = state.camera.position.distanceTo(new THREE.Vector3(wx, wy, wz));
         const fadeStart = 26;
@@ -131,18 +188,39 @@ export function ChaosScene({ active, config: _config }: ChaosSceneProps) {
 
         const isHovered   = hoveredObject === win.id;
         const targetScale = isHovered ? 1.22 : 1.0;
+        
         child.scale.lerp(new THREE.Vector3(13 * targetScale * Math.max(0.1, opacityMult), 9.75 * targetScale * Math.max(0.1, opacityMult), 1.0), 0.14);
-
         if (child instanceof THREE.Sprite && child.material instanceof THREE.SpriteMaterial) {
           const baseOpacity = isHovered ? 1.0 : 0.90;
           child.material.opacity += ((baseOpacity * opacityMult) - child.material.opacity) * 0.1;
         }
       });
     }
+
+    if (planetMesh.current) planetMesh.current.rotation.y = time * 0.05;
+    if (ringMesh.current) ringMesh.current.rotation.z = Math.sin(time * 0.18) * 0.03;
+    if (groupRef.current) groupRef.current.rotation.y = time * 0.006;
   });
 
   return (
     <group ref={groupRef} visible={active}>
+      <ambientLight color="#2d1b69" intensity={0.50} />
+      <directionalLight color="#ffe8c0" intensity={2.2} position={[-40, 50, 60]} />
+      <pointLight color="#06b6d4" intensity={1.8} position={[80, 10, -20]} distance={180} decay={1.6} />
+      <pointLight color="#7c3aed" intensity={1.2} position={[-30, -30, -50]} distance={130} decay={2.0} />
+
+      <group ref={planetGroup} position={PLANET_POS.toArray() as [number, number, number]}>
+        <mesh>
+          <sphereGeometry args={[6.2, 32, 32]} />
+          <meshStandardMaterial color="#ff8822" transparent opacity={0.14} side={THREE.BackSide} />
+        </mesh>
+
+        <mesh ref={planetMesh}>
+          <sphereGeometry args={[5.0, 64, 64]} />
+          <meshStandardMaterial map={planetTex ?? undefined} roughness={0.72} />
+        </mesh>
+      </group>
+
       <group ref={windowsGroup}>
         {active && codeWindowsData.map((win) => (
           <sprite
