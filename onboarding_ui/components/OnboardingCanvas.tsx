@@ -286,6 +286,10 @@ export function OnboardingCanvas() {
     }
   }, []);
 
+  if (hasWebGL === null) {
+    return <div className="h-full w-full bg-slate-950" />;
+  }
+
   if (hasWebGL === false) {
     return (
       <div className="flex h-screen w-screen items-center justify-center bg-slate-950 text-white p-6 text-center">
@@ -306,9 +310,7 @@ export function OnboardingCanvas() {
         gl={{
           antialias: initialAntialias, // Avoid WebGL context recreation crashes on quality change
           alpha: false,
-          powerPreference: "high-performance",
-          stencil: false, // Save memory on stencil channel allocation
-          depth: true
+          powerPreference: "high-performance"
         }}
         shadows={false} // Explicitly disable shadow maps to prevent dynamic shadow calculation overhead
         camera={{ position: [0, 0, -50], fov: 75 }}
