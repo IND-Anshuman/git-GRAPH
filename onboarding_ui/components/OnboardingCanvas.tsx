@@ -291,7 +291,12 @@ export function OnboardingCanvas() {
   }
 
   if (hasWebGL === false) {
-    return <Cosmic2DFallback />;
+    return (
+      <div className="relative h-full w-full">
+        <Cosmic2DFallback />
+        <SceneOneExplanationHUD />
+      </div>
+    );
   }
 
   return (
@@ -314,6 +319,7 @@ export function OnboardingCanvas() {
         <InfoCardOverlay />
         <PostProcessingEffects />
       </Canvas>
+      <SceneOneExplanationHUD />
     </div>
   );
 }
@@ -440,6 +446,121 @@ function Cosmic2DFallback() {
         <span className="text-[9px] font-bold tracking-wider text-slate-400 uppercase">
           2D Space Fallback Mode
         </span>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Animated Holographic HUD overlay that displays explanatory logs and introduction metadata
+ * for Scene 1 (The Chaos). It automatically fades out when the user scrolls to subsequent scenes.
+ */
+function SceneOneExplanationHUD() {
+  const currentScene = useOnboardingStore((s) => s.currentScene);
+  const [visible, setVisible] = useState(false);
+  const [logs, setLogs] = useState<string[]>([]);
+
+  // Fade in HUD on mount/scene active
+  useEffect(() => {
+    if (currentScene === 1) {
+      const timer = setTimeout(() => setVisible(true), 600);
+      return () => clearTimeout(timer);
+    } else {
+      setVisible(false);
+    }
+  }, [currentScene]);
+
+  // Type simulated system log lines sequentially
+  useEffect(() => {
+    if (currentScene !== 1) {
+      setLogs([]);
+      return;
+    }
+
+    const logMessages = [
+      "INITIALIZING INTEL SCAN...",
+      "FOUND: 10,231 COMPONENT NODES",
+      "STATUS: COGNITIVE OVERLOAD",
+      "READY FOR SEMANTIC COMPILATION"
+    ];
+
+    let currentLogIndex = 0;
+    const interval = setInterval(() => {
+      if (currentLogIndex < logMessages.length) {
+        setLogs((prev) => [...prev, logMessages[currentLogIndex]]);
+        currentLogIndex++;
+      } else {
+        clearInterval(interval);
+      }
+    }, 1200);
+
+    return () => clearInterval(interval);
+  }, [currentScene]);
+
+  if (!visible) return null;
+
+  return (
+    <div className="absolute top-[48%] left-[62%] -translate-x-1/2 -translate-y-1/2 z-30 w-full max-w-md px-4 transition-all duration-700 ease-out pointer-events-none select-none">
+      {/* Holographic container */}
+      <div className="relative bg-slate-950/80 backdrop-blur-lg border border-cyan-500/20 rounded-xl p-6 shadow-2xl shadow-cyan-500/5 animate-fade-in flex flex-col gap-4">
+        
+        {/* Animated laser line */}
+        <div className="absolute inset-x-0 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-cyan-400 to-transparent animate-scan" />
+
+        {/* HUD Brackets */}
+        <span className="absolute top-0 left-0 w-3.5 h-3.5 border-t-2 border-l-2 border-cyan-500/40 rounded-tl" />
+        <span className="absolute top-0 right-0 w-3.5 h-3.5 border-t-2 border-r-2 border-cyan-500/40 rounded-tr" />
+        <span className="absolute bottom-0 left-0 w-3.5 h-3.5 border-b-2 border-l-2 border-cyan-500/40 rounded-bl" />
+        <span className="absolute bottom-0 right-0 w-3.5 h-3.5 border-b-2 border-r-2 border-cyan-500/40 rounded-br" />
+
+        {/* System Title */}
+        <div className="flex items-center justify-between border-b border-slate-900 pb-2.5">
+          <div className="flex items-center gap-2">
+            <span className="h-1.5 w-1.5 rounded-full bg-cyan-400 animate-ping" />
+            <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-cyan-400 font-mono">
+              System Monitor: raw chaos
+            </h3>
+          </div>
+          <span className="text-[9px] font-bold text-slate-650 font-mono">
+            SEC_LOG // 01
+          </span>
+        </div>
+
+        {/* Content details */}
+        <div className="flex flex-col gap-1.5">
+          <h2 className="text-base font-extrabold tracking-tight text-white leading-snug">
+            Drifting Code Fragments
+          </h2>
+          <p className="text-xs text-slate-300 leading-relaxed font-medium">
+            This space visualizes the raw state of a complex enterprise codebase. Files, functions, and configuration layers drift in isolated orbits—representing cognitive overhead and architecture complexity before intelligence parsing.
+          </p>
+        </div>
+
+        {/* Holographic system shell logs */}
+        <div className="bg-slate-950/90 border border-slate-900 rounded p-2.5 font-mono text-[9px] text-cyan-400/80 flex flex-col gap-1 min-h-[70px] justify-end">
+          {logs.map((log, idx) => (
+            <div key={idx} className="flex gap-1.5 items-center">
+              <span className="text-cyan-500/40">&gt;</span>
+              <span>{log}</span>
+            </div>
+          ))}
+          <div className="flex gap-1.5 items-center animate-pulse">
+            <span className="text-cyan-500/40">&gt;</span>
+            <span className="h-2.5 w-1 bg-cyan-400" />
+          </div>
+        </div>
+
+        {/* HUD control hotkeys */}
+        <div className="border-t border-slate-900 pt-2.5 flex justify-between items-center text-[9px] font-mono text-slate-500">
+          <div className="flex items-center gap-1.5">
+            <span className="text-cyan-400/75 font-semibold">[MOUSE]</span>
+            <span>Hover files to query node</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <span className="text-indigo-400/75 font-semibold">[SCROLL]</span>
+            <span>Scroll down to build order</span>
+          </div>
+        </div>
       </div>
     </div>
   );
