@@ -164,62 +164,6 @@ function createRealisticPlanetTexture(): THREE.CanvasTexture {
   ctx.fillStyle = specGrad;
   ctx.fillRect(0, 0, W, H);
 
-  // ── 7. "YOUR REPO" label overlay ──
-  ctx.textAlign = "center";
-  ctx.textBaseline = "middle";
-
-  const lx = W * 0.35; // label center x
-  const ly = H * 0.50; // label center y
-
-  // Semi-transparent tag backing
-  ctx.save();
-  ctx.globalAlpha = 0.55;
-  ctx.fillStyle = "rgba(10, 5, 25, 0.7)";
-  const tagW = 320, tagH = 130;
-  if (ctx.roundRect) ctx.roundRect(lx - tagW/2, ly - tagH/2, tagW, tagH, 12);
-  else ctx.rect(lx - tagW/2, ly - tagH/2, tagW, tagH);
-  ctx.fill();
-  ctx.restore();
-
-  // Tag border
-  ctx.strokeStyle = "rgba(167, 139, 250, 0.60)";
-  ctx.lineWidth = 2;
-  if (ctx.roundRect) ctx.roundRect(lx - tagW/2, ly - tagH/2, tagW, tagH, 12);
-  else ctx.rect(lx - tagW/2, ly - tagH/2, tagW, tagH);
-  ctx.stroke();
-
-  // Small mono caption
-  ctx.font = "bold 22px 'Courier New', monospace";
-  ctx.fillStyle = "rgba(196, 181, 253, 0.82)";
-  ctx.shadowColor = "rgba(168,85,247,0.6)";
-  ctx.shadowBlur = 10;
-  ctx.fillText("// UNCOMPILED", lx, ly - 44);
-
-  // "YOUR REPO" two-line headline
-  ctx.shadowBlur = 22;
-  ctx.shadowColor = "rgba(168, 85, 247, 1.0)";
-
-  // "YOUR"
-  const tg1 = ctx.createLinearGradient(lx - 110, ly - 14, lx + 110, ly + 6);
-  tg1.addColorStop(0, "#e9d5ff");
-  tg1.addColorStop(0.5, "#ffffff");
-  tg1.addColorStop(1, "#c4b5fd");
-  ctx.font = "bold 64px 'Arial Black', 'Arial', sans-serif";
-  ctx.fillStyle = tg1;
-  ctx.fillText("YOUR", lx, ly - 12);
-
-  // "REPO"
-  ctx.shadowBlur = 16;
-  const tg2 = ctx.createLinearGradient(lx - 80, ly + 36, lx + 80, ly + 56);
-  tg2.addColorStop(0, "#a78bfa");
-  tg2.addColorStop(0.5, "#ddd6fe");
-  tg2.addColorStop(1, "#818cf8");
-  ctx.font = "bold 64px 'Arial Black', 'Arial', sans-serif";
-  ctx.fillStyle = tg2;
-  ctx.fillText("REPO", lx, ly + 44);
-
-  ctx.shadowBlur = 0;
-
   const tex = new THREE.CanvasTexture(canvas);
   tex.colorSpace = THREE.SRGBColorSpace;
   tex.wrapS = THREE.RepeatWrapping;
@@ -282,6 +226,68 @@ function createRingTexture(): THREE.CanvasTexture {
   return tex;
 }
 
+function createCodebaseLabelTexture(): THREE.CanvasTexture {
+  const W = 512, H = 160;
+  const canvas = document.createElement("canvas");
+  canvas.width = W; canvas.height = H;
+  const ctx = canvas.getContext("2d")!;
+
+  ctx.clearRect(0, 0, W, H);
+
+  // Futuristic HUD outer brackets
+  ctx.strokeStyle = "rgba(167, 139, 250, 0.85)";
+  ctx.lineWidth = 2.0;
+
+  // Left bracket
+  ctx.beginPath();
+  ctx.moveTo(35, 15);
+  ctx.lineTo(15, 15);
+  ctx.lineTo(15, H - 15);
+  ctx.lineTo(35, H - 15);
+  ctx.stroke();
+
+  // Right bracket
+  ctx.beginPath();
+  ctx.moveTo(W - 35, 15);
+  ctx.lineTo(W - 15, 15);
+  ctx.lineTo(W - 15, H - 15);
+  ctx.lineTo(W - 35, H - 15);
+  ctx.stroke();
+
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+
+  // HUD caption tag
+  ctx.font = "bold 16px 'Courier New', monospace";
+  ctx.fillStyle = "rgba(196, 181, 253, 0.9)";
+  ctx.letterSpacing = "2px";
+  ctx.fillText("UNCOMPILED / RAW", W / 2, H / 2 - 28);
+
+  // Main "THE CODEBASE" title
+  ctx.font = "900 40px 'Arial Black', sans-serif";
+  ctx.letterSpacing = "3px";
+  
+  ctx.shadowColor = "rgba(168, 85, 247, 0.95)";
+  ctx.shadowBlur = 15;
+
+  const grad = ctx.createLinearGradient(80, 0, W - 80, 0);
+  grad.addColorStop(0, "#c4b5fd");
+  grad.addColorStop(0.5, "#ffffff");
+  grad.addColorStop(1, "#a78bfa");
+  ctx.fillStyle = grad;
+
+  ctx.fillText("THE CODEBASE", W / 2, H / 2 + 10);
+
+  ctx.shadowBlur = 0;
+
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.wrapS = THREE.ClampToEdgeWrapping;
+  tex.wrapT = THREE.ClampToEdgeWrapping;
+  tex.needsUpdate = true;
+  return tex;
+}
+
 export function ChaosScene({ active, config: _config }: ChaosSceneProps) {
   const groupRef     = useRef<THREE.Group>(null);
   const planetGroup  = useRef<THREE.Group>(null);
@@ -292,6 +298,7 @@ export function ChaosScene({ active, config: _config }: ChaosSceneProps) {
   const [initialized, setInitialized] = useState(false);
   const [planetTex,   setPlanetTex]   = useState<THREE.CanvasTexture | null>(null);
   const [ringTex,     setRingTex]     = useState<THREE.CanvasTexture | null>(null);
+  const [codebaseTex, setCodebaseTex] = useState<THREE.CanvasTexture | null>(null);
 
   const shouldAnimate    = useShouldAnimateCamera();
   const qualityTier      = useOnboardingStore((s) => s.qualityTier);
@@ -306,11 +313,14 @@ export function ChaosScene({ active, config: _config }: ChaosSceneProps) {
     if (!initialized || typeof window === "undefined") return;
     const pTex = createRealisticPlanetTexture();
     const rTex = createRingTexture();
+    const cTex = createCodebaseLabelTexture();
     setPlanetTex(pTex);
     setRingTex(rTex);
+    setCodebaseTex(cTex);
     return () => {
       pTex.dispose();
       rTex.dispose();
+      cTex.dispose();
     };
   }, [initialized]);
 
@@ -432,6 +442,16 @@ export function ChaosScene({ active, config: _config }: ChaosSceneProps) {
       <pointLight color="#06b6d4" intensity={1.8} position={[80, 10, -20]} distance={180} decay={1.6} />
       <pointLight color="#7c3aed" intensity={1.2} position={[-30, -30, -50]} distance={130} decay={2.0} />
       <pointLight color="#f59e0b" intensity={1.5} position={[PLANET_POS.x - 20, PLANET_POS.y + 20, PLANET_POS.z + 30]} distance={80} decay={1.8} />
+
+      {/* ── Floating Label Above Planet ── */}
+      {codebaseTex && (
+        <sprite
+          position={[PLANET_POS.x, PLANET_POS.y + 8.5, PLANET_POS.z]}
+          scale={[15, 4.68, 1]}
+        >
+          <spriteMaterial attach="material" map={codebaseTex} transparent opacity={0.95} />
+        </sprite>
+      )}
 
       {/* ── Planet group ── */}
       <group ref={planetGroup} position={PLANET_POS.toArray() as [number, number, number]}>
