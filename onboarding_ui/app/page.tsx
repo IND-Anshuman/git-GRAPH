@@ -363,10 +363,10 @@ export default function Home() {
         <main ref={scrollContainerRef} className="ml-[380px] w-[calc(100%-380px)] min-h-screen relative z-10 flex flex-col items-center">
           
           {/* Spacer to push first card down */}
-          <div className="h-[55vh]" />
+          <div className="h-[100vh]" />
 
           {/* Scrollable scene cards list */}
-          <div className="w-full max-w-xl px-6 flex flex-col gap-[75vh]">
+          <div className="w-full max-w-xl px-6 flex flex-col gap-[150vh]">
             {scenes.map((scene) => {
               // Highlight scene card if active in store (supports scene 7 & 8 mapping to final slide)
               const isActive = currentScene === scene.num || (scene.num === 7 && currentScene === 8);
@@ -443,7 +443,7 @@ export default function Home() {
           </div>
 
           {/* Bottom spacing to ensure final scene cards can be scrolled into view */}
-          <div className="h-[60vh]" />
+          <div className="h-[100vh]" />
         </main>
 
         {/* Audio Control UI Overlay */}
