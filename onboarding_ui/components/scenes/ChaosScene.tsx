@@ -207,7 +207,7 @@ export function ChaosScene({ active, config }: ChaosSceneProps) {
       enabled: true,
       count: { ultra: 25000, high: 16000, medium: 9000, low: 4500 },
       geometry: { type: "plane", size: 1.0 },
-      material: { color: "#8b5cf6", opacity: 0.8, transparent: true },
+      material: { color: "#3b0764", opacity: 0.4, transparent: true },
       behavior: {
         animation: "nebula" as any,
         drift: {

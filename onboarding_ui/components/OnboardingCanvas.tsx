@@ -236,6 +236,15 @@ export function OnboardingCanvas() {
   const setCurrentScene = useOnboardingStore((s) => s.setCurrentScene);
   const qualityTier = useOnboardingStore((s) => s.qualityTier);
 
+  // Determine initial antialiasing once on mount to prevent WebGL context recreation crashes
+  const [initialAntialias] = useState(() => {
+    if (typeof window !== "undefined") {
+      const tier = useOnboardingStore.getState().qualityTier;
+      return tier !== "low";
+    }
+    return true;
+  });
+
   // Global keyboard accessibility listener
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -295,13 +304,16 @@ export function OnboardingCanvas() {
       <Canvas
         dpr={qualityTier === "low" ? 1.0 : qualityTier === "medium" ? 1.0 : qualityTier === "high" ? 1.25 : [1, 1.5]}
         gl={{
-          antialias: true, // Statically set to prevent WebGL context recreation crashes on quality change
+          antialias: initialAntialias, // Avoid WebGL context recreation crashes on quality change
           alpha: false,
-          powerPreference: "high-performance"
+          powerPreference: "high-performance",
+          stencil: false, // Save memory on stencil channel allocation
+          depth: true
         }}
+        shadows={false} // Explicitly disable shadow maps to prevent dynamic shadow calculation overhead
         camera={{ position: [0, 0, -50], fov: 75 }}
       >
-        <color attach="background" args={["#020617"]} />
+        <color attach="background" args={["#000000"]} />
         <CameraRig />
         <SceneContainer />
         <PerformanceMonitorHelper />

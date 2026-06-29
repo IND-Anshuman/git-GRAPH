@@ -84,10 +84,10 @@
   ],
   
   "lighting": {
-    "ambient": { "color": "#ffffff", "intensity": 0.3 },
+    "ambient": { "color": "#0a0a1a", "intensity": 0.08 },
     "point": [
-      { "color": "#8b5cf6", "intensity": 1.5, "position": [50, 50, 50], "distance": 200 },
-      { "color": "#3b82f6", "intensity": 1.0, "position": [-50, -50, -50], "distance": 200 }
+      { "color": "#7c3aed", "intensity": 0.9, "position": [30, 20, 20], "distance": 150 },
+      { "color": "#1d4ed8", "intensity": 0.6, "position": [-30, -20, -20], "distance": 150 }
     ]
   },
   

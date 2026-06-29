@@ -461,15 +461,15 @@ void main() {
   
   // Type-based falloffs and opacities
   if (vCloudType < 0.5) {
-    // 1. Large background nebula: soft, wide falloff
-    alpha = pow(1.0 - dist * 2.0, 1.4) * 0.12;
+    // 1. Large background nebula: soft, wide falloff (darker, faster decay)
+    alpha = pow(max(0.0, 1.0 - dist * 2.0), 1.8) * 0.08;
   } else if (vCloudType < 1.5) {
-    // 2. Medium nebula: moderate density
-    alpha = pow(1.0 - dist * 2.0, 1.8) * 0.22;
+    // 2. Medium nebula: moderate density (tighter boundaries)
+    alpha = pow(max(0.0, 1.0 - dist * 2.0), 2.5) * 0.15;
   } else {
-    // 3. Small stars: tight, sharp center + independent twinkling
+    // 3. Small stars: tight, sharp center + independent twinkling (perfectly pin-sharp)
     float twinkle = 0.5 + 0.5 * sin(uTime * 3.0 + vPhase);
-    alpha = pow(1.0 - dist * 2.0, 4.5) * 0.95 * twinkle;
+    alpha = pow(max(0.0, 1.0 - dist * 2.0), 6.0) * 0.95 * twinkle;
   }
   
   // Color shifting: add orange/magenta gas variance
