@@ -24,6 +24,18 @@ const snippets = [
   { filename: "user.py",         lang: "python",     code: ["class User(Model):", "    email = EmailField(unique=True)", "    name = CharField(max_length=100)", "    def check(self, pw):", "        return hash(pw)", "    "] },
   { filename: "checkout.js",     lang: "javascript", code: ["function process(cart) {", "  const tot = cart.items.reduce(", "    (s, i) => s + i.price, 0", "  );", "  return stripe.charge(tot);", "}"] },
   { filename: "app.go",          lang: "go",         code: ["func main() {", "\tr := gin.Default()", "\tr.GET(\"/ping\", func(c *gin.Context) {", "\t\tc.JSON(200, gin.H{\"msg\": \"pong\"})", "\t})", "\tr.Run()", "}"] },
+  { filename: "index.html",      lang: "html",       code: ["<!DOCTYPE html>", "<html>", "<head>", "  <title>App</title>", "</head>", "<body>"] },
+  { filename: "order.java",      lang: "java",       code: ["@RestController", "public class OrderController {", "  @PostMapping(\"/orders\")", "  public Order create(@RequestBody Cart cart) {", "    return orderService.place(cart);", "  }", "}"] },
+  { filename: "payment.rb",      lang: "ruby",       code: ["class PaymentProcessor", "  def self.charge(amount, token)", "    Stripe::Charge.create(", "      amount: amount,", "      currency: 'usd',", "      source: token", "    )", "  end", "end"] },
+  { filename: "db.sql",          lang: "sql",        code: ["CREATE TABLE users (", "  id SERIAL PRIMARY KEY,", "  email VARCHAR(255) UNIQUE,", "  password_hash TEXT,", "  created_at TIMESTAMP DEFAULT NOW()", ");"] },
+  { filename: "styles.css",      lang: "css",        code: [".nebula-particle {", "  mix-blend-mode: screen;", "  filter: blur(4px);", "  animation: drift 10s ease infinite;", "  opacity: 0.85;", "}"] },
+  { filename: "config.tf",       lang: "tf",         code: ["resource \"aws_instance\" \"web\" {", "  ami           = data.aws_ami.ubuntu.id", "  instance_type = \"t3.micro\"", "  tags = {", "    Name = \"git-graph-node\"", "  }", "}"] },
+  { filename: "redis.cache.ts",  lang: "typescript", code: ["export class RedisCache {", "  async get(key: string): Promise<string | null> {", "    return this.client.get(key);", "  }", "  async set(key: string, val: string): Promise<void> {", "    await this.client.setEx(key, 3600, val);", "  }", "}"] },
+  { filename: "api.routes.ts",   lang: "typescript", code: ["import { Router } from 'express';", "const router = Router();", "router.get('/health', (req, res) => {", "  res.status(200).json({ status: 'UP' });", "});", "export default router;"] },
+  { filename: "docker-compose.yml", lang: "yml",    code: ["version: '3.8'", "services:", "  db:", "    image: postgres:15-alpine", "    environment:", "      POSTGRES_DB: git_graph", "    ports:", "      - \"5432:5432\""] },
+  { filename: "package.json",    lang: "json",       code: ["{", "  \"name\": \"git-graph\",", "  \"dependencies\": {", "    \"three\": \"^0.185.0\",", "    \"react\": \"^19.2.0\"", "  }", "}"] },
+  { filename: "auth.middleware.go", lang: "go",     code: ["func AuthMiddleware() gin.HandlerFunc {", "  return func(c *git.Context) {", "    token := c.GetHeader(\"Authorization\")", "    if token == \"\" {", "      c.AbortWithStatus(401)", "      return", "    }", "    c.Next()", "  }", "}"] },
+  { filename: "README.md",       lang: "md",         code: ["# Software Intelligence Platform", "This experience visualizes:", "Source Code -> SEEE -> Semantic Compiler", "## Architecture Layers", "- Domain layer", "- Capability layer"] },
 ];
 
 const PLANET_POS = new THREE.Vector3(0, 0, 0);
@@ -152,59 +164,119 @@ function createRealisticPlanetTexture(): THREE.CanvasTexture {
   ctx.fillStyle = specGrad;
   ctx.fillRect(0, 0, W, H);
 
-  // ── 7. "YOUR REPO" label overlay ──
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.wrapS = THREE.RepeatWrapping;
+  tex.wrapT = THREE.ClampToEdgeWrapping;
+  tex.needsUpdate = true;
+  return tex;
+}
+
+function createRingTexture(): THREE.CanvasTexture {
+  const size = 512;
+  const canvas = document.createElement("canvas");
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext("2d")!;
+  ctx.clearRect(0, 0, size, size);
+
+  const cx = size / 2;
+  const cy = size / 2;
+
+  const maxR = size / 2 - 4;
+  const minR = maxR * (6.2 / 9.8);
+
+  ctx.fillStyle = "rgba(165, 135, 95, 0.08)";
+  ctx.beginPath();
+  ctx.arc(cx, cy, maxR, 0, Math.PI * 2);
+  ctx.arc(cx, cy, minR, 0, Math.PI * 2, true);
+  ctx.fill();
+
+  ctx.save();
+  for (let i = 0; i < 70; i++) {
+    const u = i / 70;
+    if (u > 0.63 && u < 0.70) continue; // Cassini
+    if (u > 0.87 && u < 0.90) continue; // Encke
+    if (u < 0.08) continue;
+
+    const r = minR + u * (maxR - minR);
+    const width = Math.random() * 2.2 + 0.6;
+
+    let color = "rgba(225, 195, 150, ";
+    if (u < 0.35) {
+      color = "rgba(145, 115, 85, ";
+    } else if (u > 0.70) {
+      color = "rgba(175, 165, 150, ";
+    }
+
+    const alpha = Math.random() * 0.45 + 0.15;
+    ctx.strokeStyle = color + alpha + ")";
+    ctx.lineWidth = width;
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, 0, Math.PI * 2);
+    ctx.stroke();
+  }
+  ctx.restore();
+
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.wrapS = THREE.ClampToEdgeWrapping;
+  tex.wrapT = THREE.ClampToEdgeWrapping;
+  tex.needsUpdate = true;
+  return tex;
+}
+
+function createCodebaseLabelTexture(): THREE.CanvasTexture {
+  const W = 512, H = 160;
+  const canvas = document.createElement("canvas");
+  canvas.width = W; canvas.height = H;
+  const ctx = canvas.getContext("2d")!;
+
+  ctx.clearRect(0, 0, W, H);
+
+  // Futuristic HUD outer brackets
+  ctx.strokeStyle = "rgba(167, 139, 250, 0.85)";
+  ctx.lineWidth = 2.0;
+
+  // Left bracket
+  ctx.beginPath();
+  ctx.moveTo(35, 15);
+  ctx.lineTo(15, 15);
+  ctx.lineTo(15, H - 15);
+  ctx.lineTo(35, H - 15);
+  ctx.stroke();
+
+  // Right bracket
+  ctx.beginPath();
+  ctx.moveTo(W - 35, 15);
+  ctx.lineTo(W - 15, 15);
+  ctx.lineTo(W - 15, H - 15);
+  ctx.lineTo(W - 35, H - 15);
+  ctx.stroke();
+
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
 
-  const lx = W * 0.35; // label center x
-  const ly = H * 0.50; // label center y
+  // HUD caption tag
+  ctx.font = "bold 16px 'Courier New', monospace";
+  ctx.fillStyle = "rgba(196, 181, 253, 0.9)";
+  ctx.letterSpacing = "2px";
+  ctx.fillText("UNCOMPILED / RAW", W / 2, H / 2 - 28);
 
-  // Semi-transparent tag backing
-  ctx.save();
-  ctx.globalAlpha = 0.55;
-  ctx.fillStyle = "rgba(10, 5, 25, 0.7)";
-  const tagW = 320, tagH = 130;
-  if (ctx.roundRect) ctx.roundRect(lx - tagW/2, ly - tagH/2, tagW, tagH, 12);
-  else ctx.rect(lx - tagW/2, ly - tagH/2, tagW, tagH);
-  ctx.fill();
-  ctx.restore();
+  // Main "THE CODEBASE" title
+  ctx.font = "900 40px 'Arial Black', sans-serif";
+  ctx.letterSpacing = "3px";
+  
+  ctx.shadowColor = "rgba(168, 85, 247, 0.95)";
+  ctx.shadowBlur = 15;
 
-  // Tag border
-  ctx.strokeStyle = "rgba(167, 139, 250, 0.60)";
-  ctx.lineWidth = 2;
-  if (ctx.roundRect) ctx.roundRect(lx - tagW/2, ly - tagH/2, tagW, tagH, 12);
-  else ctx.rect(lx - tagW/2, ly - tagH/2, tagW, tagH);
-  ctx.stroke();
+  const grad = ctx.createLinearGradient(80, 0, W - 80, 0);
+  grad.addColorStop(0, "#c4b5fd");
+  grad.addColorStop(0.5, "#ffffff");
+  grad.addColorStop(1, "#a78bfa");
+  ctx.fillStyle = grad;
 
-  // Small mono caption
-  ctx.font = "bold 22px 'Courier New', monospace";
-  ctx.fillStyle = "rgba(196, 181, 253, 0.82)";
-  ctx.shadowColor = "rgba(168,85,247,0.6)";
-  ctx.shadowBlur = 10;
-  ctx.fillText("// UNCOMPILED", lx, ly - 44);
-
-  // "YOUR REPO" two-line headline
-  ctx.shadowBlur = 22;
-  ctx.shadowColor = "rgba(168, 85, 247, 1.0)";
-
-  // "YOUR"
-  const tg1 = ctx.createLinearGradient(lx - 110, ly - 14, lx + 110, ly + 6);
-  tg1.addColorStop(0, "#e9d5ff");
-  tg1.addColorStop(0.5, "#ffffff");
-  tg1.addColorStop(1, "#c4b5fd");
-  ctx.font = "bold 64px 'Arial Black', 'Arial', sans-serif";
-  ctx.fillStyle = tg1;
-  ctx.fillText("YOUR", lx, ly - 12);
-
-  // "REPO"
-  ctx.shadowBlur = 16;
-  const tg2 = ctx.createLinearGradient(lx - 80, ly + 36, lx + 80, ly + 56);
-  tg2.addColorStop(0, "#a78bfa");
-  tg2.addColorStop(0.5, "#ddd6fe");
-  tg2.addColorStop(1, "#818cf8");
-  ctx.font = "bold 64px 'Arial Black', 'Arial', sans-serif";
-  ctx.fillStyle = tg2;
-  ctx.fillText("REPO", lx, ly + 44);
+  ctx.fillText("THE CODEBASE", W / 2, H / 2 + 10);
 
   ctx.shadowBlur = 0;
 
@@ -225,6 +297,8 @@ export function ChaosScene({ active, config: _config }: ChaosSceneProps) {
 
   const [initialized, setInitialized] = useState(false);
   const [planetTex,   setPlanetTex]   = useState<THREE.CanvasTexture | null>(null);
+  const [ringTex,     setRingTex]     = useState<THREE.CanvasTexture | null>(null);
+  const [codebaseTex, setCodebaseTex] = useState<THREE.CanvasTexture | null>(null);
 
   const shouldAnimate    = useShouldAnimateCamera();
   const qualityTier      = useOnboardingStore((s) => s.qualityTier);
@@ -238,8 +312,16 @@ export function ChaosScene({ active, config: _config }: ChaosSceneProps) {
   useEffect(() => {
     if (!initialized || typeof window === "undefined") return;
     const pTex = createRealisticPlanetTexture();
+    const rTex = createRingTexture();
+    const cTex = createCodebaseLabelTexture();
     setPlanetTex(pTex);
-    return () => { pTex.dispose(); };
+    setRingTex(rTex);
+    setCodebaseTex(cTex);
+    return () => {
+      pTex.dispose();
+      rTex.dispose();
+      cTex.dispose();
+    };
   }, [initialized]);
 
   // Code block count by quality
@@ -361,6 +443,16 @@ export function ChaosScene({ active, config: _config }: ChaosSceneProps) {
       <pointLight color="#7c3aed" intensity={1.2} position={[-30, -30, -50]} distance={130} decay={2.0} />
       <pointLight color="#f59e0b" intensity={1.5} position={[PLANET_POS.x - 20, PLANET_POS.y + 20, PLANET_POS.z + 30]} distance={80} decay={1.8} />
 
+      {/* ── Floating Label Above Planet ── */}
+      {codebaseTex && (
+        <sprite
+          position={[PLANET_POS.x, PLANET_POS.y + 8.5, PLANET_POS.z]}
+          scale={[15, 4.68, 1]}
+        >
+          <spriteMaterial attach="material" map={codebaseTex} transparent opacity={0.95} />
+        </sprite>
+      )}
+
       {/* ── Planet group ── */}
       <group ref={planetGroup} position={PLANET_POS.toArray() as [number, number, number]}>
 
@@ -399,6 +491,31 @@ export function ChaosScene({ active, config: _config }: ChaosSceneProps) {
             roughness={0.72}
             metalness={0.04}
             envMapIntensity={0.5}
+          />
+        </mesh>
+
+        {/* ── Saturn-style flat ring disk ── */}
+        <mesh
+          ref={ringMesh}
+          rotation={[Math.PI / 2 - 0.38, 0.12, 0]}
+        >
+          <ringGeometry args={[6.2, 9.8, 128]} />
+          <meshBasicMaterial
+            map={ringTex ?? undefined}
+            transparent
+            opacity={0.88}
+            side={THREE.DoubleSide}
+          />
+        </mesh>
+
+        {/* Ring shadow cast on planet */}
+        <mesh rotation={[Math.PI / 2 - 0.38, 0.12, 0]}>
+          <ringGeometry args={[5.1, 6.1, 96]} />
+          <meshBasicMaterial
+            color="#000000"
+            transparent
+            opacity={0.30}
+            side={THREE.DoubleSide}
           />
         </mesh>
 
