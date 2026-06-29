@@ -1,8 +1,6 @@
 "use client";
 
-import { useRef } from "react";
 import * as THREE from "three";
-import { useFrame } from "@react-three/fiber";
 import {
   EffectComposer,
   Bloom,
@@ -18,7 +16,6 @@ import { useOnboardingStore } from "@/stores/onboardingStore";
 export function PostProcessingEffects() {
   const qualityTier = useOnboardingStore((s) => s.qualityTier);
   const currentScene = useOnboardingStore((s) => s.currentScene);
-  const bloomRef = useRef<any>(null);
 
   // Scene-specific focal distances and lengths for Depth of Field
   const focalSettings: Record<number, { focusDistance: number; focalLength: number }> = {
@@ -40,18 +37,6 @@ export function PostProcessingEffects() {
   const shouldRenderBloom = qualityTier !== "low";
   const shouldRenderColorGrading = qualityTier !== "low";
 
-  // Dynamic pulsing bloom intensity on ULTRA settings to create "living" gas elements
-  useFrame((state) => {
-    if (bloomRef.current) {
-      if (currentScene === 1) {
-        bloomRef.current.intensity = qualityTier === "ultra" ? 0.95 : qualityTier === "high" ? 0.8 : 0.55;
-      } else if (qualityTier === "ultra") {
-        const time = state.clock.getElapsedTime();
-        bloomRef.current.intensity = 0.7 + Math.sin(time * 1.5) * 0.1;
-      }
-    }
-  });
-
   if (qualityTier === "low") {
     // Zero post-processing overhead on low-end machines
     return null;
@@ -72,7 +57,6 @@ export function PostProcessingEffects() {
     <EffectComposer enableNormalPass={qualityTier === "ultra"}>
       {shouldRenderBloom ? (
         <Bloom
-          ref={bloomRef}
           intensity={bloomIntensity}
           luminanceThreshold={bloomThreshold}
           luminanceSmoothing={0.9}
