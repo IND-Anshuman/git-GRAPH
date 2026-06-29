@@ -366,7 +366,7 @@ export default function Home() {
           <div className="h-[100vh]" />
 
           {/* Scrollable scene cards list */}
-          <div className="w-full max-w-xl px-6 flex flex-col gap-[150vh]">
+          <div className="w-full max-w-xl px-6 flex flex-col gap-[280vh]">
             {scenes.map((scene) => (
               <div key={scene.num} className="min-h-[220px] pointer-events-none opacity-0" />
             ))}
