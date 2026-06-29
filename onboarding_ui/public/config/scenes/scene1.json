@@ -27,7 +27,7 @@
         "easing": "easeOut"
       }
     ],
-    "lookAtTarget": "origin"
+    "lookAtTarget": [17, 4, 0]
   },
   
   "particles": {
