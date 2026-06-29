@@ -231,7 +231,7 @@ function PerformanceMonitorHelper() {
  * checking WebGL availability and executing fallback configurations.
  */
 export function OnboardingCanvas() {
-  const [mounted, setMounted] = useState(false);
+  const [hasWebGL, setHasWebGL] = useState<boolean | null>(null);
   const currentScene = useOnboardingStore((s) => s.currentScene);
   const setCurrentScene = useOnboardingStore((s) => s.setCurrentScene);
   const qualityTier = useOnboardingStore((s) => s.qualityTier);
@@ -274,11 +274,35 @@ export function OnboardingCanvas() {
   }, [currentScene]);
 
   useEffect(() => {
-    setMounted(true);
+    try {
+      const canvas = document.createElement("canvas");
+      const support = !!(
+        (window.WebGL2RenderingContext && canvas.getContext("webgl2")) ||
+        (window.WebGLRenderingContext && (canvas.getContext("webgl") || canvas.getContext("experimental-webgl")))
+      );
+      setHasWebGL(support);
+    } catch {
+      setHasWebGL(false);
+    }
   }, []);
 
-  if (!mounted) {
+  if (hasWebGL === null) {
     return <div className="h-full w-full bg-slate-950" />;
+  }
+
+  if (hasWebGL === false) {
+    return (
+      <div className="flex h-screen w-[calc(100vw-380px)] ml-[380px] items-center justify-center bg-slate-950 text-white p-6 text-center z-50 relative select-none">
+        <div className="max-w-md">
+          <h2 className="text-2xl font-black text-rose-500 tracking-wider font-mono uppercase">
+            WebGL Context Failed
+          </h2>
+          <p className="mt-4 text-xs text-slate-400 leading-relaxed font-sans">
+            Your browser or graphics driver failed to allocate a WebGL context. Please enable hardware acceleration in your browser settings, restart your browser, or close other heavy WebGL tabs to free up GPU resources.
+          </p>
+        </div>
+      </div>
+    );
   }
 
   return (
