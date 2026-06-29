@@ -231,7 +231,7 @@ function PerformanceMonitorHelper() {
  * checking WebGL availability and executing fallback configurations.
  */
 export function OnboardingCanvas() {
-  const [hasWebGL, setHasWebGL] = useState<boolean | null>(null);
+  const [mounted, setMounted] = useState(false);
   const currentScene = useOnboardingStore((s) => s.currentScene);
   const setCurrentScene = useOnboardingStore((s) => s.setCurrentScene);
   const qualityTier = useOnboardingStore((s) => s.qualityTier);
@@ -274,29 +274,11 @@ export function OnboardingCanvas() {
   }, [currentScene]);
 
   useEffect(() => {
-    try {
-      const canvas = document.createElement("canvas");
-      const support = !!(
-        (window.WebGL2RenderingContext && canvas.getContext("webgl2")) ||
-        (window.WebGLRenderingContext && (canvas.getContext("webgl") || canvas.getContext("experimental-webgl")))
-      );
-      setHasWebGL(support);
-    } catch {
-      setHasWebGL(false);
-    }
+    setMounted(true);
   }, []);
 
-  if (hasWebGL === null) {
+  if (!mounted) {
     return <div className="h-full w-full bg-slate-950" />;
-  }
-
-  if (hasWebGL === false) {
-    return (
-      <div className="relative h-full w-full">
-        <Cosmic2DFallback />
-        <SceneOneExplanationHUD />
-      </div>
-    );
   }
 
   return (
@@ -324,189 +306,7 @@ export function OnboardingCanvas() {
   );
 }
 
-/**
- * A highly optimized 2D canvas fallback that renders a beautiful space background 
- * and drifting stars with scroll-parallax to simulate a 3D universe.
- * Uses 0% GPU or WebGL context requirements, running flawlessly at 60 FPS on low-end CPUs.
- */
-function Cosmic2DFallback() {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const mouseRef = useRef({ x: 0, y: 0 });
 
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-
-    let animationFrameId: number;
-    let width = (canvas.width = window.innerWidth);
-    let height = (canvas.height = window.innerHeight);
-
-    interface Star {
-      x: number;
-      y: number;
-      vx: number;
-      vy: number;
-      size: number;
-      depth: number; // 0.1 (farthest background) to 1.0 (closest foreground)
-      color: string;
-      alpha: number;
-    }
-
-    const stars: Star[] = [];
-    const colors = ["rgba(167, 139, 250, ", "rgba(96, 165, 250, ", "rgba(251, 146, 60, ", "rgba(244, 114, 182, "];
-
-    // Create 30 layered stars (instead of 70) to represent Method 1: Fake 3D depth layers
-    for (let i = 0; i < 30; i++) {
-      const typeRand = Math.random();
-      let size = 0.5;
-      let depth = 0.1;
-      let speedFactor = 0.05;
-
-      if (typeRand < 0.4) {
-        // Background layer: small, faint, slow
-        size = Math.random() * 1.0 + 0.4;
-        depth = Math.random() * 0.2 + 0.1;
-        speedFactor = 0.02;
-      } else if (typeRand < 0.8) {
-        // Midground layer
-        size = Math.random() * 2.0 + 1.0;
-        depth = Math.random() * 0.3 + 0.4;
-        speedFactor = 0.08;
-      } else {
-        // Foreground layer: large, bright, fast
-        size = Math.random() * 3.5 + 2.2;
-        depth = Math.random() * 0.2 + 0.8;
-        speedFactor = 0.15;
-      }
-
-      stars.push({
-        x: Math.random() * width,
-        y: Math.random() * height,
-        vx: (Math.random() - 0.5) * speedFactor,
-        vy: (Math.random() - 0.5) * speedFactor,
-        size,
-        depth,
-        color: colors[Math.floor(Math.random() * colors.length)],
-        alpha: Math.random() * 0.45 + 0.35
-      });
-    }
-
-    // Window resize handler
-    const handleResize = () => {
-      if (!canvas) return;
-      width = canvas.width = window.innerWidth;
-      height = canvas.height = window.innerHeight;
-    };
-    window.addEventListener("resize", handleResize);
-
-    // Mouse tracking for parallax
-    const handleMouseMove = (e: MouseEvent) => {
-      // Normalize mouse coordinates around center (-1 to 1)
-      mouseRef.current.x = (e.clientX / window.innerWidth) * 2 - 1;
-      mouseRef.current.y = (e.clientY / window.innerHeight) * 2 - 1;
-    };
-    window.addEventListener("mousemove", handleMouseMove);
-
-    // Scroll tracking
-    let lastScrollY = typeof window !== "undefined" ? window.scrollY : 0;
-    let scrollVelocity = 0;
-
-    const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-      scrollVelocity = (currentScrollY - lastScrollY) * 0.18;
-      lastScrollY = currentScrollY;
-    };
-    window.addEventListener("scroll", handleScroll, { passive: true });
-
-    // Smooth lerp mouse targets for fluid motion
-    const currentMouse = { x: 0, y: 0 };
-
-    // Render loop
-    const render = () => {
-      // Smoothly interpolate mouse coordinates to prevent sharp jumps
-      currentMouse.x += (mouseRef.current.x - currentMouse.x) * 0.08;
-      currentMouse.y += (mouseRef.current.y - currentMouse.y) * 0.08;
-
-      // 1. Draw Space background gradient (shifts slightly opposite of mouse for background parallax)
-      const bgOffsetX = -currentMouse.x * 6.0;
-      const bgOffsetY = -currentMouse.y * 6.0;
-      const grad = ctx.createRadialGradient(
-        width / 2 + bgOffsetX, 
-        height / 2 + bgOffsetY, 
-        30, 
-        width / 2 + bgOffsetX, 
-        height / 2 + bgOffsetY, 
-        Math.max(width, height)
-      );
-      grad.addColorStop(0, "#070217");
-      grad.addColorStop(1, "#000000");
-      ctx.fillStyle = grad;
-      ctx.fillRect(0, 0, width, height);
-
-      // 2. Render drifting stars
-      stars.forEach((s) => {
-        // Shift stars based on scroll velocity and their depth (foreground shifts faster)
-        s.y -= scrollVelocity * s.depth * 5.0;
-
-        // Apply constant velocity drift
-        s.x += s.vx;
-        s.y += s.vy;
-
-        // Loop boundaries
-        if (s.x < 0) s.x = width;
-        if (s.x > width) s.x = 0;
-        if (s.y < 0) s.y = height;
-        if (s.y > height) s.y = 0;
-
-        // Calculate parallax displacement (mouse shifts stars relative to their depth)
-        const parallaxX = -currentMouse.x * s.depth * 45.0;
-        const parallaxY = -currentMouse.y * s.depth * 45.0;
-
-        const renderX = s.x + parallaxX;
-        const renderY = s.y + parallaxY;
-
-        // Draw soft glowing radial star
-        ctx.beginPath();
-        const radGrad = ctx.createRadialGradient(renderX, renderY, 0, renderX, renderY, s.size * 2.5);
-        radGrad.addColorStop(0, s.color + s.alpha + ")");
-        radGrad.addColorStop(1, s.color + "0)");
-        ctx.fillStyle = radGrad;
-        ctx.arc(renderX, renderY, s.size * 2.5, 0, Math.PI * 2);
-        ctx.fill();
-      });
-
-      // Damp scroll velocity
-      scrollVelocity *= 0.94;
-
-      animationFrameId = requestAnimationFrame(render);
-    };
-
-    render();
-
-    return () => {
-      cancelAnimationFrame(animationFrameId);
-      window.removeEventListener("resize", handleResize);
-      window.removeEventListener("mousemove", handleMouseMove);
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, []);
-
-  return (
-    <div className="relative h-full w-full bg-black overflow-hidden">
-      <canvas ref={canvasRef} className="absolute inset-0 block h-full w-full" />
-      {/* Subtle indicator in bottom-right corner */}
-      <div className="absolute right-6 bottom-6 z-30 flex items-center gap-2 bg-slate-950/80 backdrop-blur-md border border-slate-900 px-3.5 py-1.5 rounded-full pointer-events-none select-none">
-        <span className="h-2 w-2 rounded-full bg-purple-500 animate-pulse" />
-        <span className="text-[9px] font-bold tracking-wider text-slate-400 uppercase">
-          2D Space Fallback Mode
-        </span>
-      </div>
-    </div>
-  );
-}
 
 /**
  * Animated Holographic HUD overlay that displays explanatory logs and introduction metadata

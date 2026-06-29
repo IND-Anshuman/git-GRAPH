@@ -205,7 +205,7 @@ export function ChaosScene({ active, config }: ChaosSceneProps) {
     // 1. Create Consolidated Nebula System
     const nebula = engine.createParticles("scene-1-nebula-unified", {
       enabled: true,
-      count: { ultra: 25000, high: 16000, medium: 9000, low: 4500 },
+      count: { ultra: 600, high: 400, medium: 250, low: 80 },
       geometry: { type: "plane", size: 1.0 },
       material: { color: "#3b0764", opacity: 0.4, transparent: true },
       behavior: {
@@ -235,13 +235,13 @@ export function ChaosScene({ active, config }: ChaosSceneProps) {
       const typeRand = Math.random();
       if (typeRand < 0.25) {
         cloudTypes[i] = 0.0; // Large background
-        sizes[i] = Math.random() * 18.0 + 12.0;
+        sizes[i] = Math.random() * 50.0 + 30.0;
       } else if (typeRand < 0.60) {
         cloudTypes[i] = 1.0; // Mid orange/pink gas
-        sizes[i] = Math.random() * 9.0 + 5.0;
+        sizes[i] = Math.random() * 24.0 + 15.0;
       } else {
         cloudTypes[i] = 2.0; // Sharp twinkling stars
-        sizes[i] = Math.random() * 1.5 + 0.6;
+        sizes[i] = Math.random() * 2.8 + 0.8;
       }
 
       // Chaotic sphere distribution biased towards center
