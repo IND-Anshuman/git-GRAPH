@@ -292,14 +292,61 @@ export function OnboardingCanvas() {
 
   if (hasWebGL === false) {
     return (
-      <div className="flex h-screen w-[calc(100vw-380px)] ml-[380px] items-center justify-center bg-slate-950 text-white p-6 text-center z-50 relative select-none">
-        <div className="max-w-md">
-          <h2 className="text-2xl font-black text-rose-500 tracking-wider font-mono uppercase">
-            WebGL Context Failed
-          </h2>
-          <p className="mt-4 text-xs text-slate-400 leading-relaxed font-sans">
-            Your browser or graphics driver failed to allocate a WebGL context. Please enable hardware acceleration in your browser settings, restart your browser, or close other heavy WebGL tabs to free up GPU resources.
-          </p>
+      <div className="flex h-screen w-[calc(100vw-380px)] ml-[380px] items-center justify-center bg-slate-950 text-slate-100 p-8 select-none relative overflow-hidden font-sans">
+        {/* Animated CSS space dust background */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,#0c0628_0%,#000000_100%)] opacity-80" />
+        <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(6,182,212,0.03)_1px,transparent_1px)] bg-[size:40px_40px] opacity-25" />
+        
+        {/* Tech diagnostic card */}
+        <div className="relative z-10 w-full max-w-md bg-slate-900/60 backdrop-blur-md border border-rose-500/30 rounded-xl p-8 shadow-2xl shadow-rose-500/5 flex flex-col gap-6">
+          <span className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-rose-500/50 rounded-tl" />
+          <span className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-rose-500/50 rounded-tr" />
+          <span className="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-rose-500/50 rounded-bl" />
+          <span className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-rose-500/50 rounded-br" />
+
+          <div className="flex items-center gap-3 border-b border-slate-800 pb-4">
+            <span className="h-2.5 w-2.5 rounded-full bg-rose-500 animate-pulse" />
+            <h2 className="text-base font-black tracking-wider text-rose-500 uppercase font-mono">
+              WebGL Diagnostics: Locked
+            </h2>
+          </div>
+
+          <div className="flex flex-col gap-3 text-xs leading-relaxed text-slate-300">
+            <p className="font-semibold text-slate-200">
+              The Software Intelligence Universe requires WebGL to compile the 3D semantic graph. Your browser reported that hardware acceleration is currently disabled or blocked by the GPU software blocklist.
+            </p>
+            
+            <div className="mt-2 bg-slate-950/80 border border-slate-900 rounded p-4 flex flex-col gap-3 font-mono text-[10px] text-cyan-400">
+              <div className="font-bold border-b border-slate-800/60 pb-1.5 text-slate-400">
+                QUICK REPAIR PROCEDURES:
+              </div>
+              <div className="flex gap-2">
+                <span className="text-rose-500">1.</span>
+                <span>Navigate to <code className="bg-slate-900 px-1 py-0.5 rounded text-white select-all">chrome://settings/system</code></span>
+              </div>
+              <div className="flex gap-2 ml-4">
+                <span className="text-slate-500">-</span>
+                <span>Toggle <span className="text-white">"Use graphics acceleration when available"</span> to <span className="text-green-400 font-bold">ON</span></span>
+              </div>
+              <div className="flex gap-2">
+                <span className="text-rose-500">2.</span>
+                <span>Navigate to <code className="bg-slate-900 px-1.5 py-0.5 rounded text-white select-all">chrome://flags/#ignore-gpu-blocklist</code></span>
+              </div>
+              <div className="flex gap-2 ml-4">
+                <span className="text-slate-500">-</span>
+                <span>Set <span className="text-white">"Override software rendering list"</span> to <span className="text-green-400 font-bold">Enabled</span> (forces WebGL on blocked GPUs)</span>
+              </div>
+              <div className="flex gap-2">
+                <span className="text-rose-500">3.</span>
+                <span>Relaunch the browser and refresh this tab.</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="border-t border-slate-800 pt-4 flex justify-between items-center text-[9px] font-mono text-slate-500">
+            <span>DEVICE: LOW-END PROFILE</span>
+            <span>GPU STATUS: BLOCKED</span>
+          </div>
         </div>
       </div>
     );
