@@ -529,10 +529,10 @@ function SceneOneExplanationHUD() {
         {/* Content details */}
         <div className="flex flex-col gap-1.5">
           <h2 className="text-base font-extrabold tracking-tight text-white leading-snug">
-            Drifting Code Fragments
+            Why We Are Building Git-Graph
           </h2>
           <p className="text-xs text-slate-300 leading-relaxed font-medium">
-            This space visualizes the raw state of a complex enterprise codebase. Files, functions, and configuration layers drift in isolated orbits—representing cognitive overhead and architecture complexity before intelligence parsing.
+            Modern enterprise repositories are too vast to comprehend. We are building Git-Graph to compile this chaotic drift of isolated source files into a unified, interactive semantic map. By automatically mapping dependencies and resolving relations, we turn raw code into searchable, visible structural intelligence.
           </p>
         </div>
 
