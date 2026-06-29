@@ -274,16 +274,20 @@ export function OnboardingCanvas() {
   }, [currentScene]);
 
   useEffect(() => {
+    let support = false;
     try {
       const canvas = document.createElement("canvas");
-      const support = !!(
-        (window.WebGL2RenderingContext && canvas.getContext("webgl2")) ||
-        (window.WebGLRenderingContext && (canvas.getContext("webgl") || canvas.getContext("experimental-webgl")))
-      );
-      setHasWebGL(support);
-    } catch {
-      setHasWebGL(false);
+      const gl = canvas.getContext("webgl2") || canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
+      if (gl) {
+        // Statically verify WebGLRenderer creation succeeds to catch sandboxed/driver context failures
+        const renderer = new THREE.WebGLRenderer({ canvas });
+        renderer.dispose();
+        support = true;
+      }
+    } catch (err) {
+      support = false;
     }
+    setHasWebGL(support);
   }, []);
 
   if (hasWebGL === null) {
