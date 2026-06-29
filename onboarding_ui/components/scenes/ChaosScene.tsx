@@ -2,14 +2,11 @@
 
 import { useRef, useEffect, useState, useMemo } from "react";
 import { useFrame } from "@react-three/fiber";
+import * as THREE from "three";
 import { useOnboardingStore, useShouldAnimateCamera } from "@/stores/onboardingStore";
-import { ParticleSystemEngine, ParticleGroup } from "@/lib/ParticleSystemEngine";
-import { ParticleAnimator } from "@/lib/ParticleAnimator";
-import { ParticleLODManager } from "@/lib/ParticleLOD";
 import { CodeSnippetRenderer } from "@/lib/CodeSnippetRenderer";
 import { InteractionHandler } from "@/lib/InteractionHandler";
 import { SceneConfig } from "@/types";
-import * as THREE from "three";
 
 interface ChaosSceneProps {
   active: boolean;
@@ -17,434 +14,257 @@ interface ChaosSceneProps {
 }
 
 const languages: Record<string, string> = {
-  typescript: "TypeScript",
-  python: "Python",
-  javascript: "JavaScript",
-  go: "Go",
-  html: "HTML",
-  java: "Java",
-  ruby: "Ruby",
-  sql: "SQL",
-  css: "CSS",
-  tf: "Terraform",
-  yml: "YAML",
-  json: "JSON",
-  md: "Markdown"
+  typescript: "TypeScript", python: "Python", javascript: "JavaScript",
+  go: "Go", html: "HTML", java: "Java", ruby: "Ruby", sql: "SQL",
+  css: "CSS", tf: "Terraform", yml: "YAML", json: "JSON", md: "Markdown"
 };
 
 const snippets = [
   { filename: "auth.service.ts", lang: "typescript", code: ["export class AuthService {", "  async login(cred) {", "    const t = await validate(cred);", "    return this.session(t);", "  }", "}"] },
-  { filename: "user.py", lang: "python", code: ["class User(Model):", "    email = EmailField(unique=True)", "    name = CharField(max_length=100)", "    def check(self, pw):", "        return hash(pw)", "    "] },
-  { filename: "checkout.js", lang: "javascript", code: ["function process(cart) {", "  const tot = cart.items.reduce(", "    (s, i) => s + i.price, 0", "  );", "  return stripe.charge(tot);", "}"] },
-  { filename: "app.go", lang: "go", code: ["func main() {", "\tr := gin.Default()", "\tr.GET(\"/ping\", func(c *gin.Context) {", "\t\tc.JSON(200, gin.H{\"msg\": \"pong\"})", "\t})", "\tr.Run()", "}"] },
-  { filename: "index.html", lang: "html", code: ["<!DOCTYPE html>", "<html>", "<head>", "  <title>App</title>", "</head>", "<body>"] },
-  { filename: "order.java", lang: "java", code: ["@RestController", "public class OrderController {", "  @PostMapping(\"/orders\")", "  public Order create(@RequestBody Cart cart) {", "    return orderService.place(cart);", "  }", "}"] },
-  { filename: "payment.rb", lang: "ruby", code: ["class PaymentProcessor", "  def self.charge(amount, token)", "    Stripe::Charge.create(", "      amount: amount,", "      currency: 'usd',", "      source: token", "    )", "  end", "end"] },
-  { filename: "db.sql", lang: "sql", code: ["CREATE TABLE users (", "  id SERIAL PRIMARY KEY,", "  email VARCHAR(255) UNIQUE,", "  password_hash TEXT,", "  created_at TIMESTAMP DEFAULT NOW()", ");"] },
-  { filename: "styles.css", lang: "css", code: [".nebula-particle {", "  mix-blend-mode: screen;", "  filter: blur(4px);", "  animation: drift 10s ease infinite;", "  opacity: 0.85;", "}"] },
-  { filename: "config.tf", lang: "tf", code: ["resource \"aws_instance\" \"web\" {", "  ami           = data.aws_ami.ubuntu.id", "  instance_type = \"t3.micro\"", "  tags = {", "    Name = \"git-graph-node\"", "  }", "}"] },
-  { filename: "redis.cache.ts", lang: "typescript", code: ["export class RedisCache {", "  async get(key: string): Promise<string | null> {", "    return this.client.get(key);", "  }", "  async set(key: string, val: string): Promise<void> {", "    await this.client.setEx(key, 3600, val);", "  }", "}"] },
-  { filename: "api.routes.ts", lang: "typescript", code: ["import { Router } from 'express';", "const router = Router();", "router.get('/health', (req, res) => {", "  res.status(200).json({ status: 'UP' });", "});", "export default router;"] },
-  { filename: "docker-compose.yml", lang: "yml", code: ["version: '3.8'", "services:", "  db:", "    image: postgres:15-alpine", "    environment:", "      POSTGRES_DB: git_graph", "    ports:", "      - \"5432:5432\""] },
-  { filename: "package.json", lang: "json", code: ["{", "  \"name\": \"git-graph\",", "  \"dependencies\": {", "    \"three\": \"^0.185.0\",", "    \"react\": \"^19.2.0\"", "  }", "}"] },
-  { filename: "auth.middleware.go", lang: "go", code: ["func AuthMiddleware() gin.HandlerFunc {", "  return func(c *gin.Context) {", "    token := c.GetHeader(\"Authorization\")", "    if token == \"\" {", "      c.AbortWithStatus(401)", "      return", "    }", "    c.Next()", "  }", "}"] },
-  { filename: "README.md", lang: "md", code: ["# Software Intelligence Platform", "This experience visualizes the platform pipeline:", "Source Code -> SEEE -> Semantic Compiler", "## Architecture Layers", "- Domain layer", "- Capability layer"] }
+  { filename: "user.py",         lang: "python",     code: ["class User(Model):", "    email = EmailField(unique=True)", "    name = CharField(max_length=100)", "    def check(self, pw):", "        return hash(pw)", "    "] },
+  { filename: "checkout.js",     lang: "javascript", code: ["function process(cart) {", "  const tot = cart.items.reduce(", "    (s, i) => s + i.price, 0", "  );", "  return stripe.charge(tot);", "}"] },
+  { filename: "app.go",          lang: "go",         code: ["func main() {", "\tr := gin.Default()", "\tr.GET(\"/ping\", func(c *gin.Context) {", "\t\tc.JSON(200, gin.H{\"msg\": \"pong\"})", "\t})", "\tr.Run()", "}"] },
+  { filename: "index.html",      lang: "html",       code: ["<!DOCTYPE html>", "<html>", "<head>", "  <title>App</title>", "</head>", "<body>"] },
+  { filename: "order.java",      lang: "java",       code: ["@RestController", "public class OrderController {", "  @PostMapping(\"/orders\")", "  public Order create(@RequestBody Cart cart) {", "    return orderService.place(cart);", "  }", "}"] },
+  { filename: "payment.rb",      lang: "ruby",       code: ["class PaymentProcessor", "  def self.charge(amount, token)", "    Stripe::Charge.create(", "      amount: amount,", "      currency: 'usd',", "      source: token", "    )", "  end", "end"] },
+  { filename: "db.sql",          lang: "sql",        code: ["CREATE TABLE users (", "  id SERIAL PRIMARY KEY,", "  email VARCHAR(255) UNIQUE,", "  password_hash TEXT,", "  created_at TIMESTAMP DEFAULT NOW()", ");"] },
+  { filename: "styles.css",      lang: "css",        code: [".nebula-particle {", "  mix-blend-mode: screen;", "  filter: blur(4px);", "  animation: drift 10s ease infinite;", "  opacity: 0.85;", "}"] },
+  { filename: "config.tf",       lang: "tf",         code: ["resource \"aws_instance\" \"web\" {", "  ami           = data.aws_ami.ubuntu.id", "  instance_type = \"t3.micro\"", "  tags = {", "    Name = \"git-graph-node\"", "  }", "}"] },
+  { filename: "redis.cache.ts",  lang: "typescript", code: ["export class RedisCache {", "  async get(key: string): Promise<string | null> {", "    return this.client.get(key);", "  }", "  async set(key: string, val: string): Promise<void> {", "    await this.client.setEx(key, 3600, val);", "  }", "}"] },
+  { filename: "api.routes.ts",   lang: "typescript", code: ["import { Router } from 'express';", "const router = Router();", "router.get('/health', (req, res) => {", "  res.status(200).json({ status: 'UP' });", "});", "export default router;"] },
+  { filename: "docker-compose.yml", lang: "yml",    code: ["version: '3.8'", "services:", "  db:", "    image: postgres:15-alpine", "    environment:", "      POSTGRES_DB: git_graph", "    ports:", "      - \"5432:5432\""] },
+  { filename: "package.json",    lang: "json",       code: ["{", "  \"name\": \"git-graph\",", "  \"dependencies\": {", "    \"three\": \"^0.185.0\",", "    \"react\": \"^19.2.0\"", "  }", "}"] },
+  { filename: "auth.middleware.go", lang: "go",     code: ["func AuthMiddleware() gin.HandlerFunc {", "  return func(c *git.Context) {", "    token := c.GetHeader(\"Authorization\")", "    if token == \"\" {", "      c.AbortWithStatus(401)", "      return", "    }", "    c.Next()", "  }", "}"] },
+  { filename: "README.md",       lang: "md",         code: ["# Software Intelligence Platform", "This experience visualizes:", "Source Code -> SEEE -> Semantic Compiler", "## Architecture Layers", "- Domain layer", "- Capability layer"] },
 ];
 
-const filenames = [
-  "user.py", "auth.service.ts", "checkout.js", "config.tf",
-  "redis.cache.ts", "order.controller.java", "payment.rb",
-  "database.sql", "api.routes.ts", "styles.css", "index.html",
-  "main.go", "routes.ts", "db.sql", "config.yml", "test.py",
-  "middleware.ts", "index.js", "setup.py", "types.ts",
-  "package.json", "next.config.js", "dockerfile", "app.css", "utils.js"
-];
+const PLANET_POS = new THREE.Vector3(0, 0, 0);
 
-export function ChaosScene({ active, config }: ChaosSceneProps) {
-  const groupRef = useRef<THREE.Group>(null);
-  const windowsGroupRef = useRef<THREE.Group>(null);
-  const badgesGroupRef = useRef<THREE.Group>(null);
-  
+interface ScatteredSlot {
+  radius: number;
+  theta: number;
+  phi: number;
+  speed: number;
+  driftOffset: THREE.Vector3;
+  driftSpeed: number;
+  phase: number;
+}
+
+function buildScatteredSlots(count: number): ScatteredSlot[] {
+  const slots: ScatteredSlot[] = [];
+  for (let i = 0; i < count; i++) {
+    const radius = 18 + (i / count) * 26 + (Math.random() - 0.5) * 3;
+    const theta = Math.random() * Math.PI * 2;
+    const phi = Math.acos((Math.random() * 2) - 1);
+    slots.push({
+      radius,
+      theta,
+      phi,
+      speed: (Math.random() * 0.04 + 0.015) * (Math.random() > 0.5 ? 1 : -1),
+      driftOffset: new THREE.Vector3(
+        (Math.random() - 0.5) * 6,
+        (Math.random() - 0.5) * 6,
+        (Math.random() - 0.5) * 6
+      ),
+      driftSpeed: Math.random() * 0.15 + 0.08,
+      phase: Math.random() * Math.PI * 2
+    });
+  }
+  return slots;
+}
+
+function createRealisticPlanetTexture(): THREE.CanvasTexture {
+  const W = 1024, H = 1024;
+  const canvas = document.createElement("canvas");
+  canvas.width = W; canvas.height = H;
+  const ctx = canvas.getContext("2d")!;
+
+  ctx.clearRect(0, 0, W, H);
+
+  // Simple band gradients for initial commit
+  const grad = ctx.createLinearGradient(0, 0, 0, H);
+  grad.addColorStop(0, "#2c223a");
+  grad.addColorStop(0.32, "#7f5145");
+  grad.addColorStop(0.52, "#e5cca8");
+  grad.addColorStop(0.74, "#8f5e4c");
+  grad.addColorStop(1, "#181014");
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, W, H);
+
+  // Write "YOUR REPO" on the planet initially
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  const lx = W * 0.35, ly = H * 0.50;
+  ctx.font = "bold 64px sans-serif";
+  ctx.fillStyle = "#ffffff";
+  ctx.fillText("YOUR REPO", lx, ly);
+
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.wrapS = THREE.RepeatWrapping;
+  tex.wrapT = THREE.ClampToEdgeWrapping;
+  tex.needsUpdate = true;
+  return tex;
+}
+
+function createRingTexture(): THREE.CanvasTexture {
+  const size = 512;
+  const canvas = document.createElement("canvas");
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext("2d")!;
+  ctx.clearRect(0, 0, size, size);
+
+  const cx = size / 2, cy = size / 2;
+  const maxR = size / 2 - 4;
+  const minR = maxR * (6.2 / 9.8);
+
+  ctx.fillStyle = "rgba(165, 135, 95, 0.4)";
+  ctx.beginPath();
+  ctx.arc(cx, cy, maxR, 0, Math.PI * 2);
+  ctx.arc(cx, cy, minR, 0, Math.PI * 2, true);
+  ctx.fill();
+
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.needsUpdate = true;
+  return tex;
+}
+
+export function ChaosScene({ active, config: _config }: ChaosSceneProps) {
+  const groupRef     = useRef<THREE.Group>(null);
+  const planetGroup  = useRef<THREE.Group>(null);
+  const windowsGroup = useRef<THREE.Group>(null);
+  const planetMesh   = useRef<THREE.Mesh>(null);
+  const ringMesh     = useRef<THREE.Mesh>(null);
+
   const [initialized, setInitialized] = useState(false);
-  const shouldAnimate = useShouldAnimateCamera();
-  const qualityTier = useOnboardingStore((s) => s.qualityTier);
+  const [planetTex,   setPlanetTex]   = useState<THREE.CanvasTexture | null>(null);
+  const [ringTex,     setRingTex]     = useState<THREE.CanvasTexture | null>(null);
+
+  const shouldAnimate    = useShouldAnimateCamera();
+  const qualityTier      = useOnboardingStore((s) => s.qualityTier);
+  const hoveredObject    = useOnboardingStore((s) => s.hoveredObjectId);
   const setHoveredObject = useOnboardingStore((s) => s.setHoveredObject);
-  const expandCard = useOnboardingStore((s) => s.expandCard);
+  const expandCard       = useOnboardingStore((s) => s.expandCard);
 
-  // States for particle systems
-  const [nebulaSystem, setNebulaSystem] = useState<ParticleGroup | null>(null);
-  const [explosionCore, setExplosionCore] = useState<ParticleGroup | null>(null);
+  useEffect(() => { if (active && !initialized) setInitialized(true); }, [active, initialized]);
 
-  // Lazy Initialization
   useEffect(() => {
-    if (active && !initialized) {
-      setInitialized(true);
-    }
-  }, [active, initialized]);
+    if (!initialized || typeof window === "undefined") return;
+    const pTex = createRealisticPlanetTexture();
+    const rTex = createRingTexture();
+    setPlanetTex(pTex);
+    setRingTex(rTex);
+    return () => {
+      pTex.dispose();
+      rTex.dispose();
+    };
+  }, [initialized]);
 
-  // Dynamic scaling limits based on active Quality Tier (keeps VRAM and draw calls in check on 1GB GPUs)
-  const counts = useMemo(() => {
+  const windowCount = useMemo(() => {
     switch (qualityTier) {
-      case "low":
-        return { windows: 4, badges: 8 };
-      case "medium":
-        return { windows: 6, badges: 12 };
-      case "high":
-        return { windows: 9, badges: 18 };
-      case "ultra":
-      default:
-        return { windows: 12, badges: 25 };
+      case "low":    return 12;
+      case "medium": return 20;
+      case "high":   return 28;
+      default:       return 32;
     }
   }, [qualityTier]);
 
-  // Generate Snippets and Badges data once on initialization and re-evaluate dynamically on quality change
+  const scatteredSlots = useMemo(() => buildScatteredSlots(windowCount), [windowCount]);
+
   const codeWindowsData = useMemo(() => {
     if (!initialized || typeof window === "undefined") return [];
     const renderer = new CodeSnippetRenderer();
-    const data = [];
-    const windowCount = counts.windows;
-    for (let i = 0; i < windowCount; i++) {
+    return Array.from({ length: windowCount }, (_, i) => {
       const snip = snippets[i % snippets.length];
-      const tex = renderer.renderCodeSnippet(snip.filename, snip.code, snip.lang);
-      const pos = new THREE.Vector3(
-        (Math.random() - 0.5) * 200,
-        (Math.random() - 0.5) * 150,
-        (Math.random() - 0.5) * 200
-      );
-      data.push({
-        id: `scene-1-window-${i}`,
-        filename: snip.filename,
-        lang: snip.lang,
-        codeLength: snip.code.length,
-        texture: tex,
-        position: pos
-      });
-    }
-    return data;
-  }, [initialized, counts.windows]);
+      const tex  = renderer.renderCodeSnippet(snip.filename, snip.code, snip.lang);
+      return { id: `scene-1-window-${i}`, filename: snip.filename, lang: snip.lang, codeLength: snip.code.length, texture: tex, slot: scatteredSlots[i] };
+    });
+  }, [initialized, windowCount, scatteredSlots]);
 
-  const filenameBadgesData = useMemo(() => {
-    if (!initialized || typeof window === "undefined") return [];
-    const renderer = new CodeSnippetRenderer();
-    const data = [];
-    const badgeCount = counts.badges;
-    for (let i = 0; i < badgeCount; i++) {
-      const fn = filenames[i % filenames.length];
-      const tex = renderer.renderFilenameBadge(fn);
-      const pos = new THREE.Vector3(
-        (Math.random() - 0.5) * 250,
-        (Math.random() - 0.5) * 180,
-        (Math.random() - 0.5) * 250
-      );
-      const ext = fn.split(".").pop() || "";
-      data.push({
-        id: `scene-1-badge-${i}`,
-        filename: fn,
-        ext,
-        texture: tex,
-        position: pos
-      });
-    }
-    return data;
-  }, [initialized, counts.badges]);
-
-  // Register interactive items in InteractionHandler for raycast queries
   useEffect(() => {
     if (!initialized) return;
     const handler = InteractionHandler.getInstance();
-
-    codeWindowsData.forEach((win) => {
-      handler.registerObject(win.id, win.position, 15.0, {
-        type: "Code Fragment",
-        title: win.filename,
-        description: `A floating, raw source code fragment containing ${win.codeLength} lines of syntax-highlighted syntax, drifting in complexity.`,
-        details: {
-          Language: languages[win.lang] || win.lang,
-          Complexity: win.id.charCodeAt(win.id.length - 1) % 3 === 0 ? "High" : win.id.charCodeAt(win.id.length - 1) % 3 === 1 ? "Medium" : "Critical",
-          Status: win.id.charCodeAt(win.id.length - 1) % 2 === 0 ? "Legacy / Untracked" : "Drifting",
-          Size: `${(win.codeLength * 0.15 + 0.5).toFixed(2)} KB`
-        }
+    codeWindowsData.forEach((win, i) => {
+      handler.registerObject(win.id, PLANET_POS.clone(), 16.0, {
+        type: "Code Fragment", title: win.filename,
+        description: `A raw source code fragment.`,
+        details: { Language: languages[win.lang] || win.lang }
       });
     });
+    return () => { codeWindowsData.forEach((win) => handler.unregisterObject(win.id)); };
+  }, [initialized, codeWindowsData]);
 
-    filenameBadgesData.forEach((badge) => {
-      handler.registerObject(badge.id, badge.position, 7.5, {
-        type: "File Badge",
-        title: badge.filename,
-        description: `An untracked source file badge drifting in the workspace. Part of the 10,231 legacy files in this repository.`,
-        details: {
-          Extension: badge.ext.toUpperCase() || "Unknown",
-          Type: badge.ext === "yml" || badge.ext === "json" ? "Configuration" : "Source Code",
-          Owner: badge.id.charCodeAt(badge.id.length - 1) % 4 === 0 ? "Git-Graph Agent" : "Legacy Importer"
-        }
-      });
-    });
-
-    return () => {
-      codeWindowsData.forEach((win) => handler.unregisterObject(win.id));
-      filenameBadgesData.forEach((badge) => handler.unregisterObject(badge.id));
-    };
-  }, [initialized, codeWindowsData, filenameBadgesData]);
-
-  // Texture and material disposal on unmount
   useEffect(() => {
-    return () => {
-      codeWindowsData.forEach((win) => win.texture.dispose());
-      filenameBadgesData.forEach((badge) => badge.texture.dispose());
-      document.body.style.cursor = "auto";
-    };
-  }, [codeWindowsData, filenameBadgesData]);
+    return () => { codeWindowsData.forEach((win) => win.texture.dispose()); };
+  }, [codeWindowsData]);
 
-  // Initialize Particles (Nebula + Core)
-  useEffect(() => {
-    if (!initialized) return;
-
-    const engine = ParticleSystemEngine.getInstance();
-    const animator = ParticleAnimator.getInstance();
-
-    // 1. Create Consolidated Nebula System
-    const nebula = engine.createParticles("scene-1-nebula-unified", {
-      enabled: true,
-      count: { ultra: 600, high: 400, medium: 250, low: 80 },
-      geometry: { type: "plane", size: 1.0 },
-      material: { color: "#3b0764", opacity: 0.4, transparent: true },
-      behavior: {
-        animation: "nebula" as any,
-        drift: {
-          velocity: [new THREE.Vector3(-0.02, -0.01, -0.02), new THREE.Vector3(0.02, 0.01, 0.02)],
-          turbulence: 2.2
-        }
-      },
-      initialDistribution: {
-        type: "sphere",
-        size: 150.0
-      } as any
-    });
-
-    // Populate Custom Instance Attributes for size, phase and cloud type
-    const count = nebula.count;
-    const sizes = new Float32Array(count);
-    const cloudTypes = new Float32Array(count);
-    const phases = new Float32Array(count);
-    const positions = new Float32Array(count * 3);
-
-    for (let i = 0; i < count; i++) {
-      phases[i] = Math.random() * 200.0;
-
-      // 0.0 = Background Large, 1.0 = Mid Gas, 2.0 = Twinkling Star
-      const typeRand = Math.random();
-      if (typeRand < 0.25) {
-        cloudTypes[i] = 0.0; // Large background
-        sizes[i] = Math.random() * 50.0 + 30.0;
-      } else if (typeRand < 0.60) {
-        cloudTypes[i] = 1.0; // Mid orange/pink gas
-        sizes[i] = Math.random() * 24.0 + 15.0;
-      } else {
-        cloudTypes[i] = 2.0; // Sharp twinkling stars
-        sizes[i] = Math.random() * 2.8 + 0.8;
-      }
-
-      // Chaotic sphere distribution biased towards center
-      const theta = Math.random() * Math.PI * 2;
-      const phi = Math.acos(2 * Math.random() - 1);
-      const radiusDecay = Math.pow(Math.random(), 2.5); // Exponential decay
-      const radius = radiusDecay * 140.0;
-
-      positions[i * 3 + 0] = radius * Math.sin(phi) * Math.cos(theta);
-      positions[i * 3 + 1] = radius * Math.sin(phi) * Math.sin(theta);
-      positions[i * 3 + 2] = radius * Math.cos(phi);
-    }
-
-    // Attach custom float attributes to the LOD meshes
-    Object.values(nebula.lodMeshes).forEach((mesh) => {
-      mesh.geometry.setAttribute("aCustomSize", new THREE.InstancedBufferAttribute(sizes, 1));
-      mesh.geometry.setAttribute("aCloudType", new THREE.InstancedBufferAttribute(cloudTypes, 1));
-      mesh.geometry.setAttribute("aInitialPosition", new THREE.InstancedBufferAttribute(positions, 3));
-    });
-
-    setNebulaSystem(nebula);
-
-    // 2. Create Explosion Core System
-    const core = engine.createParticles("scene-1-explosion-core", {
-      enabled: true,
-      count: { ultra: 1000, high: 700, medium: 500, low: 250 },
-      geometry: { type: "sphere", size: 0.35 },
-      material: { color: "#f97316", opacity: 0.9, transparent: true },
-      behavior: {
-        animation: "explosion",
-        explosion: {
-          origin: [0, 0, 0],
-          force: [8.0, 15.0],
-          gravity: [0, 0, 0],
-          damping: 0.18
-        }
-      },
-      initialDistribution: {
-        type: "sphere",
-        size: 8.0 // Tightly bound center core
-      } as any
-    });
-
-    // Randomize initial scale and apply orange-to-white color gradient to explosion core
-    const coreCount = core.count;
-    const orange = new THREE.Color("#f97316");
-    const white = new THREE.Color("#ffffff");
-    const tempCol = new THREE.Color();
-    const tempMatrix = new THREE.Matrix4();
-    const tempPos = new THREE.Vector3();
-    const tempQuat = new THREE.Quaternion();
-    const tempScale = new THREE.Vector3();
-
-    Object.values(core.lodMeshes).forEach((mesh) => {
-      for (let i = 0; i < coreCount; i++) {
-        // Color gradient interpolation
-        tempCol.copy(orange).lerp(white, Math.random());
-        mesh.setColorAt(i, tempCol);
-
-        // Scale variation (1 to 5 units)
-        mesh.getMatrixAt(i, tempMatrix);
-        tempMatrix.decompose(tempPos, tempQuat, tempScale);
-        const randScale = Math.random() * 4.0 + 1.0;
-        tempScale.set(randScale, randScale, randScale);
-        tempMatrix.compose(tempPos, tempQuat, tempScale);
-        mesh.setMatrixAt(i, tempMatrix);
-      }
-      mesh.instanceMatrix.needsUpdate = true;
-      if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
-    });
-
-    setExplosionCore(core);
-
-    // Play animator sequences
-    animator.play("scene-1-nebula-unified", { type: "nebula" as any, loop: true });
-    animator.play("scene-1-explosion-core", { type: "explosion", loop: false });
-
-    return () => {
-      animator.stop("scene-1-nebula-unified");
-      animator.stop("scene-1-explosion-core");
-      engine.destroyParticles("scene-1-nebula-unified");
-      engine.destroyParticles("scene-1-explosion-core");
-    };
-  }, [initialized, config, qualityTier]);
-
-  // Sync Pause/Resume
-  useEffect(() => {
-    if (!initialized) return;
-    const animator = ParticleAnimator.getInstance();
-    if (shouldAnimate) {
-      animator.resume("scene-1-nebula-unified");
-      animator.resume("scene-1-explosion-core");
-    } else {
-      animator.pause("scene-1-nebula-unified");
-      animator.pause("scene-1-explosion-core");
-    }
-  }, [shouldAnimate, initialized]);
-
-  // Frame loop animations
-  useFrame((state, delta) => {
+  useFrame((state) => {
     if (!active || !initialized || !shouldAnimate) return;
-
-    const camera = state.camera;
-    const lod = ParticleLODManager.getInstance();
-
-    // 1. Update LOD and culling for custom particle groups
-    if (nebulaSystem) lod.updateLOD(nebulaSystem, camera);
-    if (explosionCore) lod.updateLOD(explosionCore, camera);
-
-    // 2. Slow spin rotation of the entire galaxy on the Z-axis
-    if (groupRef.current) {
-      groupRef.current.rotation.z = state.clock.getElapsedTime() * 0.025;
-    }
-
-    // 3. Animate float code windows and filename badges (drift-free, frame rate independent)
     const time = state.clock.getElapsedTime();
 
-    if (windowsGroupRef.current) {
-      windowsGroupRef.current.children.forEach((child, idx) => {
+    if (windowsGroup.current) {
+      windowsGroup.current.children.forEach((child, idx) => {
         const win = codeWindowsData[idx];
-        if (win) {
-          child.position.y = win.position.y + Math.sin(time * 0.8 + idx) * 1.5;
-          if (child instanceof THREE.Sprite && child.material instanceof THREE.SpriteMaterial) {
-            child.material.rotation += delta * 0.05;
-          }
-        }
+        if (!win?.slot) return;
+        const { radius, theta, phi, speed, driftOffset, driftSpeed, phase } = win.slot;
+
+        const angle = time * speed + phase;
+        const lx = Math.sin(phi) * Math.cos(theta + angle) * radius;
+        const lz = Math.sin(phi) * Math.sin(theta + angle) * radius;
+        const ly = Math.cos(phi) * radius;
+
+        const dx = Math.sin(time * driftSpeed + phase) * driftOffset.x;
+        const dy = Math.cos(time * driftSpeed * 1.1 + phase) * driftOffset.y;
+        const dz = Math.sin(time * driftSpeed * 0.9 + phase) * driftOffset.z;
+
+        const wx = PLANET_POS.x + lx + dx;
+        const wy = PLANET_POS.y + ly + dy;
+        const wz = PLANET_POS.z + lz + dz;
+
+        child.position.set(wx, wy, wz);
+        InteractionHandler.getInstance().updateObjectPosition(win.id, new THREE.Vector3(wx, wy, wz));
+
+        const isHovered   = hoveredObject === win.id;
+        const targetScale = isHovered ? 1.22 : 1.0;
+        child.scale.lerp(new THREE.Vector3(13 * targetScale, 9.75 * targetScale, 1.0), 0.14);
       });
     }
 
-    if (badgesGroupRef.current) {
-      badgesGroupRef.current.children.forEach((child, idx) => {
-        const badge = filenameBadgesData[idx];
-        if (badge) {
-          child.position.y = badge.position.y + Math.sin(time * 0.8 + idx + 10) * 1.0;
-          if (child instanceof THREE.Sprite && child.material instanceof THREE.SpriteMaterial) {
-            child.material.rotation += delta * 0.05;
-          }
-        }
-      });
-    }
+    if (planetMesh.current) planetMesh.current.rotation.y = time * 0.05;
+    if (ringMesh.current) ringMesh.current.rotation.z = Math.sin(time * 0.18) * 0.03;
+    if (groupRef.current) groupRef.current.rotation.y = time * 0.006;
   });
 
   return (
     <group ref={groupRef} visible={active}>
-      {/* Dynamic Lighting */}
-      <ambientLight color="#8B5CF6" intensity={0.4} />
-      <pointLight color="#FF9955" intensity={3.5} position={[0, 0, 0]} distance={150} />
-      <directionalLight color="#EC4899" intensity={1.8} position={[40, 40, 40]} />
+      <ambientLight color="#2d1b69" intensity={0.50} />
+      <directionalLight color="#ffe8c0" intensity={2.2} position={[-40, 50, 60]} />
 
-      {/* Render GPU Instanced Systems */}
-      {nebulaSystem && <primitive object={nebulaSystem.container} />}
-      {explosionCore && <primitive object={explosionCore.container} />}
+      <group ref={planetGroup} position={PLANET_POS.toArray() as [number, number, number]}>
+        <mesh ref={planetMesh}>
+          <sphereGeometry args={[5.0, 64, 64]} />
+          <meshStandardMaterial map={planetTex ?? undefined} roughness={0.72} />
+        </mesh>
 
-      {/* Render Code Editor Windows (Interactive via R3F) */}
-      <group ref={windowsGroupRef}>
+        <mesh ref={ringMesh} rotation={[Math.PI / 2 - 0.38, 0.12, 0]}>
+          <ringGeometry args={[6.2, 9.8, 128]} />
+          <meshBasicMaterial map={ringTex ?? undefined} transparent opacity={0.88} side={THREE.DoubleSide} />
+        </mesh>
+      </group>
+
+      <group ref={windowsGroup}>
         {active && codeWindowsData.map((win) => (
           <sprite
             key={win.id}
-            position={win.position}
-            scale={[30, 22.5, 1]}
-            onPointerOver={(e) => {
-              e.stopPropagation();
-              setHoveredObject(win.id);
-              document.body.style.cursor = "pointer";
-            }}
-            onPointerOut={(e) => {
-              e.stopPropagation();
-              setHoveredObject(null);
-              document.body.style.cursor = "auto";
-            }}
-            onClick={(e) => {
-              e.stopPropagation();
-              expandCard(win.id);
-            }}
+            position={[0, 0, 0]}
+            scale={[13, 9.75, 1]}
+            onPointerOver={(e) => { e.stopPropagation(); setHoveredObject(win.id); }}
+            onPointerOut={(e)  => { e.stopPropagation(); setHoveredObject(null); }}
+            onClick={(e)       => { e.stopPropagation(); expandCard(win.id); }}
           >
-            <spriteMaterial attach="material" map={win.texture} transparent opacity={0.9} />
-          </sprite>
-        ))}
-      </group>
-
-      {/* Render Filename Badges (Interactive via R3F) */}
-      <group ref={badgesGroupRef}>
-        {active && filenameBadgesData.map((badge) => (
-          <sprite
-            key={badge.id}
-            position={badge.position}
-            scale={[15, 3.75, 1]}
-            onPointerOver={(e) => {
-              e.stopPropagation();
-              setHoveredObject(badge.id);
-              document.body.style.cursor = "pointer";
-            }}
-            onPointerOut={(e) => {
-              e.stopPropagation();
-              setHoveredObject(null);
-              document.body.style.cursor = "auto";
-            }}
-            onClick={(e) => {
-              e.stopPropagation();
-              expandCard(badge.id);
-            }}
-          >
-            <spriteMaterial attach="material" map={badge.texture} transparent opacity={0.8} />
+            <spriteMaterial attach="material" map={win.texture} transparent opacity={0.92} />
           </sprite>
         ))}
       </group>
