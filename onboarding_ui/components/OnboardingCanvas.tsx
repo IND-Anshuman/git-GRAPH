@@ -331,6 +331,7 @@ export function OnboardingCanvas() {
  */
 function Cosmic2DFallback() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const mouseRef = useRef({ x: 0, y: 0 });
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -349,28 +350,51 @@ function Cosmic2DFallback() {
       vx: number;
       vy: number;
       size: number;
+      depth: number; // 0.1 (farthest background) to 1.0 (closest foreground)
       color: string;
       alpha: number;
-      decaySpeed: number;
     }
 
     const stars: Star[] = [];
     const colors = ["rgba(167, 139, 250, ", "rgba(96, 165, 250, ", "rgba(251, 146, 60, ", "rgba(244, 114, 182, "];
 
-    // Create 70 stars with random trajectories and base colors
-    for (let i = 0; i < 70; i++) {
+    // Create 30 layered stars (instead of 70) to represent Method 1: Fake 3D depth layers
+    for (let i = 0; i < 30; i++) {
+      const typeRand = Math.random();
+      let size = 0.5;
+      let depth = 0.1;
+      let speedFactor = 0.05;
+
+      if (typeRand < 0.4) {
+        // Background layer: small, faint, slow
+        size = Math.random() * 1.0 + 0.4;
+        depth = Math.random() * 0.2 + 0.1;
+        speedFactor = 0.02;
+      } else if (typeRand < 0.8) {
+        // Midground layer
+        size = Math.random() * 2.0 + 1.0;
+        depth = Math.random() * 0.3 + 0.4;
+        speedFactor = 0.08;
+      } else {
+        // Foreground layer: large, bright, fast
+        size = Math.random() * 3.5 + 2.2;
+        depth = Math.random() * 0.2 + 0.8;
+        speedFactor = 0.15;
+      }
+
       stars.push({
         x: Math.random() * width,
         y: Math.random() * height,
-        vx: (Math.random() - 0.5) * 0.12,
-        vy: (Math.random() - 0.5) * 0.12,
-        size: Math.random() * 2.0 + 0.5,
+        vx: (Math.random() - 0.5) * speedFactor,
+        vy: (Math.random() - 0.5) * speedFactor,
+        size,
+        depth,
         color: colors[Math.floor(Math.random() * colors.length)],
-        alpha: Math.random() * 0.5 + 0.3,
-        decaySpeed: 0.005 + Math.random() * 0.005
+        alpha: Math.random() * 0.45 + 0.35
       });
     }
 
+    // Window resize handler
     const handleResize = () => {
       if (!canvas) return;
       width = canvas.width = window.innerWidth;
@@ -378,6 +402,15 @@ function Cosmic2DFallback() {
     };
     window.addEventListener("resize", handleResize);
 
+    // Mouse tracking for parallax
+    const handleMouseMove = (e: MouseEvent) => {
+      // Normalize mouse coordinates around center (-1 to 1)
+      mouseRef.current.x = (e.clientX / window.innerWidth) * 2 - 1;
+      mouseRef.current.y = (e.clientY / window.innerHeight) * 2 - 1;
+    };
+    window.addEventListener("mousemove", handleMouseMove);
+
+    // Scroll tracking
     let lastScrollY = typeof window !== "undefined" ? window.scrollY : 0;
     let scrollVelocity = 0;
 
@@ -388,21 +421,37 @@ function Cosmic2DFallback() {
     };
     window.addEventListener("scroll", handleScroll, { passive: true });
 
-    // 2D animation frame
+    // Smooth lerp mouse targets for fluid motion
+    const currentMouse = { x: 0, y: 0 };
+
+    // Render loop
     const render = () => {
-      // Draw background space gradient
-      const grad = ctx.createRadialGradient(width / 2, height / 2, 50, width / 2, height / 2, Math.max(width, height));
-      grad.addColorStop(0, "#08021c");
+      // Smoothly interpolate mouse coordinates to prevent sharp jumps
+      currentMouse.x += (mouseRef.current.x - currentMouse.x) * 0.08;
+      currentMouse.y += (mouseRef.current.y - currentMouse.y) * 0.08;
+
+      // 1. Draw Space background gradient (shifts slightly opposite of mouse for background parallax)
+      const bgOffsetX = -currentMouse.x * 6.0;
+      const bgOffsetY = -currentMouse.y * 6.0;
+      const grad = ctx.createRadialGradient(
+        width / 2 + bgOffsetX, 
+        height / 2 + bgOffsetY, 
+        30, 
+        width / 2 + bgOffsetX, 
+        height / 2 + bgOffsetY, 
+        Math.max(width, height)
+      );
+      grad.addColorStop(0, "#070217");
       grad.addColorStop(1, "#000000");
       ctx.fillStyle = grad;
       ctx.fillRect(0, 0, width, height);
 
-      // Render drifting stars
+      // 2. Render drifting stars
       stars.forEach((s) => {
-        // Shift stars based on scroll velocity (parallax)
-        s.y -= scrollVelocity * (s.size * 0.5);
+        // Shift stars based on scroll velocity and their depth (foreground shifts faster)
+        s.y -= scrollVelocity * s.depth * 5.0;
 
-        // Drift stars
+        // Apply constant velocity drift
         s.x += s.vx;
         s.y += s.vy;
 
@@ -412,17 +461,24 @@ function Cosmic2DFallback() {
         if (s.y < 0) s.y = height;
         if (s.y > height) s.y = 0;
 
-        // Create glowing radial gradient for soft star appearance
+        // Calculate parallax displacement (mouse shifts stars relative to their depth)
+        const parallaxX = -currentMouse.x * s.depth * 45.0;
+        const parallaxY = -currentMouse.y * s.depth * 45.0;
+
+        const renderX = s.x + parallaxX;
+        const renderY = s.y + parallaxY;
+
+        // Draw soft glowing radial star
         ctx.beginPath();
-        const radGrad = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, s.size * 2.5);
+        const radGrad = ctx.createRadialGradient(renderX, renderY, 0, renderX, renderY, s.size * 2.5);
         radGrad.addColorStop(0, s.color + s.alpha + ")");
         radGrad.addColorStop(1, s.color + "0)");
         ctx.fillStyle = radGrad;
-        ctx.arc(s.x, s.y, s.size * 2.5, 0, Math.PI * 2);
+        ctx.arc(renderX, renderY, s.size * 2.5, 0, Math.PI * 2);
         ctx.fill();
       });
 
-      // Slowly damp the scroll velocity
+      // Damp scroll velocity
       scrollVelocity *= 0.94;
 
       animationFrameId = requestAnimationFrame(render);
@@ -433,6 +489,7 @@ function Cosmic2DFallback() {
     return () => {
       cancelAnimationFrame(animationFrameId);
       window.removeEventListener("resize", handleResize);
+      window.removeEventListener("mousemove", handleMouseMove);
       window.removeEventListener("scroll", handleScroll);
     };
   }, []);
