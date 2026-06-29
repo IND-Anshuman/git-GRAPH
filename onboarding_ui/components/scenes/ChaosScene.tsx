@@ -49,8 +49,12 @@ function buildScatteredSlots(count: number): ScatteredSlot[] {
       theta,
       phi,
       speed: (Math.random() * 0.04 + 0.015) * (Math.random() > 0.5 ? 1 : -1),
-      driftOffset: new THREE.Vector3(0, 0, 0),
-      driftSpeed: 0,
+      driftOffset: new THREE.Vector3(
+        (Math.random() - 0.5) * 6,
+        (Math.random() - 0.5) * 6,
+        (Math.random() - 0.5) * 6
+      ),
+      driftSpeed: Math.random() * 0.15 + 0.08,
       phase: Math.random() * Math.PI * 2
     });
   }
@@ -100,18 +104,39 @@ export function ChaosScene({ active, config: _config }: ChaosSceneProps) {
       windowsGroup.current.children.forEach((child, idx) => {
         const win = codeWindowsData[idx];
         if (!win?.slot) return;
-        const { radius, theta, phi, speed, phase } = win.slot;
+        const { radius, theta, phi, speed, driftOffset, driftSpeed, phase } = win.slot;
 
         const angle = time * speed + phase;
         const lx = Math.sin(phi) * Math.cos(theta + angle) * radius;
         const lz = Math.sin(phi) * Math.sin(theta + angle) * radius;
         const ly = Math.cos(phi) * radius;
 
-        const wx = PLANET_POS.x + lx;
-        const wy = PLANET_POS.y + ly;
-        const wz = PLANET_POS.z + lz;
+        const dx = Math.sin(time * driftSpeed + phase) * driftOffset.x;
+        const dy = Math.cos(time * driftSpeed * 1.1 + phase) * driftOffset.y;
+        const dz = Math.sin(time * driftSpeed * 0.9 + phase) * driftOffset.z;
+
+        const wx = PLANET_POS.x + lx + dx;
+        const wy = PLANET_POS.y + ly + dy;
+        const wz = PLANET_POS.z + lz + dz;
 
         child.position.set(wx, wy, wz);
+
+        const distToCam = state.camera.position.distanceTo(new THREE.Vector3(wx, wy, wz));
+        const fadeStart = 26;
+        const fadeEnd = 14;
+        let opacityMult = 1.0;
+        if (distToCam < fadeStart) {
+          opacityMult = Math.max(0.0, (distToCam - fadeEnd) / (fadeStart - fadeEnd));
+        }
+
+        const isHovered   = hoveredObject === win.id;
+        const targetScale = isHovered ? 1.22 : 1.0;
+        child.scale.lerp(new THREE.Vector3(13 * targetScale * Math.max(0.1, opacityMult), 9.75 * targetScale * Math.max(0.1, opacityMult), 1.0), 0.14);
+
+        if (child instanceof THREE.Sprite && child.material instanceof THREE.SpriteMaterial) {
+          const baseOpacity = isHovered ? 1.0 : 0.90;
+          child.material.opacity += ((baseOpacity * opacityMult) - child.material.opacity) * 0.1;
+        }
       });
     }
   });
@@ -123,7 +148,7 @@ export function ChaosScene({ active, config: _config }: ChaosSceneProps) {
           <sprite
             key={win.id}
             position={[0, 0, 0]}
-            scale={[18, 13.5, 1]}
+            scale={[13, 9.75, 1]}
             onPointerOver={(e) => { e.stopPropagation(); setHoveredObject(win.id); }}
             onPointerOut={(e)  => { e.stopPropagation(); setHoveredObject(null); }}
             onClick={(e)       => { e.stopPropagation(); expandCard(win.id); }}
