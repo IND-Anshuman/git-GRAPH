@@ -367,79 +367,9 @@ export default function Home() {
 
           {/* Scrollable scene cards list */}
           <div className="w-full max-w-xl px-6 flex flex-col gap-[150vh]">
-            {scenes.map((scene) => {
-              // Highlight scene card if active in store (supports scene 7 & 8 mapping to final slide)
-              const isActive = currentScene === scene.num || (scene.num === 7 && currentScene === 8);
-              
-              return (
-                <section
-                  key={scene.num}
-                  onClick={() => getScrollController().setProgress(scene.progress)}
-                  className={`group relative bg-slate-900/40 backdrop-blur-md border rounded-xl p-6 cursor-pointer transition-all duration-500 flex flex-col justify-between min-h-[220px] ${
-                    isActive
-                      ? "border-cyan-500 bg-slate-900/70 shadow-lg shadow-cyan-500/10 scale-[1.02]"
-                      : "border-slate-900 hover:border-slate-800 hover:bg-slate-900/50"
-                  }`}
-                >
-                  {/* Subtle Neon Glow for Active Cards */}
-                  {isActive && (
-                    <span className="absolute inset-0 rounded-xl bg-gradient-to-r from-cyan-500/10 to-indigo-500/10 blur opacity-75 pointer-events-none" />
-                  )}
-
-                  {/* Header Row */}
-                  <div className="flex w-full justify-between items-start">
-                    <div>
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-cyan-400">
-                        Scene {scene.num}
-                      </span>
-                      <h2 className="text-xl font-extrabold text-white mt-0.5 tracking-tight group-hover:text-cyan-300 transition-colors">
-                        {scene.name}
-                      </h2>
-                    </div>
-                    <span className="text-xs font-bold text-slate-500 tracking-wider">
-                      {scene.pct}
-                    </span>
-                  </div>
-
-                  {/* Subtitle */}
-                  <div className="text-xs font-semibold text-slate-400 mt-2">
-                    {scene.sub}
-                  </div>
-
-                  {/* Description */}
-                  <p className="text-xs text-slate-300 mt-3 leading-relaxed">
-                    {scene.desc}
-                  </p>
-
-                  {/* Tags and CTA */}
-                  <div className="mt-6 flex flex-wrap justify-between items-center gap-4">
-                    <div className="flex flex-wrap gap-1.5">
-                      {scene.tags.map((tag) => (
-                        <span
-                          key={tag}
-                          className="text-[9px] font-medium bg-slate-950/60 text-slate-400 px-2 py-0.5 rounded border border-slate-900"
-                        >
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-
-                    {/* Final Action Button */}
-                    {scene.isLast && (
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          alert("Welcome to the Software Intelligence Universe!");
-                        }}
-                        className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white text-xs font-bold py-1.5 px-4 rounded-full shadow-lg shadow-purple-500/20 transition cursor-pointer border-none outline-none"
-                      >
-                        Enter The Universe
-                      </button>
-                    )}
-                  </div>
-                </section>
-              );
-            })}
+            {scenes.map((scene) => (
+              <div key={scene.num} className="min-h-[220px] pointer-events-none opacity-0" />
+            ))}
           </div>
 
           {/* Bottom spacing to ensure final scene cards can be scrolled into view */}
