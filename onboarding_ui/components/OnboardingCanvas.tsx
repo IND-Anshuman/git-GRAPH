@@ -277,8 +277,8 @@ export function OnboardingCanvas() {
     try {
       const canvas = document.createElement("canvas");
       const support = !!(
-        window.WebGLRenderingContext &&
-        (canvas.getContext("webgl") || canvas.getContext("experimental-webgl"))
+        (window.WebGL2RenderingContext && canvas.getContext("webgl2")) ||
+        (window.WebGLRenderingContext && (canvas.getContext("webgl") || canvas.getContext("experimental-webgl")))
       );
       setHasWebGL(support);
     } catch {
