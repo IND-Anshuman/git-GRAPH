@@ -217,6 +217,157 @@ function PerformanceMonitorHelper() {
 }
 
 /**
+ * SceneTransparencyController makes the WebGL canvas transparent for Scene 1
+ * (so the CSS star field gradient shows through) and opaque for all other scenes.
+ */
+function SceneTransparencyController() {
+  const { gl } = useThree();
+  const currentScene = useOnboardingStore((s) => s.currentScene);
+
+  useEffect(() => {
+    if (currentScene === 1) {
+      gl.setClearColor(0x000000, 0); // fully transparent
+    } else {
+      gl.setClearColor(0x000010, 1); // opaque dark blue-black
+    }
+  }, [currentScene, gl]);
+
+  return null;
+}
+
+/**
+ * High-performance 2D Canvas Starfield that draws organic, glowing,
+ * and twinkling stars with different sizes, colors, and twinkling cycles.
+ */
+function StarfieldCanvas() {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+
+    let animationFrameId: number;
+    let width = (canvas.width = window.innerWidth);
+    let height = (canvas.height = window.innerHeight);
+
+    // Generate stars with diverse sizes, colors (white, blue, gold, purple), and twinkle cycles
+    const stars = Array.from({ length: 180 }, () => ({
+      x: Math.random() * width,
+      y: Math.random() * height,
+      size: Math.random() * 2.2 + 0.5,
+      color: ["#ffffff", "#e0f2fe", "#fef3c7", "#fae8ff"][Math.floor(Math.random() * 4)],
+      speed: Math.random() * 0.015 + 0.005,
+      phase: Math.random() * Math.PI * 2,
+      glow: Math.random() > 0.88 // 12% of stars have a premium glow halo
+    }));
+
+    const handleResize = () => {
+      if (!canvas) return;
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    const render = () => {
+      ctx.clearRect(0, 0, width, height);
+
+      stars.forEach((star) => {
+        star.phase += star.speed;
+        const opacity = 0.25 + Math.abs(Math.sin(star.phase)) * 0.75;
+
+        ctx.fillStyle = star.color;
+        ctx.globalAlpha = opacity;
+
+        if (star.glow) {
+          const glowRad = star.size * 3.5;
+          const glowGrad = ctx.createRadialGradient(star.x, star.y, 0, star.x, star.y, glowRad);
+          glowGrad.addColorStop(0, star.color);
+          glowGrad.addColorStop(0.3, "rgba(255, 255, 255, 0.18)");
+          glowGrad.addColorStop(1, "transparent");
+          ctx.fillStyle = glowGrad;
+          ctx.beginPath();
+          ctx.arc(star.x, star.y, glowRad, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        ctx.fillStyle = star.color;
+        ctx.beginPath();
+        ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      animationFrameId = requestAnimationFrame(render);
+    };
+
+    render();
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      cancelAnimationFrame(animationFrameId);
+    };
+  }, []);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      style={{
+        position: "absolute",
+        inset: 0,
+        width: "100%",
+        height: "100%",
+        pointerEvents: "none",
+      }}
+    />
+  );
+}
+
+/**
+ * Scene1UniverseBackground renders a pure 2D CSS universe sky behind the WebGL canvas.
+ * It uses only CSS gradients and pseudo-element dots — zero GPU compute, ideal for low-end devices.
+ */
+function Scene1UniverseBackground({ visible }: { visible: boolean }) {
+  return (
+    <div
+      className="scene1-universe-bg"
+      style={{
+        position: "absolute",
+        inset: 0,
+        zIndex: 0,
+        pointerEvents: "none",
+        opacity: visible ? 1 : 0,
+        transition: "opacity 1.2s ease",
+        background: [
+          // Deep space gradient — multiple layered radial gradients
+          "radial-gradient(ellipse 160% 100% at 50% 120%, #1e0040 0%, transparent 55%)",
+          "radial-gradient(ellipse 80% 60% at 20% 30%, #0d1b4a 0%, transparent 50%)",
+          "radial-gradient(ellipse 60% 50% at 80% 70%, #0c0628 0%, transparent 45%)",
+          "radial-gradient(ellipse 120% 80% at 50% 50%, #04001a 0%, #000010 100%)",
+        ].join(", "),
+        overflow: "hidden",
+      }}
+    >
+      {/* Dynamic, premium HTML5 2D Canvas Starfield */}
+      {visible && <StarfieldCanvas />}
+
+      {/* Nebula color washes — soft purple/teal blobs */}
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          background: [
+            "radial-gradient(ellipse 50% 35% at 15% 25%, rgba(124,58,237,0.12) 0%, transparent 70%)",
+            "radial-gradient(ellipse 40% 30% at 85% 65%, rgba(6,182,212,0.09) 0%, transparent 70%)",
+            "radial-gradient(ellipse 35% 25% at 55% 80%, rgba(244,63,94,0.07) 0%, transparent 65%)",
+          ].join(", "),
+        }}
+      />
+    </div>
+  );
+}
+
+/**
  * OnboardingCanvas provides the core canvas workspace for R3F,
  * checking WebGL availability and executing fallback configurations.
  */
@@ -340,18 +491,23 @@ export function OnboardingCanvas() {
   }
 
   return (
-    <div className="relative h-full w-full bg-slate-950 overflow-hidden">
+    <div className="relative h-full w-full overflow-hidden" style={{ background: "#000010" }}>
+      {/* 2D universe starfield background for Scene 1 — pure CSS, zero GPU overhead */}
+      <Scene1UniverseBackground visible={currentScene === 1} />
+
       <Canvas
+        style={{ position: "relative", zIndex: 1 }}
         dpr={qualityTier === "low" ? 1.0 : qualityTier === "medium" ? 1.0 : qualityTier === "high" ? 1.25 : [1, 1.5]}
         gl={{
           antialias: initialAntialias,
-          alpha: false,
+          alpha: true,
           powerPreference: "high-performance"
         }}
         shadows={false}
         camera={{ position: [0, 0, -50], fov: 75 }}
       >
-        <color attach="background" args={["#000000"]} />
+        {/* SceneTransparencyController sets WebGL clearAlpha to 0 for scene 1 (shows CSS stars) */}
+        <SceneTransparencyController />
         <CameraRig />
         <SceneContainer />
         <PerformanceMonitorHelper />
