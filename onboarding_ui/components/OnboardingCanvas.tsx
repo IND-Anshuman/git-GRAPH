@@ -55,7 +55,6 @@ function CameraRig() {
     const sceneManager = SceneManager.getInstance();
     const config = sceneManager.getSceneConfig(currentScene);
 
-    // Default rail definition if config isn't loaded yet
     const defaultRail = {
       sceneNumber: currentScene,
       splineType: "catmullRom" as const,
@@ -76,14 +75,13 @@ function CameraRig() {
     if (config?.camera?.lookAtTarget) {
       controller.setLookAtTarget(config.camera.lookAtTarget);
     } else {
-      controller.setLookAtTarget("origin"); // fallback target
+      controller.setLookAtTarget("origin");
     }
 
     cameraControllerRef.current = controller;
   }, [currentScene, isReady]);
 
   useFrame((state) => {
-    // Sync spatial audio listener with the camera position/rotation
     AudioSystem.getInstance().updateListener(camera);
 
     if (!shouldAnimate || !cameraControllerRef.current) return;
@@ -93,14 +91,12 @@ function CameraRig() {
     const range = end - start;
     const localProgress = range === 0 ? 1.0 : (store.scrollProgress - start) / range;
 
-    // Parallax effect based on pointer (mouse/touch coordinates in [-1, 1] range)
-    const mouseX = state.pointer.x * 2.0; // scale to 2 units range
+    const mouseX = state.pointer.x * 2.0;
     const mouseY = state.pointer.y * 2.0;
     cameraControllerRef.current.addOffset(new THREE.Vector3(mouseX, mouseY, 0));
 
     const cameraState = cameraControllerRef.current.updateCamera(localProgress);
 
-    // Smooth lerp for position, rotation, and fov to prevent jerky motion
     camera.position.lerp(cameraState.position, 0.1);
     camera.quaternion.slerp(new THREE.Quaternion().setFromEuler(cameraState.rotation), 0.1);
 
@@ -135,19 +131,15 @@ function SceneContainer() {
   }
 
   useFrame((state, delta) => {
-    // Poll current scene opacities from SceneManager
     const newOpacities: Record<number, number> = {};
     for (let i = 1; i <= 8; i++) {
       newOpacities[i] = sceneManager.getSceneOpacity(i as any);
     }
     setOpacities(newOpacities);
 
-    // Update active GPU shader-based particle animations
     ParticleAnimator.getInstance().update(delta);
 
-    // Apply Level of Detail (LOD) and Frustum Culling to active particle groups
     activeGroups.forEach((group) => {
-      // Swap geometries based on distance & cull out-of-screen instances concurrently
       ParticleLODManager.getInstance().updateLOD(group, state.camera);
     });
   });
@@ -158,7 +150,6 @@ function SceneContainer() {
       <directionalLight position={[10, 10, 5]} intensity={1} />
       <pointLight position={[-10, -10, -10]} intensity={0.5} />
 
-      {/* Render GPU particles for active scenes */}
       {activeGroups.map((group) => (
         <primitive key={group.id} object={group.container} />
       ))}
@@ -213,7 +204,6 @@ function PerformanceMonitorHelper() {
 
     const unsubscribe = monitor.onQualityChange((tier) => {
       useOnboardingStore.getState().setQualityTier(tier);
-      // Adjust particle count limits instantly
       ParticleSystemEngine.getInstance().adjustQuality(tier);
     });
 
@@ -236,7 +226,6 @@ export function OnboardingCanvas() {
   const setCurrentScene = useOnboardingStore((s) => s.setCurrentScene);
   const qualityTier = useOnboardingStore((s) => s.qualityTier);
 
-  // Determine initial antialiasing once on mount to prevent WebGL context recreation crashes
   const [initialAntialias] = useState(() => {
     if (typeof window !== "undefined") {
       const tier = useOnboardingStore.getState().qualityTier;
@@ -245,7 +234,6 @@ export function OnboardingCanvas() {
     return true;
   });
 
-  // Global keyboard accessibility listener
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       InteractionHandler.getInstance().handleKeyDown(e);
@@ -256,7 +244,6 @@ export function OnboardingCanvas() {
     };
   }, []);
 
-  // Scene 7 -> Scene 8 automatic transition timer at scroll bounds progress 1.00
   useEffect(() => {
     if (currentScene === 7) {
       const timer = setTimeout(() => {
@@ -266,7 +253,6 @@ export function OnboardingCanvas() {
     }
   }, [currentScene, setCurrentScene]);
 
-  // Audio system transition trigger
   useEffect(() => {
     const audio = AudioSystem.getInstance();
     audio.playWhoosh();
@@ -279,7 +265,6 @@ export function OnboardingCanvas() {
       const canvas = document.createElement("canvas");
       const gl = canvas.getContext("webgl2") || canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
       if (gl) {
-        // Statically verify WebGLRenderer creation succeeds to catch sandboxed/driver context failures
         const renderer = new THREE.WebGLRenderer({ canvas });
         renderer.dispose();
         support = true;
@@ -297,11 +282,9 @@ export function OnboardingCanvas() {
   if (hasWebGL === false) {
     return (
       <div className="flex h-screen w-[calc(100vw-380px)] ml-[380px] items-center justify-center bg-slate-950 text-slate-100 p-8 select-none relative overflow-hidden font-sans">
-        {/* Animated CSS space dust background */}
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,#0c0628_0%,#000000_100%)] opacity-80" />
         <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(6,182,212,0.03)_1px,transparent_1px)] bg-[size:40px_40px] opacity-25" />
         
-        {/* Tech diagnostic card */}
         <div className="relative z-10 w-full max-w-md bg-slate-900/60 backdrop-blur-md border border-rose-500/30 rounded-xl p-8 shadow-2xl shadow-rose-500/5 flex flex-col gap-6">
           <span className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-rose-500/50 rounded-tl" />
           <span className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-rose-500/50 rounded-tr" />
@@ -361,11 +344,11 @@ export function OnboardingCanvas() {
       <Canvas
         dpr={qualityTier === "low" ? 1.0 : qualityTier === "medium" ? 1.0 : qualityTier === "high" ? 1.25 : [1, 1.5]}
         gl={{
-          antialias: initialAntialias, // Avoid WebGL context recreation crashes on quality change
+          antialias: initialAntialias,
           alpha: false,
           powerPreference: "high-performance"
         }}
-        shadows={false} // Explicitly disable shadow maps to prevent dynamic shadow calculation overhead
+        shadows={false}
         camera={{ position: [0, 0, -50], fov: 75 }}
       >
         <color attach="background" args={["#000000"]} />
@@ -381,7 +364,6 @@ export function OnboardingCanvas() {
   );
 }
 
-// Static dictionary of scene explanation metadata
 const sceneExplanations: Record<number, { title: string; subtitle: string; desc: string; reason: string; logs: string[] }> = {
   1: {
     title: "Why We Are Building Git-Graph",
@@ -422,7 +404,7 @@ const sceneExplanations: Record<number, { title: string; subtitle: string; desc:
     title: "Constellation of Reasoning",
     subtitle: "Interactive Impact Analysis",
     desc: "We run a reasoning neural network over the unified knowledge graph to answer questions, analyze architectural impact, and surface critical code health insights.",
-    reason: "Neural sparks show active query pathways traveling between evidence nodes to resolve complex questions.",
+    reason: "Neural sparks show active query pathways traveling between evidence nodes to resolve resolve complex questions.",
     logs: ["INITIALIZING NEURAL GRAPH...", "COMPILING EVOLVED INSIGHTS", "REASONING PATHWAYS ACTIVE", "ANALYSIS PIPELINE READY"]
   },
   7: {
@@ -434,23 +416,97 @@ const sceneExplanations: Record<number, { title: string; subtitle: string; desc:
   }
 };
 
-/**
- * Animated Holographic HUD overlay that displays explanatory logs and introduction metadata
- * for each scene. Its position and scale animate in response to scroll progress.
- */
 function UniversalExplanationHUD() {
   const currentScene = useOnboardingStore((s) => s.currentScene);
-  const scrollProgress = useOnboardingStore((s) => s.scrollProgress);
   const [logs, setLogs] = useState<string[]>([]);
+  const cardRef = useRef<HTMLDivElement>(null);
+  const mouseRef = useRef({ x: 0, y: 0 });
 
-  // Dynamically query boundaries for the active scene
   const activeInfo = sceneExplanations[currentScene];
-  const boundaries = useOnboardingStore.getState().getSceneBoundaries(currentScene);
-  const range = boundaries.end - boundaries.start;
-  const localProgress = range === 0 ? 1.0 : (scrollProgress - boundaries.start) / range;
-  const clampedProgress = Math.max(0.0, Math.min(1.0, localProgress));
 
-  // Typewriter effect for system monitor logs
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      mouseRef.current.x = (e.clientX / window.innerWidth) * 2 - 1;
+      mouseRef.current.y = (e.clientY / window.innerHeight) * 2 - 1;
+    };
+    window.addEventListener("mousemove", handleMouseMove);
+    return () => window.removeEventListener("mousemove", handleMouseMove);
+  }, []);
+
+  useEffect(() => {
+    let animationFrameId: number;
+    const currentRot = { x: 0, y: 0 };
+    const currentScrollTrans = { x: 60, y: 0, scale: 0.9, opacity: 0 };
+
+    const update = () => {
+      if (!cardRef.current) {
+        animationFrameId = requestAnimationFrame(update);
+        return;
+      }
+
+      currentRot.x += (mouseRef.current.y * -16.0 - currentRot.x) * 0.07;
+      currentRot.y += (mouseRef.current.x * 16.0 - currentRot.y) * 0.07;
+
+      const store = useOnboardingStore.getState();
+      const current = store.currentScene;
+      const scroll = store.scrollProgress;
+      const info = sceneExplanations[current];
+
+      if (!info) {
+        cardRef.current.style.opacity = "0";
+        cardRef.current.style.pointerEvents = "none";
+        animationFrameId = requestAnimationFrame(update);
+        return;
+      }
+
+      const boundaries = store.getSceneBoundaries(current);
+      const range = boundaries.end - boundaries.start;
+      const localProgress = range === 0 ? 1.0 : (scroll - boundaries.start) / range;
+      const clampedProgress = Math.max(0.0, Math.min(1.0, localProgress));
+
+      let targetOpacity = 1.0;
+      let targetX = 0;
+      let targetY = 0;
+      let targetScale = 1.0;
+
+      if (clampedProgress < 0.20) {
+        const t = clampedProgress / 0.20;
+        targetOpacity = t;
+        targetX = (1 - t) * 60;
+        targetScale = 0.92 + t * 0.08;
+      } else if (clampedProgress > 0.80) {
+        const t = (clampedProgress - 0.80) / 0.20;
+        targetOpacity = 1 - t;
+        targetY = -t * 40;
+        targetScale = 1.0 - t * 0.04;
+      } else {
+        const floatProgress = (clampedProgress - 0.20) / 0.60;
+        targetY = Math.sin(floatProgress * Math.PI) * 12;
+      }
+
+      currentScrollTrans.opacity += (targetOpacity - currentScrollTrans.opacity) * 0.10;
+      currentScrollTrans.x += (targetX - currentScrollTrans.x) * 0.10;
+      currentScrollTrans.y += (targetY - currentScrollTrans.y) * 0.10;
+      currentScrollTrans.scale += (targetScale - currentScrollTrans.scale) * 0.10;
+
+      cardRef.current.style.opacity = currentScrollTrans.opacity.toString();
+      cardRef.current.style.pointerEvents = currentScrollTrans.opacity > 0.1 ? "auto" : "none";
+      cardRef.current.style.transform = `
+        translate(-50%, -50%) 
+        translate3d(${currentScrollTrans.x}px, ${currentScrollTrans.y}px, 0) 
+        scale(${currentScrollTrans.scale}) 
+        perspective(1200px) 
+        rotateX(${currentRot.x}deg) 
+        rotateY(${currentRot.y}deg)
+      `;
+
+      animationFrameId = requestAnimationFrame(update);
+    };
+
+    update();
+    return () => cancelAnimationFrame(animationFrameId);
+  }, []);
+
   useEffect(() => {
     setLogs([]);
     if (!activeInfo) return;
@@ -470,55 +526,38 @@ function UniversalExplanationHUD() {
 
   if (!activeInfo) return null;
 
-  // Calculate scroll transitions (Slide-in -> Floating -> Slide-out)
-  let opacity = 1.0;
-  let translateX = 0;
-  let translateY = 0;
-  let scale = 1.0;
-
-  if (clampedProgress < 0.20) {
-    // 0% -> 20%: Enter and slide in from the right
-    const t = clampedProgress / 0.20;
-    opacity = t;
-    translateX = (1 - t) * 60; // offset in px
-    scale = 0.92 + t * 0.08;
-  } else if (clampedProgress > 0.80) {
-    // 80% -> 100%: Exit and slide up/fade out
-    const t = (clampedProgress - 0.80) / 0.20;
-    opacity = 1 - t;
-    translateY = -t * 40; // slide up in px
-    scale = 1.0 - t * 0.04;
-  } else {
-    // 20% -> 80%: Zero-gravity floating sine oscillation
-    const floatProgress = (clampedProgress - 0.20) / 0.60;
-    translateY = Math.sin(floatProgress * Math.PI) * 12;
-  }
-
   return (
     <div 
-      className="absolute top-[48%] left-[62%] -translate-x-1/2 -translate-y-1/2 z-30 w-full max-w-md px-4 pointer-events-none select-none"
+      ref={cardRef}
+      className="absolute top-[48%] left-[62%] -translate-x-1/2 -translate-y-1/2 z-30 w-full max-w-md px-4 select-none"
       style={{
-        opacity,
-        transform: `translate(-50%, -50%) translate3d(${translateX}px, ${translateY}px, 0) scale(${scale})`,
-        transition: "opacity 0.05s ease-out, transform 0.05s ease-out"
+        transformStyle: "preserve-3d",
+        willChange: "transform, opacity"
       }}
     >
-      {/* Holographic container */}
-      <div className="relative bg-slate-950/80 backdrop-blur-lg border border-cyan-500/20 rounded-xl p-6 shadow-2xl shadow-cyan-500/5 flex flex-col gap-4">
-        {/* Animated laser line */}
-        <div className="absolute inset-x-0 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-cyan-400 to-transparent animate-scan" />
+      <div 
+        className="relative bg-[#0d0920]/80 backdrop-blur-2xl border border-purple-500/20 border-t-purple-400/40 rounded-2xl p-6 shadow-[0_0_50px_rgba(168,85,247,0.12)] flex flex-col gap-4"
+        style={{ transformStyle: "preserve-3d" }}
+      >
+        <div className="absolute -inset-[1px] rounded-2xl bg-gradient-to-tr from-purple-500/0 via-purple-500/10 to-cyan-400/15 pointer-events-none" />
 
-        {/* HUD Brackets */}
-        <span className="absolute top-0 left-0 w-3.5 h-3.5 border-t-2 border-l-2 border-cyan-500/40 rounded-tl" />
-        <span className="absolute top-0 right-0 w-3.5 h-3.5 border-t-2 border-r-2 border-cyan-500/40 rounded-tr" />
-        <span className="absolute bottom-0 left-0 w-3.5 h-3.5 border-b-2 border-l-2 border-cyan-500/40 rounded-bl" />
-        <span className="absolute bottom-0 right-0 w-3.5 h-3.5 border-b-2 border-r-2 border-cyan-500/40 rounded-br" />
+        <div 
+          className="absolute inset-x-0 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-purple-400 to-transparent animate-scan"
+          style={{ transform: "translateZ(40px)" }}
+        />
 
-        {/* System Title */}
-        <div className="flex items-center justify-between border-b border-slate-900 pb-2.5">
+        <span className="absolute top-0 left-0 w-3.5 h-3.5 border-t-2 border-l-2 border-purple-500/50 rounded-tl" />
+        <span className="absolute top-0 right-0 w-3.5 h-3.5 border-t-2 border-r-2 border-purple-500/50 rounded-tr" />
+        <span className="absolute bottom-0 left-0 w-3.5 h-3.5 border-b-2 border-l-2 border-purple-500/50 rounded-bl" />
+        <span className="absolute bottom-0 right-0 w-3.5 h-3.5 border-b-2 border-r-2 border-purple-500/50 rounded-br" />
+
+        <div 
+          className="flex items-center justify-between border-b border-slate-900/60 pb-2.5"
+          style={{ transform: "translateZ(25px)" }}
+        >
           <div className="flex items-center gap-2">
-            <span className="h-1.5 w-1.5 rounded-full bg-cyan-400 animate-ping" />
-            <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-cyan-400 font-mono">
+            <span className="h-1.5 w-1.5 rounded-full bg-purple-400 animate-ping" />
+            <h3 className="text-[9px] font-bold uppercase tracking-[0.22em] text-purple-400 font-mono">
               System Monitor: {activeInfo.subtitle}
             </h3>
           </div>
@@ -527,34 +566,43 @@ function UniversalExplanationHUD() {
           </span>
         </div>
 
-        {/* Content details */}
         <div className="flex flex-col gap-1.5">
-          <h2 className="text-sm font-extrabold tracking-tight text-white leading-snug">
+          <h2 
+            className="text-sm font-extrabold tracking-tight bg-gradient-to-r from-purple-200 via-indigo-100 to-cyan-200 bg-clip-text text-transparent leading-snug"
+            style={{ transform: "translateZ(35px)" }}
+          >
             {activeInfo.title}
           </h2>
-          <p className="text-[11px] text-slate-300 leading-relaxed font-normal">
+          <p 
+            className="text-[11px] text-slate-350 leading-relaxed font-normal"
+            style={{ transform: "translateZ(20px)" }}
+          >
             {activeInfo.desc}
           </p>
         </div>
 
-        {/* Holographic system shell logs */}
-        <div className="bg-slate-950/90 border border-slate-900 rounded p-2.5 font-mono text-[9px] text-cyan-400/80 flex flex-col gap-1 min-h-[70px] justify-end">
+        <div 
+          className="bg-slate-950/80 border border-slate-900/80 rounded-xl p-2.5 font-mono text-[9px] text-amber-500/90 flex flex-col gap-1 min-h-[70px] justify-end"
+          style={{ transform: "translateZ(15px)" }}
+        >
           {logs.map((log, idx) => (
             <div key={idx} className="flex gap-1.5 items-center">
-              <span className="text-cyan-500/40">&gt;</span>
+              <span className="text-amber-500/30">&gt;</span>
               <span>{log}</span>
             </div>
           ))}
           <div className="flex gap-1.5 items-center animate-pulse">
-            <span className="text-cyan-500/40">&gt;</span>
-            <span className="h-2.5 w-1 bg-cyan-400" />
+            <span className="text-amber-500/30">&gt;</span>
+            <span className="h-2.5 w-1 bg-amber-500" />
           </div>
         </div>
 
-        {/* HUD control hotkeys */}
-        <div className="border-t border-slate-900 pt-2.5 flex justify-between items-center text-[9px] font-mono text-slate-500">
+        <div 
+          className="border-t border-slate-900/60 pt-2.5 flex justify-between items-center text-[9px] font-mono text-slate-500"
+          style={{ transform: "translateZ(25px)" }}
+        >
           <div className="flex items-center gap-1.5">
-            <span className="text-cyan-400/75 font-semibold">[DIAGNOSTIC]</span>
+            <span className="text-purple-400/80 font-bold uppercase">[DIAGNOSTIC]</span>
             <span>{activeInfo.reason}</span>
           </div>
         </div>
