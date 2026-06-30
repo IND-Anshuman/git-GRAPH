@@ -227,3 +227,6 @@ git_graph.db
 
 # Local data and repositories cache
 data/
+
+# Agents
+.agents/
