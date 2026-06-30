@@ -5,19 +5,12 @@ import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import { useOnboardingStore, useShouldAnimateCamera } from "@/stores/onboardingStore";
 import { CodeSnippetRenderer } from "@/lib/CodeSnippetRenderer";
-import { InteractionHandler } from "@/lib/InteractionHandler";
 import { SceneConfig } from "@/types";
 
 interface ChaosSceneProps {
   active: boolean;
   config: SceneConfig;
 }
-
-const languages: Record<string, string> = {
-  typescript: "TypeScript", python: "Python", javascript: "JavaScript",
-  go: "Go", html: "HTML", java: "Java", ruby: "Ruby", sql: "SQL",
-  css: "CSS", tf: "Terraform", yml: "YAML", json: "JSON", md: "Markdown"
-};
 
 const snippets = [
   { filename: "auth.service.ts", lang: "typescript", code: ["export class AuthService {", "  async login(cred) {", "    const t = await validate(cred);", "    return this.session(t);", "  }", "}"] },
@@ -302,9 +295,6 @@ export function ChaosScene({ active, config: _config }: ChaosSceneProps) {
 
   const shouldAnimate    = useShouldAnimateCamera();
   const qualityTier      = useOnboardingStore((s) => s.qualityTier);
-  const hoveredObject    = useOnboardingStore((s) => s.hoveredObjectId);
-  const setHoveredObject = useOnboardingStore((s) => s.setHoveredObject);
-  const expandCard       = useOnboardingStore((s) => s.expandCard);
 
   useEffect(() => { if (active && !initialized) setInitialized(true); }, [active, initialized]);
 
@@ -346,24 +336,7 @@ export function ChaosScene({ active, config: _config }: ChaosSceneProps) {
     });
   }, [initialized, windowCount, scatteredSlots]);
 
-  // Register interactions
-  useEffect(() => {
-    if (!initialized) return;
-    const handler = InteractionHandler.getInstance();
-    codeWindowsData.forEach((win, i) => {
-      handler.registerObject(win.id, PLANET_POS.clone(), 16.0, {
-        type: "Code Fragment", title: win.filename,
-        description: `A raw source code fragment containing ${win.codeLength} lines, floating in the chaos before semantic compilation.`,
-        details: {
-          Language: languages[win.lang] || win.lang,
-          Complexity: i % 3 === 0 ? "High" : i % 3 === 1 ? "Medium" : "Critical",
-          Status: "Orbiting / Untracked",
-          Size: `${(win.codeLength * 0.15 + 0.5).toFixed(2)} KB`
-        }
-      });
-    });
-    return () => { codeWindowsData.forEach((win) => handler.unregisterObject(win.id)); };
-  }, [initialized, codeWindowsData]);
+
 
   // Dispose
   useEffect(() => {
@@ -397,7 +370,6 @@ export function ChaosScene({ active, config: _config }: ChaosSceneProps) {
         const wz = PLANET_POS.z + lz + dz;
 
         child.position.set(wx, wy, wz);
-        InteractionHandler.getInstance().updateObjectPosition(win.id, new THREE.Vector3(wx, wy, wz));
 
         const distToCam = state.camera.position.distanceTo(new THREE.Vector3(wx, wy, wz));
         const fadeStart = 26;
@@ -407,12 +379,9 @@ export function ChaosScene({ active, config: _config }: ChaosSceneProps) {
           opacityMult = Math.max(0.0, (distToCam - fadeEnd) / (fadeStart - fadeEnd));
         }
 
-        const isHovered   = hoveredObject === win.id;
-        const targetScale = isHovered ? 1.22 : 1.0;
-        
-        child.scale.lerp(new THREE.Vector3(13 * targetScale * Math.max(0.1, opacityMult), 9.75 * targetScale * Math.max(0.1, opacityMult), 1.0), 0.14);
+        child.scale.lerp(new THREE.Vector3(13 * Math.max(0.1, opacityMult), 9.75 * Math.max(0.1, opacityMult), 1.0), 0.14);
         if (child instanceof THREE.Sprite && child.material instanceof THREE.SpriteMaterial) {
-          const baseOpacity = isHovered ? 1.0 : 0.90;
+          const baseOpacity = 0.90;
           child.material.opacity += ((baseOpacity * opacityMult) - child.material.opacity) * 0.1;
         }
       });
@@ -538,9 +507,6 @@ export function ChaosScene({ active, config: _config }: ChaosSceneProps) {
             key={win.id}
             position={[0, 0, 0]}
             scale={[13, 9.75, 1]}
-            onPointerOver={(e) => { e.stopPropagation(); setHoveredObject(win.id); document.body.style.cursor = "pointer"; }}
-            onPointerOut={(e)  => { e.stopPropagation(); setHoveredObject(null); document.body.style.cursor = "auto"; }}
-            onClick={(e)       => { e.stopPropagation(); expandCard(win.id); }}
           >
             <spriteMaterial attach="material" map={win.texture} transparent opacity={0.92} />
           </sprite>
