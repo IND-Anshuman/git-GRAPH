@@ -24,7 +24,6 @@ const snippets = [
   { filename: "user.py",         lang: "python",     code: ["class User(Model):", "    email = EmailField(unique=True)", "    name = CharField(max_length=100)", "    def check(self, pw):", "        return hash(pw)", "    "] },
   { filename: "checkout.js",     lang: "javascript", code: ["function process(cart) {", "  const tot = cart.items.reduce(", "    (s, i) => s + i.price, 0", "  );", "  return stripe.charge(tot);", "}"] },
   { filename: "app.go",          lang: "go",         code: ["func main() {", "\tr := gin.Default()", "\tr.GET(\"/ping\", func(c *gin.Context) {", "\t\tc.JSON(200, gin.H{\"msg\": \"pong\"})", "\t})", "\tr.Run()", "}"] },
-<<<<<<< HEAD
   { filename: "index.html",      lang: "html",       code: ["<!DOCTYPE html>", "<html>", "<head>", "  <title>App</title>", "</head>", "<body>"] },
   { filename: "order.java",      lang: "java",       code: ["@RestController", "public class OrderController {", "  @PostMapping(\"/orders\")", "  public Order create(@RequestBody Cart cart) {", "    return orderService.place(cart);", "  }", "}"] },
   { filename: "payment.rb",      lang: "ruby",       code: ["class PaymentProcessor", "  def self.charge(amount, token)", "    Stripe::Charge.create(", "      amount: amount,", "      currency: 'usd',", "      source: token", "    )", "  end", "end"] },
@@ -325,226 +324,6 @@ export function ChaosScene({ active, config: _config }: ChaosSceneProps) {
     };
   }, [initialized]);
 
-=======
-];
-
-const PLANET_POS = new THREE.Vector3(0, 0, 0);
-
-interface ScatteredSlot {
-  radius: number;
-  theta: number;
-  phi: number;
-  speed: number;
-  driftOffset: THREE.Vector3;
-  driftSpeed: number;
-  phase: number;
-}
-
-function buildScatteredSlots(count: number): ScatteredSlot[] {
-  const slots: ScatteredSlot[] = [];
-  for (let i = 0; i < count; i++) {
-    const radius = 18 + (i / count) * 26 + (Math.random() - 0.5) * 3;
-    const theta = Math.random() * Math.PI * 2;
-    const phi = Math.acos((Math.random() * 2) - 1);
-    slots.push({
-      radius,
-      theta,
-      phi,
-      speed: (Math.random() * 0.04 + 0.015) * (Math.random() > 0.5 ? 1 : -1),
-      driftOffset: new THREE.Vector3(
-        (Math.random() - 0.5) * 6,
-        (Math.random() - 0.5) * 6,
-        (Math.random() - 0.5) * 6
-      ),
-      driftSpeed: Math.random() * 0.15 + 0.08,
-      phase: Math.random() * Math.PI * 2
-    });
-  }
-  return slots;
-}
-
-function createRealisticPlanetTexture(): THREE.CanvasTexture {
-  const W = 1024, H = 1024;
-  const canvas = document.createElement("canvas");
-  canvas.width = W; canvas.height = H;
-  const ctx = canvas.getContext("2d")!;
-
-  ctx.clearRect(0, 0, W, H);
-
-  // Smooth gradient background with warm terracotta, ochre, ivory, and slate tones
-  const grad = ctx.createLinearGradient(0, 0, 0, H);
-  grad.addColorStop(0, "#2c223a");
-  grad.addColorStop(0.16, "#523c4d");
-  grad.addColorStop(0.32, "#7f5145");
-  grad.addColorStop(0.46, "#b88a68");
-  grad.addColorStop(0.52, "#e5cca8");
-  grad.addColorStop(0.60, "#cda583");
-  grad.addColorStop(0.74, "#8f5e4c");
-  grad.addColorStop(0.88, "#422822");
-  grad.addColorStop(1, "#181014");
-  ctx.fillStyle = grad;
-  ctx.fillRect(0, 0, W, H);
-
-  // Blended screen cloud overlays
-  ctx.save();
-  ctx.globalCompositeOperation = "screen";
-  ctx.globalAlpha = 0.14;
-  for (let i = 0; i < 7; i++) {
-    const cx = W * (0.15 + i * 0.12);
-    const cy = H * (0.25 + Math.sin(i * 1.5) * 0.16);
-    const r = 240 + Math.random() * 160;
-    const radGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
-    radGrad.addColorStop(0, "#ffffff");
-    radGrad.addColorStop(0.4, "rgba(255, 235, 205, 0.45)");
-    radGrad.addColorStop(1, "transparent");
-    ctx.fillStyle = radGrad;
-    ctx.beginPath();
-    ctx.arc(cx, cy, r, 0, Math.PI * 2);
-    ctx.fill();
-  }
-  ctx.restore();
-
-  // Blended multiply shadow overlays
-  ctx.save();
-  ctx.globalCompositeOperation = "multiply";
-  ctx.globalAlpha = 0.18;
-  for (let i = 0; i < 5; i++) {
-    const cx = W * (0.35 + i * 0.14);
-    const cy = H * (0.65 + Math.cos(i * 1.2) * 0.12);
-    const r = 280;
-    const radGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
-    radGrad.addColorStop(0, "#4a2c20");
-    radGrad.addColorStop(0.6, "rgba(74, 44, 32, 0.4)");
-    radGrad.addColorStop(1, "transparent");
-    ctx.fillStyle = radGrad;
-    ctx.beginPath();
-    ctx.arc(cx, cy, r, 0, Math.PI * 2);
-    ctx.fill();
-  }
-  ctx.restore();
-
-  // Soft atmospheric storm spots
-  const spotX = W * 0.35, spotY = H * 0.48;
-  const spotR = 76;
-  ctx.save();
-  ctx.globalAlpha = 0.60;
-  const spotGrad = ctx.createRadialGradient(spotX - 8, spotY - 8, 0, spotX, spotY, spotR);
-  spotGrad.addColorStop(0, "#e88c60");
-  spotGrad.addColorStop(0.35, "#be4b29");
-  spotGrad.addColorStop(1, "transparent");
-  ctx.fillStyle = spotGrad;
-  ctx.beginPath();
-  ctx.arc(spotX, spotY, spotR, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.restore();
-
-  // Terminator shadow
-  const shadowGrad = ctx.createLinearGradient(W * 0.48, 0, W, 0);
-  shadowGrad.addColorStop(0,   "rgba(0,0,0,0)");
-  shadowGrad.addColorStop(0.50, "rgba(0,0,0,0.32)");
-  shadowGrad.addColorStop(1,   "rgba(0,0,0,0.85)");
-  ctx.fillStyle = shadowGrad;
-  ctx.fillRect(0, 0, W, H);
-
-  // Specular highlight
-  const specGrad = ctx.createRadialGradient(W * 0.22, H * 0.22, 0, W * 0.28, H * 0.30, W * 0.38);
-  specGrad.addColorStop(0,   "rgba(255, 235, 200, 0.45)");
-  specGrad.addColorStop(0.3, "rgba(255, 210, 160, 0.18)");
-  specGrad.addColorStop(1,   "rgba(0,0,0,0)");
-  ctx.fillStyle = specGrad;
-  ctx.fillRect(0, 0, W, H);
-
-  // ── 7. "YOUR REPO" label overlay ──
-  ctx.textAlign = "center";
-  ctx.textBaseline = "middle";
-
-  const lx = W * 0.35; // label center x
-  const ly = H * 0.50; // label center y
-
-  // Semi-transparent tag backing
-  ctx.save();
-  ctx.globalAlpha = 0.55;
-  ctx.fillStyle = "rgba(10, 5, 25, 0.7)";
-  const tagW = 320, tagH = 130;
-  if (ctx.roundRect) ctx.roundRect(lx - tagW/2, ly - tagH/2, tagW, tagH, 12);
-  else ctx.rect(lx - tagW/2, ly - tagH/2, tagW, tagH);
-  ctx.fill();
-  ctx.restore();
-
-  // Tag border
-  ctx.strokeStyle = "rgba(167, 139, 250, 0.60)";
-  ctx.lineWidth = 2;
-  if (ctx.roundRect) ctx.roundRect(lx - tagW/2, ly - tagH/2, tagW, tagH, 12);
-  else ctx.rect(lx - tagW/2, ly - tagH/2, tagW, tagH);
-  ctx.stroke();
-
-  // Small mono caption
-  ctx.font = "bold 22px 'Courier New', monospace";
-  ctx.fillStyle = "rgba(196, 181, 253, 0.82)";
-  ctx.shadowColor = "rgba(168,85,247,0.6)";
-  ctx.shadowBlur = 10;
-  ctx.fillText("// UNCOMPILED", lx, ly - 44);
-
-  // "YOUR REPO" two-line headline
-  ctx.shadowBlur = 22;
-  ctx.shadowColor = "rgba(168, 85, 247, 1.0)";
-
-  // "YOUR"
-  const tg1 = ctx.createLinearGradient(lx - 110, ly - 14, lx + 110, ly + 6);
-  tg1.addColorStop(0, "#e9d5ff");
-  tg1.addColorStop(0.5, "#ffffff");
-  tg1.addColorStop(1, "#c4b5fd");
-  ctx.font = "bold 64px 'Arial Black', 'Arial', sans-serif";
-  ctx.fillStyle = tg1;
-  ctx.fillText("YOUR", lx, ly - 12);
-
-  // "REPO"
-  ctx.shadowBlur = 16;
-  const tg2 = ctx.createLinearGradient(lx - 80, ly + 36, lx + 80, ly + 56);
-  tg2.addColorStop(0, "#a78bfa");
-  tg2.addColorStop(0.5, "#ddd6fe");
-  tg2.addColorStop(1, "#818cf8");
-  ctx.font = "bold 64px 'Arial Black', 'Arial', sans-serif";
-  ctx.fillStyle = tg2;
-  ctx.fillText("REPO", lx, ly + 44);
-
-  ctx.shadowBlur = 0;
-
-  const tex = new THREE.CanvasTexture(canvas);
-  tex.colorSpace = THREE.SRGBColorSpace;
-  tex.wrapS = THREE.RepeatWrapping;
-  tex.wrapT = THREE.ClampToEdgeWrapping;
-  tex.needsUpdate = true;
-  return tex;
-}
-
-export function ChaosScene({ active, config: _config }: ChaosSceneProps) {
-  const groupRef     = useRef<THREE.Group>(null);
-  const planetGroup  = useRef<THREE.Group>(null);
-  const windowsGroup = useRef<THREE.Group>(null);
-  const planetMesh   = useRef<THREE.Mesh>(null);
-  const ringMesh     = useRef<THREE.Mesh>(null);
-
-  const [initialized, setInitialized] = useState(false);
-  const [planetTex,   setPlanetTex]   = useState<THREE.CanvasTexture | null>(null);
-
-  const shouldAnimate    = useShouldAnimateCamera();
-  const qualityTier      = useOnboardingStore((s) => s.qualityTier);
-  const hoveredObject    = useOnboardingStore((s) => s.hoveredObjectId);
-  const setHoveredObject = useOnboardingStore((s) => s.setHoveredObject);
-  const expandCard       = useOnboardingStore((s) => s.expandCard);
-
-  useEffect(() => { if (active && !initialized) setInitialized(true); }, [active, initialized]);
-
-  // Generate textures
-  useEffect(() => {
-    if (!initialized || typeof window === "undefined") return;
-    const pTex = createRealisticPlanetTexture();
-    setPlanetTex(pTex);
-    return () => { pTex.dispose(); };
-  }, [initialized]);
-
->>>>>>> e70486cec5c526ea295b6bd03197b194f4e9fa22
   // Code block count by quality
   const windowCount = useMemo(() => {
     switch (qualityTier) {
@@ -664,7 +443,6 @@ export function ChaosScene({ active, config: _config }: ChaosSceneProps) {
       <pointLight color="#7c3aed" intensity={1.2} position={[-30, -30, -50]} distance={130} decay={2.0} />
       <pointLight color="#f59e0b" intensity={1.5} position={[PLANET_POS.x - 20, PLANET_POS.y + 20, PLANET_POS.z + 30]} distance={80} decay={1.8} />
 
-<<<<<<< HEAD
       {/* ── Floating Label Above Planet ── */}
       {codebaseTex && (
         <sprite
@@ -678,11 +456,6 @@ export function ChaosScene({ active, config: _config }: ChaosSceneProps) {
       {/* ── Planet group ── */}
       <group ref={planetGroup} position={PLANET_POS.toArray() as [number, number, number]}>
 
-=======
-      {/* ── Planet group ── */}
-      <group ref={planetGroup} position={PLANET_POS.toArray() as [number, number, number]}>
-
->>>>>>> e70486cec5c526ea295b6bd03197b194f4e9fa22
         {/* Outer atmosphere halo (back-side glow) */}
         <mesh>
           <sphereGeometry args={[6.2, 32, 32]} />
@@ -721,7 +494,6 @@ export function ChaosScene({ active, config: _config }: ChaosSceneProps) {
           />
         </mesh>
 
-<<<<<<< HEAD
         {/* ── Saturn-style flat ring disk ── */}
         <mesh
           ref={ringMesh}
@@ -747,8 +519,6 @@ export function ChaosScene({ active, config: _config }: ChaosSceneProps) {
           />
         </mesh>
 
-=======
->>>>>>> e70486cec5c526ea295b6bd03197b194f4e9fa22
         {/* Inner core glow */}
         <mesh>
           <sphereGeometry args={[1.6, 16, 16]} />
