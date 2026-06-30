@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { OnboardingCanvas } from "@/components/OnboardingCanvas";
+import { Scene2Sidebar } from "@/components/scenes/Scene2Overlay";
 import { getScrollController } from "@/lib/ScrollController";
 import { SceneManager } from "@/lib/SceneManager";
 import { useOnboardingStore } from "@/stores/onboardingStore";
@@ -60,11 +61,8 @@ const MouseIcon = () => (
 export default function Home() {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const currentScene = useOnboardingStore((s) => s.currentScene);
-  const qualityTier = useOnboardingStore((s) => s.qualityTier);
-  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
 
     // Audio autoplay compliance sequence
     const handleFirstInteraction = () => {
@@ -219,13 +217,58 @@ export default function Home() {
         <OnboardingCanvas />
       </div>
 
+      {/* Top Navigation Bar matching reference image exactly */}
+      <header className="fixed top-5 left-8 right-8 z-40 flex items-center justify-between pointer-events-none select-none">
+        {/* Left: Progress Dots */}
+        <div className="flex items-center gap-3 bg-[#080710]/60 backdrop-blur border border-white/10 px-4 py-2 rounded-full shadow-lg pointer-events-auto">
+          <span className="text-[10px] font-black uppercase tracking-widest text-slate-300 font-mono leading-none">
+            SCENE {currentScene} OF 8
+          </span>
+          <div className="flex items-center gap-1.5 h-1.5">
+            {[1, 2, 3, 4, 5, 6, 7, 8].map((s) => (
+              <span 
+                key={s} 
+                className={`h-1.5 w-1.5 rounded-full transition-all duration-300 ${
+                  s === currentScene 
+                    ? "bg-purple-500 ring-2 ring-purple-500/50 scale-125" 
+                    : s < currentScene 
+                      ? "bg-purple-400/40" 
+                      : "bg-slate-700"
+                }`} 
+              />
+            ))}
+          </div>
+        </div>
+
+        {/* Right: Skip Journey button */}
+        <button 
+          onClick={() => getScrollController().setProgress(1.0)} 
+          className="pointer-events-auto bg-[#080710]/70 hover:bg-[#080710]/90 border border-white/10 hover:border-purple-500/20 text-slate-300 hover:text-white text-[10px] font-bold uppercase tracking-wider py-2 px-5 rounded-full transition shadow-lg cursor-pointer"
+        >
+          Skip Journey &rarr;
+        </button>
+      </header>
+
       {/* Main Split Layout */}
       <div className="relative z-10 flex min-h-screen w-full">
         
         {/* Left Fixed Sidebar (Glassmorphic) */}
-        <aside className="fixed left-0 top-0 z-20 h-screen w-[380px] bg-slate-950/85 backdrop-blur-md border-r border-slate-900 p-6 overflow-y-auto flex flex-col justify-between select-none">
-          {currentScene === 1 ? (
-            <div className="flex flex-col gap-5 select-none transition-all duration-300">
+        <aside className="fixed left-0 top-0 z-20 h-screen w-[380px] bg-transparent p-6 overflow-y-auto flex flex-col justify-between select-none">
+          <div className="relative flex-1 flex flex-col">
+            
+            {/* Panel 1: Scene 1 Overlay */}
+            <div 
+              className="w-full transition-all duration-500 ease-out select-none flex flex-col gap-5"
+              style={{
+                opacity: currentScene === 1 ? 1 : 0,
+                transform: `translateY(${currentScene === 1 ? 0 : currentScene > 1 ? -16 : 16}px)`,
+                pointerEvents: currentScene === 1 ? "auto" : "none",
+                position: currentScene === 1 ? "relative" : "absolute",
+                top: 0,
+                left: 0,
+                right: 0,
+              }}
+            >
               <div className="stats-header">
                 <span className="text-[11px] font-bold uppercase tracking-[0.3em] text-purple-400 mb-2 block">
                   THE CHAOS
@@ -267,8 +310,36 @@ export default function Home() {
                 <span className="tracking-wide">Scroll to explore the journey</span>
               </div>
             </div>
-          ) : (
-            <div>
+
+            {/* Panel 2: Scene 2 Overlay */}
+            <div 
+              className="w-full transition-all duration-500 ease-out select-none"
+              style={{
+                opacity: currentScene === 2 ? 1 : 0,
+                transform: `translateY(${currentScene === 2 ? 0 : currentScene > 2 ? -16 : 16}px)`,
+                pointerEvents: currentScene === 2 ? "auto" : "none",
+                position: currentScene === 2 ? "relative" : "absolute",
+                top: 0,
+                left: 0,
+                right: 0,
+              }}
+            >
+              <Scene2Sidebar />
+            </div>
+
+            {/* Panel 3: Fallback Scene Overlay */}
+            <div 
+              className="w-full transition-all duration-500 ease-out select-none flex flex-col"
+              style={{
+                opacity: currentScene >= 3 ? 1 : 0,
+                transform: `translateY(${currentScene >= 3 ? 0 : 16}px)`,
+                pointerEvents: currentScene >= 3 ? "auto" : "none",
+                position: currentScene >= 3 ? "relative" : "absolute",
+                top: 0,
+                left: 0,
+                right: 0,
+              }}
+            >
               <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-purple-400">Onboarding Experience</span>
               <h1 className="text-3xl font-extrabold tracking-tight text-white mt-1">Space Universe Journey</h1>
               <p className="text-xs text-slate-400 mt-2 leading-relaxed">
@@ -302,59 +373,6 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* Data Flow vertical chart */}
-              <div className="mt-6">
-                <h3 className="text-[10px] font-bold uppercase tracking-wider text-slate-300 border-b border-slate-900 pb-1">Data Flow</h3>
-                <div className="flex flex-col gap-1 mt-2 pl-2.5 border-l border-cyan-500/20">
-                  {[
-                    { title: "Repository", desc: "Git, Files, Commits" },
-                    { title: "SEEE Processing", desc: "Extraction & Analysis" },
-                    { title: "Knowledge Graph", desc: "Entities, Relations, Events" },
-                    { title: "Intelligence Layers", desc: "Capabilities, Architecture, Decisions" },
-                    { title: "Insights & Actions", desc: "Understanding & Impact" }
-                  ].map((step, idx) => (
-                    <div key={step.title} className="relative py-1">
-                      <div className="text-[10px] font-bold text-slate-200">{step.title}</div>
-                      <div className="text-[9px] text-slate-500">{step.desc}</div>
-                      {idx < 4 && (
-                        <span className="absolute -left-[14px] top-[70%] text-[8px] text-cyan-400">↓</span>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Bottom Performance and Controls */}
-          <div className="mt-6 pt-4 border-t border-slate-900">
-            {/* Performance metrics with checklist style */}
-            <div className="grid grid-cols-2 gap-1.5 mb-4">
-              <div className="text-[10px] text-slate-400 flex items-center gap-1">
-                <span className="text-emerald-500 font-bold">✓</span> LOD for 3D models
-              </div>
-              <div className="text-[10px] text-slate-400 flex items-center gap-1">
-                <span className="text-emerald-500 font-bold">✓</span> Frustum culling
-              </div>
-              <div className="text-[10px] text-slate-400 flex items-center gap-1">
-                <span className="text-emerald-500 font-bold">✓</span> Instanced meshes
-              </div>
-              <div className="text-[10px] text-slate-400 flex items-center gap-1">
-                <span className="text-emerald-500 font-bold">✓</span> 60 FPS target
-              </div>
-            </div>
-
-            <div className="flex justify-between items-center bg-slate-900/80 border border-slate-900 px-3 py-2 rounded-lg">
-              <div>
-                <div className="text-[9px] uppercase tracking-wider text-slate-500">Active Quality</div>
-                <div className="text-xs font-bold text-cyan-400">{mounted ? qualityTier.toUpperCase() : "MEDIUM"}</div>
-              </div>
-              <button 
-                onClick={() => getScrollController().setProgress(0.0)} 
-                className="bg-slate-800 hover:bg-slate-700 text-slate-300 text-[10px] font-bold py-1 px-3 rounded border border-slate-700 cursor-pointer transition"
-              >
-                Reset Progress
-              </button>
             </div>
           </div>
         </aside>
@@ -375,6 +393,8 @@ export default function Home() {
           {/* Bottom spacing to ensure final scene cards can be scrolled into view */}
           <div className="h-[100vh]" />
         </main>
+
+
 
         {/* Audio Control UI Overlay */}
         <AudioToggle />
