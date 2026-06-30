@@ -225,7 +225,7 @@ function SceneTransparencyController() {
   const currentScene = useOnboardingStore((s) => s.currentScene);
 
   useEffect(() => {
-    if (currentScene === 1) {
+    if (currentScene === 1 || currentScene === 2) {
       gl.setClearColor(0x000000, 0); // fully transparent
     } else {
       gl.setClearColor(0x000010, 1); // opaque dark blue-black
@@ -492,8 +492,8 @@ export function OnboardingCanvas() {
 
   return (
     <div className="relative h-full w-full overflow-hidden" style={{ background: "#000010" }}>
-      {/* 2D universe starfield background for Scene 1 — pure CSS, zero GPU overhead */}
-      <Scene1UniverseBackground visible={currentScene === 1} />
+      {/* 2D universe starfield background for Scene 1 & 2 — pure CSS, zero GPU overhead */}
+      <Scene1UniverseBackground visible={currentScene === 1 || currentScene === 2} />
 
       <Canvas
         style={{ position: "relative", zIndex: 1 }}
@@ -574,11 +574,18 @@ const sceneExplanations: Record<number, { title: string; subtitle: string; desc:
 
 function UniversalExplanationHUD() {
   const currentScene = useOnboardingStore((s) => s.currentScene);
+  const scrollProgress = useOnboardingStore((s) => s.scrollProgress);
   const [logs, setLogs] = useState<string[]>([]);
   const cardRef = useRef<HTMLDivElement>(null);
   const mouseRef = useRef({ x: 0, y: 0 });
 
   const activeInfo = sceneExplanations[currentScene];
+  const localProgress = Math.max(0, Math.min(1, (scrollProgress - 0.17) / 0.16));
+  const extractionProgress = localProgress <= 0.3 
+    ? 0 
+    : localProgress <= 0.7 
+      ? Math.round(((localProgress - 0.3) / 0.4) * 68) 
+      : Math.round(68 + ((localProgress - 0.7) / 0.3) * 32);
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -685,7 +692,7 @@ function UniversalExplanationHUD() {
   return (
     <div 
       ref={cardRef}
-      className="absolute top-[48%] left-[62%] -translate-x-1/2 -translate-y-1/2 z-30 w-full max-w-md px-4 select-none"
+      className="absolute top-[80%] left-[94%] -translate-x-1/2 -translate-y-1/2 z-30 w-full max-w-md px-4 select-none"
       style={{
         transformStyle: "preserve-3d",
         willChange: "transform, opacity"
@@ -736,6 +743,34 @@ function UniversalExplanationHUD() {
             {activeInfo.desc}
           </p>
         </div>
+
+        {currentScene === 2 && (
+          <div 
+            className="flex flex-col gap-2 font-mono text-[9px] bg-slate-950/50 border border-purple-500/10 rounded-xl p-3"
+            style={{ transform: "translateZ(20px)" }}
+          >
+            <style>{`
+              @keyframes shimmer {
+                0% { transform: translateX(-100%); }
+                100% { transform: translateX(100%); }
+              }
+              .animate-shimmer {
+                animation: shimmer 2.2s infinite linear;
+              }
+            `}</style>
+            <div className="flex items-center justify-between text-cyan-400 font-bold uppercase tracking-wider">
+              <span>Extraction In Progress</span>
+              <span className="text-xs">{extractionProgress}%</span>
+            </div>
+            <div className="relative h-2 bg-slate-900 rounded-full overflow-hidden border border-white/5">
+              <div 
+                className="absolute inset-y-0 left-0 bg-gradient-to-r from-purple-500 via-pink-500 to-cyan-400 rounded-full transition-all duration-300 animate-pulse"
+                style={{ width: `${extractionProgress}%` }}
+              />
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-shimmer" />
+            </div>
+          </div>
+        )}
 
         <div 
           className="bg-slate-950/80 border border-slate-900/80 rounded-xl p-2.5 font-mono text-[9px] text-amber-500/90 flex flex-col gap-1 min-h-[70px] justify-end"
