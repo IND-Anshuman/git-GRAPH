@@ -126,3 +126,57 @@ We turned the raw code particle drift in Scene 1 into a premium, volumetric "cod
   ✓ Generating static pages using 5 workers (4/4) in 871ms
   ```
   *(Completed successfully with exit code 0)*
+
+---
+
+## Wave 9.8 - Scene 2 Scattered-to-Merged Line Bundles, Spaced Clusters, Sidebar Transition, Transparency, HUD Relocation & Progress Bar Integration
+
+We have refactored and optimized Scene 2 ("Stardust of Code") to feature 6 bundles of high-intensity line segments, spaced cluster geometries, a smoothly transitioning left explanation sidebar, a seamless transparent viewport design, and an integrated HUD progress bar console:
+
+### 1. Scattered-to-Merged Line Bundles
+- **Dynamic Scattered Starts**: Configured 12 lines per cluster (72 lines total). On every frame, each line's start position tracks the exact, animated floating coordinate of its respective code snippet card on the left.
+- **Corrected Bezier Blending Math**: Blended the individual scattered Bezier path and the unified central Bezier path dynamically using:
+   `decay = pow(1.0 - t * 2.85, 3.5)`
+   This guarantees that at `t = 0`, the line segment begins precisely at the moving codeblock's center, and they merge perfectly into a single core line by `t = 0.35`.
+- **Sci-Fi Wave Shine**: Added high-frequency sine-wave noise along the merged core path.
+- **Additive Blending & Vertex Colors**: Colored each bundle to match its destination cluster (blue, purple, orange, etc.) with additive blending to look like a single glowing laser channel.
+
+### 2. Minimized Code Blocks Retention & UI Cleanups
+- **Shrink and Retain**: Grouped the VSCode snippet sprites and HTML filename badges into parent groups. During Phase 2, the groups shrink down to `30%` of their original scale and dim to `55%` opacity, retaining this shrunken background state for the remainder of the scene instead of disappearing completely.
+- **Remove Extraction Preview**: Completely removed the bottom-right "Live Extraction Preview" popup window card from `Scene2Overlay.tsx` to streamline the viewport design.
+
+### 3. Left Sidebar Transition & Transparency (Seamless Integration)
+- **Concurrent Sidebar Rendering & Compacting**: Restructured `app/page.tsx` fixed sidebar `<aside>` layout to render all three scene panels concurrently, and reduced/compacted stats, tech stacks, and removed the performance metrics widget to eliminate vertical scrolling.
+- **Cross-Fade & Glide Transition**: Implemented a CSS transition:
+  - Active panel: `opacity: 1`, `transform: translateY(0)`, `pointer-events: auto`, `position: relative`.
+  - Scrolled past panel: `opacity: 0`, `transform: translateY(-16px)`, `pointer-events: none`, `position: absolute`.
+  - Next panel: `opacity: 0`, `transform: translateY(16px)`, `pointer-events: none`, `position: absolute`.
+  This creates a premium, sliding cross-fade effect when transitioning scenes.
+- **Seamless 3D Overlay Background**: Made the sidebar background completely transparent (`bg-transparent`) and removed the vertical divider border and backdrop blur. This allows the 3D Canvas space to render edge-to-edge behind the explanation text, merging the panel seamlessly with the active animation scene.
+
+### 4. Relocated HUD Card & Integrated Progress Bar
+- **HUD Relocation (`left-[84%]`)**: Moved the default holographic `UniversalExplanationHUD` position to `left-[84%]` (further to the right) to clear the center space of the screen for the 3D canvas and converging lines, ensuring the card stays perfectly inside boundaries.
+- **Integrated Progress Bar**: Calculated `extractionProgress` inside `OnboardingCanvas.tsx` and dynamically render a custom, glowing extraction progress bar inside the HUD explanation card when in Scene 2.
+- **Removed Duplicate Progress Bar**: Deleted the standalone `<Scene2Overlays />` progress bar component and wrapper styles to keep the UI clean.
+
+### 5. Shifted Clusters Closer to Code Blocks & Wide Vertical Spacing
+- **Cluster Shifting & Wide Spacing**: Shifted all 6 cluster positions on the X-axis closer to the center/left code snippets, and spread them wider vertically along the Y-axis to move them into the empty spaces above and below:
+  - `classes`: `(2.5, 23, 2)` (Moved up)
+  - `functions`: `(8.0, 13, 4)` (Moved up)
+  - `apis`: `(9.0, -13, -4)` (Moved down)
+  - `databases`: `(12.5, 3.5, 5)` (Moved up)
+  - `queues`: `(4.0, -23, 2)` (Moved down)
+  - `dependencies`: `(1.0, -3.5, -5)` (Moved down)
+- **Reduced Size (`1.9` Scale)**: Reduced the final scale of the clusters to `1.9` (down from `2.6`) and pulse bounds to `1.9 + 0.04` to prevent visual clipping and match the new compact layout.
+- **Perfect Connection**: Terminated the lines exactly at `cluster.position` so they connect to the cluster cores with mathematical precision.
+
+
+
+
+
+
+
+
+
+
+
