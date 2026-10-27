@@ -1,27 +1,36 @@
 'use client';
 
 import React from 'react';
-import { Cpu, Briefcase, Blocks, Shield, Layers, HelpCircle, ArrowUpRight, TrendingUp, TrendingDown, Minus, AlertTriangle } from 'lucide-react';
+import { Cpu, Briefcase, Blocks, Shield, Layers, HelpCircle, ArrowUpRight, AlertTriangle } from 'lucide-react';
 import Link from 'next/link';
 import { useCapabilities } from '@/hooks/useCapabilities';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import ErrorBoundary from '@/components/common/ErrorBoundary';
 import SpotlightCard from '@/components/common/SpotlightCard';
 import AnimatedCounter from '@/components/common/AnimatedCounter';
-import Badge from '@/components/common/Badge';
 
 interface CapabilitySummaryWidgetProps {
   repositoryId: string | null;
 }
 
-const DOMAIN_METADATA: Record<string, { label: string; icon: React.ComponentType<any>; color: string; sparkline: number[] }> = {
-  BUSINESS: { label: 'Business Systems', icon: Briefcase, color: '#4F8CFF', sparkline: [40, 45, 42, 48, 52, 55, 60] },
-  AI: { label: 'AI Intelligence', icon: Cpu, color: '#8B5CF6', sparkline: [10, 15, 30, 45, 60, 75, 80] },
-  TECHNICAL: { label: 'Technical Core', icon: Blocks, color: '#10B981', sparkline: [70, 72, 75, 74, 76, 78, 82] },
-  INFRASTRUCTURE: { label: 'Infrastructure', icon: Layers, color: '#F97316', sparkline: [30, 32, 35, 33, 38, 42, 45] },
-  SECURITY: { label: 'Security Domain', icon: Shield, color: '#EF4444', sparkline: [90, 88, 85, 92, 94, 95, 96] },
-  INTEGRATION: { label: 'Integration Layer', icon: Layers, color: '#06B6D4', sparkline: [50, 52, 55, 53, 58, 60, 62] },
+const DOMAIN_METADATA: Record<string, { label: string; icon: React.ComponentType<{ size?: number; className?: string }>; color: string }> = {
+  BUSINESS: { label: 'Business Systems', icon: Briefcase, color: '#4F8CFF' },
+  AI: { label: 'AI Intelligence', icon: Cpu, color: '#8B5CF6' },
+  TECHNICAL: { label: 'Technical Core', icon: Blocks, color: '#10B981' },
+  INFRASTRUCTURE: { label: 'Infrastructure', icon: Layers, color: '#F97316' },
+  SECURITY: { label: 'Security Domain', icon: Shield, color: '#EF4444' },
+  INTEGRATION: { label: 'Integration Layer', icon: Layers, color: '#06B6D4' },
 };
+
+interface DomainStat {
+  count: number;
+  maturitySum: number;
+  coverageSum: number;
+  riskSum: number;
+  maturity: number[];
+}
+
+const emptyStat = (): DomainStat => ({ count: 0, maturitySum: 0, coverageSum: 0, riskSum: 0, maturity: [] });
 
 function CapabilitySummaryInner({ repositoryId }: CapabilitySummaryWidgetProps) {
   const { data: capabilities = [], isLoading, isError, refetch } = useCapabilities(repositoryId);
@@ -30,17 +39,23 @@ function CapabilitySummaryInner({ repositoryId }: CapabilitySummaryWidgetProps) 
 
   // Group stats by Domain type
   const domainStats = React.useMemo(() => {
-    const stats: Record<string, { count: number; maturitySum: number; coverageSum: number; riskSum: number }> = {};
+    const stats: Record<string, DomainStat> = {};
     Object.keys(DOMAIN_METADATA).forEach((key) => {
-      stats[key] = { count: 0, maturitySum: 0, coverageSum: 0, riskSum: 0 };
+      stats[key] = emptyStat();
     });
-    capabilities.forEach((c) => {
+    // Discovery order, so each domain's sparkline reads oldest -> newest.
+    const ordered = [...capabilities].sort(
+      (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime(),
+    );
+    ordered.forEach((c) => {
       const type = (c.capability_type || 'TECHNICAL').toUpperCase();
       if (!stats[type]) {
-        stats[type] = { count: 0, maturitySum: 0, coverageSum: 0, riskSum: 0 };
+        stats[type] = emptyStat();
       }
+      const maturity = c.maturity_score > 1 ? c.maturity_score / 100 : c.maturity_score;
       stats[type].count++;
-      stats[type].maturitySum += c.maturity_score > 1 ? c.maturity_score / 100 : c.maturity_score;
+      stats[type].maturity.push(maturity * 100);
+      stats[type].maturitySum += maturity;
       stats[type].coverageSum += c.coverage_score > 1 ? c.coverage_score / 100 : c.coverage_score;
       stats[type].riskSum += c.risk_score > 1 ? c.risk_score / 100 : c.risk_score;
     });
@@ -97,7 +112,7 @@ function CapabilitySummaryInner({ repositoryId }: CapabilitySummaryWidgetProps) 
   const activeDomains = Object.entries(domainStats).filter(([_, stat]) => stat.count > 0);
   if (activeDomains.length === 0) {
     // default to show TECHNICAL core if database returned 0 (so we never render a blank card)
-    activeDomains.push(['TECHNICAL', { count: 0, maturitySum: 0, coverageSum: 0, riskSum: 0 }]);
+    activeDomains.push(['TECHNICAL', emptyStat()]);
   }
 
   return (
@@ -131,16 +146,12 @@ function CapabilitySummaryInner({ repositoryId }: CapabilitySummaryWidgetProps) 
             label: key,
             icon: HelpCircle,
             color: 'var(--color-text-tertiary)',
-            sparkline: [50, 50, 50],
           };
           const Icon = meta.icon;
           const count = stat.count;
           const avgMaturity = count > 0 ? (stat.maturitySum / count) * 100 : 0;
           const avgCoverage = count > 0 ? (stat.coverageSum / count) * 100 : 0;
-          const avgRisk = count > 0 ? (stat.riskSum / count) * 100 : 0;
 
-          // Deduce trend from fake sparkline progression for visual aesthetics
-          const isUp = meta.sparkline[meta.sparkline.length - 1] > meta.sparkline[0];
 
           return (
             <div
@@ -181,24 +192,22 @@ function CapabilitySummaryInner({ repositoryId }: CapabilitySummaryWidgetProps) 
                 </div>
               </div>
 
-              {/* Sparkline & Trend */}
+              {/* Maturity of each capability in this domain, in discovery order */}
               <div className="flex items-center gap-3 shrink-0">
-                <svg className="w-12 h-4 overflow-visible opacity-50 hidden sm:block" aria-hidden="true">
-                  <path
-                    d={drawSparkline(meta.sparkline)}
-                    fill="none"
-                    stroke={meta.color}
-                    strokeWidth={1.5}
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-                <span className="shrink-0 flex items-center">
-                  {isUp ? (
-                    <TrendingUp size={12} className="text-[var(--color-success)]" />
-                  ) : (
-                    <TrendingDown size={12} className="text-[var(--color-warning)]" />
-                  )}
+                {stat.maturity.length > 1 && (
+                  <svg className="w-12 h-4 overflow-visible opacity-50 hidden sm:block" aria-hidden="true">
+                    <path
+                      d={drawSparkline(stat.maturity)}
+                      fill="none"
+                      stroke={meta.color}
+                      strokeWidth={1.5}
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                )}
+                <span className="shrink-0 font-mono text-[10px] text-[var(--color-text-tertiary)]">
+                  {count} cap{count === 1 ? '' : 's'}
                 </span>
               </div>
 

@@ -1,11 +1,13 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { useDebounce } from '@/hooks/useDebounce';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, X, Clock, CornerDownLeft, Loader2, Cpu } from 'lucide-react';
+import { Search, X, Clock, CornerDownLeft, Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useUIStore, useCommandPaletteStore, useSearchStore } from '@/stores';
-import { capabilitiesApi } from '@/services/api/endpoints';
+import { capabilitiesApi } from '@/lib/api';
 import type { CapabilityQueryResult } from '@/types/platform';
 import { useKeyboardShortcut } from '@/hooks/useKeyboardShortcut';
 import { cn } from '@/lib/utils';
@@ -23,58 +25,31 @@ export default function GlobalSearch() {
   const clearRecentSearches = useSearchStore((s) => s.clearRecentSearches);
 
   const [query, setQuery] = useState('');
-  const [results, setResults] = useState<CapabilityQueryResult[]>([]);
-  const [isSearching, setIsSearching] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
-
   const inputRef = useRef<HTMLInputElement>(null);
-  const searchDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Focus input on open
-  useEffect(() => {
+  // Start fresh each time the panel opens. Adjusting state during render
+  // (instead of in an effect) avoids rendering the stale query first.
+  const [wasOpen, setWasOpen] = useState(isSearchOpen);
+  if (isSearchOpen !== wasOpen) {
+    setWasOpen(isSearchOpen);
     if (isSearchOpen) {
       setQuery('');
-      setResults([]);
       setActiveIndex(0);
-      setTimeout(() => inputRef.current?.focus(), 50);
     }
-  }, [isSearchOpen]);
+  }
 
-  // Handle Search Ingest Query
-  useEffect(() => {
-    if (searchDebounceRef.current) {
-      clearTimeout(searchDebounceRef.current);
-    }
-
-    if (query.trim().length < 2) {
-      setResults([]);
-      setIsSearching(false);
-      return;
-    }
-
-    setIsSearching(true);
-
-    searchDebounceRef.current = setTimeout(async () => {
-      try {
-        if (!repositoryId) return;
-        const res = await capabilitiesApi.query(repositoryId, {
-          query_text: query,
-          limit: 10,
-        });
-        setResults(res.results || []);
-      } catch (err) {
-        console.error('Failed to query capabilities:', err);
-        setResults([]);
-      } finally {
-        setIsSearching(false);
-        setActiveIndex(0);
-      }
-    }, 300);
-
-    return () => {
-      if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current);
-    };
-  }, [query, repositoryId]);
+  const trimmed = query.trim();
+  const debounced = useDebounce(trimmed, 300);
+  const searchQuery = useQuery({
+    queryKey: ['capability-search', repositoryId, debounced],
+    queryFn: () => capabilitiesApi.query(repositoryId!, { query_text: debounced, limit: 10 }),
+    enabled: isSearchOpen && !!repositoryId && debounced.length >= 2,
+    staleTime: 30_000,
+  });
+  const results: CapabilityQueryResult[] =
+    trimmed.length >= 2 && debounced === trimmed ? (searchQuery.data?.results ?? []) : [];
+  const isSearching = trimmed.length >= 2 && (debounced !== trimmed || searchQuery.isFetching);
 
   // Keyboard Navigation inside search
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -117,7 +92,7 @@ export default function GlobalSearch() {
   };
 
   // Keyboard shortcut listener to toggle search with Ctrl+Space or / (excluding focus inputs)
-  useKeyboardShortcut({ key: '/' }, (e) => {
+  useKeyboardShortcut({ key: '/' }, () => {
     // Only open if focus is not in an input
     const active = document.activeElement;
     if (active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA')) {
@@ -165,8 +140,12 @@ export default function GlobalSearch() {
               <input
                 ref={inputRef}
                 type="text"
+                autoFocus
                 value={query}
-                onChange={(e) => setQuery(e.target.value)}
+                onChange={(e) => {
+                  setQuery(e.target.value);
+                  setActiveIndex(0);
+                }}
                 placeholder="Search capabilities, concepts, or behavioral signatures..."
                 className="flex-1 bg-transparent border-none text-sm outline-none text-sip-text-primary placeholder:text-sip-text-tertiary"
               />

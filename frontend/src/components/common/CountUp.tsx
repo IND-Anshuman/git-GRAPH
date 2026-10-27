@@ -16,7 +16,8 @@ interface CountUpProps {
 
 export function CountUp({
   end,
-  duration = 2,
+  // Timing comes from the spring below; accepted for call-site compatibility.
+  duration: _duration,
   decimals = 0,
   separator = ",",
   prefix = "",

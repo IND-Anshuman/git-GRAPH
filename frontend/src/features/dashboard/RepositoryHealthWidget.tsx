@@ -1,65 +1,57 @@
 'use client';
 
-import React from 'react';
-import { AlertTriangle, ShieldCheck, TrendingUp, TrendingDown } from 'lucide-react';
-import { motion } from 'framer-motion';
-import { useCapabilities } from '@/hooks/useCapabilities';
-import LoadingSpinner from '@/components/common/LoadingSpinner';
-import ErrorBoundary from '@/components/common/ErrorBoundary';
-import AnimatedCounter from '@/components/common/AnimatedCounter';
-import Sparkline from '@/components/common/Sparkline';
+import React from "react";
+import { ShieldCheck } from "lucide-react";
+import { motion } from "framer-motion";
+import { useCapabilities } from "@/hooks/useCapabilities";
+import { Card, Stack, Text, Skeleton, ErrorState, EmptyState, riskScoreToTone } from "@/components/ui";
+import Sparkline from "@/components/common/Sparkline";
 
 interface RepositoryHealthWidgetProps {
   repositoryId: string | null;
 }
+
+// Sparklines plot real per-capability scores in discovery order (oldest ->
+// newest). There is no repository-level health history endpoint, so the
+// widget shows no trend arrows rather than inventing a direction.
 
 function RepositoryHealthInner({ repositoryId }: RepositoryHealthWidgetProps) {
   const { data: capabilities = [], isLoading, isError, refetch } = useCapabilities(repositoryId);
 
   if (isLoading) {
     return (
-      <div className="flex flex-col items-center justify-center professional-card" style={{ height: '420px' }}>
-        <LoadingSpinner size="md" className="mb-2" />
-        <span className="text-metadata text-gray-400">
-          Loading intelligence data...
-        </span>
-      </div>
+      <Card padded style={{ minHeight: 420 }}>
+        <Stack direction="vertical" gap={3} align="center" className="h-full justify-center">
+          <Skeleton shape="circle" width="quarter" height={48} />
+          <Skeleton width="third" />
+          <Skeleton width="half" />
+        </Stack>
+      </Card>
     );
   }
 
   if (isError) {
     return (
-      <div className="flex flex-col items-center justify-center professional-card text-center" style={{ height: '420px' }}>
-        <AlertTriangle className="w-8 h-8 text-[var(--color-danger)] mb-2" />
-        <h4 className="text-sm font-semibold mb-1">
-          Failed to load metrics
-        </h4>
-        <button
-          onClick={() => void refetch()}
-          type="button"
-          className="px-4 py-2 mt-2 text-sm font-medium rounded-lg bg-[var(--color-primary)] text-white hover:bg-[var(--color-primary-hover)] transition-colors"
-        >
-          Retry
-        </button>
-      </div>
+      <ErrorState
+        title="Failed to load metrics"
+        description="We couldn't reach the backend. Check your connection and try again."
+        onRetry={() => refetch()}
+      />
     );
   }
 
   if (capabilities.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center professional-card text-center" style={{ height: '420px' }}>
-        <ShieldCheck className="w-8 h-8 text-gray-500 mb-2" />
-        <h4 className="text-sm font-semibold mb-1">
-          No data available
-        </h4>
-        <p className="text-xs text-gray-400">
-          Ingest a repository to view intelligence metrics.
-        </p>
-      </div>
+      <EmptyState
+        icon={<ShieldCheck size={20} />}
+        title="No data available"
+        description="Ingest a repository to view intelligence metrics."
+      />
     );
   }
 
-  // Helper to parse 0-1 or 0-100 scores
+  // ── Compute averages ──────────────────────────────────────────────
+  // Backend returns scores in [0, 1]; widgets display as 0–100 ints.
   const parseScore = (val: number) => (val > 1 ? val / 100 : val);
 
   const totalCaps = capabilities.length;
@@ -67,132 +59,140 @@ function RepositoryHealthInner({ repositoryId }: RepositoryHealthWidgetProps) {
   let sumRisk = 0;
   let sumCoverage = 0;
 
-  capabilities.forEach((c) => {
-    const m = parseScore(c.maturity_score);
-    const r = parseScore(c.risk_score);
-    const cov = parseScore(c.coverage_score);
-    
-    sumMaturity += m;
-    sumRisk += r;
-    sumCoverage += cov;
-  });
+  for (const c of capabilities) {
+    sumMaturity += parseScore(c.maturity_score);
+    sumRisk += parseScore(c.risk_score);
+    sumCoverage += parseScore(c.coverage_score);
+  }
 
   const avgMaturity = sumMaturity / totalCaps;
   const avgRisk = sumRisk / totalCaps;
   const avgCoverage = sumCoverage / totalCaps;
 
-  // System Intelligence Score formula: (Maturity + Coverage + (1 - Risk)) / 3
-  const healthScoreRaw = (avgMaturity + avgCoverage + (1 - avgRisk)) / 3;
-  const healthScore = Math.max(0, Math.min(100, Math.round(healthScoreRaw * 100)));
-
-  // Generate sparkline data (7 points)
-  const riskSparkline = Array.from({ length: 7 }, () => 
-    Math.max(0, Math.min(100, (avgRisk * 100) + (Math.random() - 0.5) * 15))
-  );
-  const coverageSparkline = Array.from({ length: 7 }, () => 
-    Math.max(0, Math.min(100, (avgCoverage * 100) + (Math.random() - 0.5) * 12))
-  );
-  const driftSparkline = Array.from({ length: 7 }, () => 
-    Math.max(0, Math.min(10, 2 + (Math.random() - 0.5) * 2))
+  // System Intelligence Score: (Maturity + Coverage + (1 - Risk)) / 3
+  const healthScore = Math.max(
+    0,
+    Math.min(100, Math.round(((avgMaturity + avgCoverage + (1 - avgRisk)) / 3) * 100)),
   );
 
-  // Risk level determination
-  const riskLevel = avgRisk >= 0.7 ? 'Critical' : avgRisk >= 0.4 ? 'Medium' : 'Low';
-  const riskColor = avgRisk >= 0.7 ? 'var(--color-danger)' : avgRisk >= 0.4 ? 'var(--color-warning)' : 'var(--color-success)';
+  const byDiscovery = [...capabilities].sort(
+    (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime(),
+  );
+  const riskSparkline = byDiscovery.map((c) => parseScore(c.risk_score) * 100);
+  const coverageSparkline = byDiscovery.map((c) => parseScore(c.coverage_score) * 100);
+  const maturitySparkline = byDiscovery.map((c) => parseScore(c.maturity_score) * 100);
+  const highRiskCount = capabilities.filter((c) => parseScore(c.risk_score) >= 0.6).length;
+
+  const riskLevel: "low" | "medium" | "high" | "critical" =
+    avgRisk >= 0.7 ? "critical" : avgRisk >= 0.4 ? "medium" : "low";
+  const riskTone = riskScoreToTone(avgRisk);
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-      className="professional-card"
-      style={{ height: '420px', padding: '40px' }}
+      style={{ minHeight: 420 }}
     >
-      {/* Center-aligned score */}
-      <div className="flex flex-col items-center justify-center mb-12">
-        <motion.div
-          className="text-metric-number"
-          style={{ color: 'var(--color-primary)' }}
-          initial={{ scale: 0.8, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
-        >
-          <AnimatedCounter value={healthScore} />
-        </motion.div>
-        <div className="text-label text-gray-400 mt-2">
-          System Intelligence
-        </div>
-      </div>
+      <Card padded>
+        <Stack direction="vertical" gap={8}>
+          {/* Center-aligned score */}
+          <Stack direction="vertical" gap={2} align="center">
+            <motion.div
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
+            >
+              <Text variant="metric" tone="primary" className="text-5xl font-bold">
+                {healthScore}
+              </Text>
+            </motion.div>
+            <Text variant="eyebrow">System Intelligence</Text>
+          </Stack>
 
-      {/* Three metrics in a row */}
-      <div className="grid grid-cols-3 gap-8">
-        {/* Risk */}
-        <div className="flex flex-col">
-          <div className="text-label text-gray-400 mb-3">Risk</div>
-          <div className="flex items-baseline gap-2 mb-4">
-            <span className="text-4xl font-bold" style={{ color: riskColor }}>
-              {riskLevel}
-            </span>
-            {avgRisk > 0.5 ? (
-              <TrendingUp className="w-5 h-5" style={{ color: riskColor }} />
-            ) : (
-              <TrendingDown className="w-5 h-5 text-[var(--color-success)]" />
-            )}
-          </div>
-          <Sparkline 
-            data={riskSparkline} 
-            width={180} 
-            height={40} 
-            color={riskColor}
-            strokeWidth={2}
-            filled
-          />
-        </div>
-
-        {/* Coverage */}
-        <div className="flex flex-col">
-          <div className="text-label text-gray-400 mb-3">Coverage</div>
-          <div className="flex items-baseline gap-2 mb-4">
-            <span className="text-4xl font-bold text-[var(--color-primary)]">
-              <AnimatedCounter 
-                value={Math.round(avgCoverage * 100)} 
-                formatter={(v) => `${Math.round(v)}%`}
+          {/* Three metrics */}
+          <div className="grid grid-cols-3 gap-6">
+            {/* Risk */}
+            <Stack direction="vertical" gap={3}>
+              <Text variant="eyebrow">Risk</Text>
+              <Stack direction="horizontal" gap={2} align="baseline">
+                <Text
+                  variant="title"
+                  className="text-4xl"
+                  tone={
+                    riskTone === "danger"
+                      ? "danger"
+                      : riskTone === "warning"
+                        ? "warning"
+                        : "success"
+                  }
+                >
+                  {riskLevel.charAt(0).toUpperCase() + riskLevel.slice(1)}
+                </Text>
+              </Stack>
+              <Text variant="caption" tone="muted">
+                {highRiskCount} of {totalCaps} capabilities high risk
+              </Text>
+              <Sparkline
+                data={riskSparkline}
+                width={180}
+                height={40}
+                color={
+                  riskTone === "danger"
+                    ? "var(--color-danger)"
+                    : riskTone === "warning"
+                      ? "var(--color-warning)"
+                      : "var(--color-success)"
+                }
+                strokeWidth={2}
+                filled
               />
-            </span>
-            <TrendingUp className="w-5 h-5 text-[var(--color-success)]" />
-          </div>
-          <Sparkline 
-            data={coverageSparkline} 
-            width={180} 
-            height={40} 
-            color="var(--color-primary)"
-            strokeWidth={2}
-            filled
-          />
-        </div>
+            </Stack>
 
-        {/* Drift */}
-        <div className="flex flex-col">
-          <div className="text-label text-gray-400 mb-3">Drift</div>
-          <div className="flex items-baseline gap-2 mb-4">
-            <span className="text-4xl font-bold text-[var(--color-warning)]">
-              <AnimatedCounter 
-                value={2} 
-                formatter={(v) => `${Math.round(v)}%`}
+            {/* Coverage */}
+            <Stack direction="vertical" gap={3}>
+              <Text variant="eyebrow">Coverage</Text>
+              <Stack direction="horizontal" gap={2} align="baseline">
+                <Text variant="title" className="text-4xl" tone="primary">
+                  {Math.round(avgCoverage * 100)}%
+                </Text>
+              </Stack>
+              <Text variant="caption" tone="muted">
+                average across {totalCaps} capabilities
+              </Text>
+              <Sparkline
+                data={coverageSparkline}
+                width={180}
+                height={40}
+                color="var(--color-primary)"
+                strokeWidth={2}
+                filled
               />
-            </span>
-            <TrendingDown className="w-5 h-5 text-[var(--color-success)]" />
+            </Stack>
+
+            {/* Drift */}
+            <Stack direction="vertical" gap={3}>
+              <Text variant="eyebrow">Maturity</Text>
+              <Stack direction="horizontal" gap={2} align="baseline">
+                <Text variant="title" className="text-4xl" tone="warning">
+                  {Math.round(avgMaturity * 100)}%
+                </Text>
+              </Stack>
+              <Text variant="caption" tone="muted">
+                per capability, oldest → newest
+              </Text>
+              <Sparkline
+                data={maturitySparkline}
+                width={180}
+                height={40}
+                color="var(--color-warning)"
+                strokeWidth={2}
+                filled
+              />
+            </Stack>
           </div>
-          <Sparkline 
-            data={driftSparkline} 
-            width={180} 
-            height={40} 
-            color="var(--color-warning)"
-            strokeWidth={2}
-            filled
-          />
-        </div>
-      </div>
+        </Stack>
+      </Card>
     </motion.div>
   );
 }
@@ -203,4 +203,27 @@ export default function RepositoryHealthWidget({ repositoryId }: RepositoryHealt
       <RepositoryHealthInner repositoryId={repositoryId} />
     </ErrorBoundary>
   );
+}
+
+// Minimal error boundary kept local to avoid pulling common/ into the import graph
+import { Component, type ReactNode } from "react";
+class ErrorBoundary extends Component<
+  { children: ReactNode },
+  { hasError: boolean; message?: string }
+> {
+  state = { hasError: false, message: undefined as string | undefined };
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true, message: error.message };
+  }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <ErrorState
+          title="Widget crashed"
+          description={this.state.message ?? "An unexpected error occurred."}
+        />
+      );
+    }
+    return this.props.children;
+  }
 }
