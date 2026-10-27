@@ -1,22 +1,34 @@
 """Architecture Artifact Service for the Architectural Intelligence Layer."""
 
-from datetime import datetime
-from typing import Any, Dict, List, Optional
 import uuid
+from collections.abc import Callable
+from datetime import UTC, datetime
+from typing import Any
 
 from src.application.ports.unit_of_work import IUnitOfWork
-from src.infrastructure.persistence.models.knowledge_artifact_model import KnowledgeArtifactModel
+from src.domain.entities.knowledge_artifact import KnowledgeArtifact
+
 
 class ArchitectureArtifactService:
     """Service to convert architecture engine outputs to KnowledgeArtifacts and persist them."""
 
-    def __init__(self, uow: IUnitOfWork):
-        self.uow = uow
+    def __init__(self, uow_factory: Callable[[], IUnitOfWork]):
+        # A fresh unit of work per call: one shared instance would hand the
+        # same session to concurrent requests.
+        self.uow_factory = uow_factory
 
-    def persist_artifact(self, repository_id: uuid.UUID, artifact_type: str, source: str, confidence: float, commit_hash: str, provenance: Dict[str, Any]) -> None:
+    def persist_artifact(
+        self,
+        repository_id: uuid.UUID,
+        artifact_type: str,
+        source: str,
+        confidence: float,
+        commit_hash: str,
+        provenance: dict[str, Any],
+    ) -> None:
         """Persists a single KnowledgeArtifact."""
-        with self.uow:
-            artifact = KnowledgeArtifactModel(
+        with self.uow_factory() as uow:
+            artifact = KnowledgeArtifact(
                 id=uuid.uuid4(),
                 repository_id=repository_id,
                 artifact_type=artifact_type,
@@ -24,16 +36,19 @@ class ArchitectureArtifactService:
                 confidence=confidence,
                 valid_from_commit=commit_hash,
                 valid_to_commit=None,
-                observed_at=datetime.utcnow(),
+                observed_at=datetime.now(UTC),
                 artifact_version=1,
-                provenance=provenance
+                provenance=provenance,
             )
-            self.uow.knowledge_artifacts.add(artifact)
-            self.uow.commit()
+            uow.knowledge_artifacts.save(artifact)
+            uow.commit()
 
-    def persist_profile(self, repository_id: uuid.UUID, commit_hash: str, profile_data: Dict[str, Any]) -> None:
+    def persist_profile(
+        self, repository_id: uuid.UUID, commit_hash: str, profile_data: dict[str, Any]
+    ) -> None:
         from src.infrastructure.persistence.models.architecture_models import ArchitectureProfileModel
-        with self.uow:
+
+        with self.uow_factory() as uow:
             model = ArchitectureProfileModel(
                 id=uuid.uuid4(),
                 repository_id=str(repository_id),
@@ -42,28 +57,32 @@ class ArchitectureArtifactService:
                 description=profile_data.get("description", ""),
                 confidence=profile_data.get("confidence", {}),
                 evidence=profile_data.get("evidence", {}),
-                detected_at=datetime.utcnow()
+                detected_at=datetime.now(UTC),
             )
-            self.uow.architecture_profiles.add(model)
-            
+            uow.architecture_profiles.add(model)
+
             # Also persist as a generic knowledge artifact
-            artifact = KnowledgeArtifactModel(
+            artifact = KnowledgeArtifact(
                 id=uuid.uuid4(),
                 repository_id=repository_id,
                 artifact_type="architecture_profile",
                 source="ArchitectureReasoningEngine",
                 confidence=profile_data.get("confidence", {}).get("score", 0.0),
                 valid_from_commit=commit_hash,
-                observed_at=datetime.utcnow(),
+                valid_to_commit=None,
+                observed_at=datetime.now(UTC),
                 artifact_version=1,
-                provenance={"profile_id": str(model.id)}
+                provenance={"profile_id": str(model.id)},
             )
-            self.uow.knowledge_artifacts.add(artifact)
-            self.uow.commit()
-            
-    def persist_fitness(self, repository_id: uuid.UUID, commit_hash: str, fitness_data: Dict[str, Any]) -> None:
+            uow.knowledge_artifacts.save(artifact)
+            uow.commit()
+
+    def persist_fitness(
+        self, repository_id: uuid.UUID, commit_hash: str, fitness_data: dict[str, Any]
+    ) -> None:
         from src.infrastructure.persistence.models.architecture_models import ArchitectureFitnessModel
-        with self.uow:
+
+        with self.uow_factory() as uow:
             model = ArchitectureFitnessModel(
                 id=uuid.uuid4(),
                 repository_id=str(repository_id),
@@ -77,27 +96,31 @@ class ArchitectureArtifactService:
                 layer_violation_score=fitness_data.get("layer_violation_score", 0.0),
                 overall_score=fitness_data.get("overall_score", 0.0),
                 formulas=fitness_data.get("formulas", {}),
-                computed_at=datetime.utcnow()
+                computed_at=datetime.now(UTC),
             )
-            self.uow.architecture_fitness.add(model)
-            
-            artifact = KnowledgeArtifactModel(
+            uow.architecture_fitness.add(model)
+
+            artifact = KnowledgeArtifact(
                 id=uuid.uuid4(),
                 repository_id=repository_id,
                 artifact_type="architecture_fitness",
                 source="FitnessFunctionEngine",
                 confidence=1.0,
                 valid_from_commit=commit_hash,
-                observed_at=datetime.utcnow(),
+                valid_to_commit=None,
+                observed_at=datetime.now(UTC),
                 artifact_version=1,
-                provenance={"fitness_id": str(model.id)}
+                provenance={"fitness_id": str(model.id)},
             )
-            self.uow.knowledge_artifacts.add(artifact)
-            self.uow.commit()
+            uow.knowledge_artifacts.save(artifact)
+            uow.commit()
 
-    def persist_violations(self, repository_id: uuid.UUID, commit_hash: str, violations: List[Dict[str, Any]]) -> None:
+    def persist_violations(
+        self, repository_id: uuid.UUID, commit_hash: str, violations: list[dict[str, Any]]
+    ) -> None:
         from src.infrastructure.persistence.models.architecture_models import ArchitectureViolationModel
-        with self.uow:
+
+        with self.uow_factory() as uow:
             for violation in violations:
                 model = ArchitectureViolationModel(
                     id=uuid.uuid4(),
@@ -109,27 +132,31 @@ class ArchitectureArtifactService:
                     affected_capabilities=violation.get("affected_capabilities", []),
                     reason=violation.get("reason", ""),
                     evidence=violation.get("evidence", {}),
-                    detected_at=datetime.utcnow()
+                    detected_at=datetime.now(UTC),
                 )
-                self.uow.architecture_violations.add(model)
-                
-                artifact = KnowledgeArtifactModel(
+                uow.architecture_violations.add(model)
+
+                artifact = KnowledgeArtifact(
                     id=uuid.uuid4(),
                     repository_id=repository_id,
                     artifact_type="architecture_violation",
                     source="InvariantReasoningEngine",
                     confidence=1.0,
                     valid_from_commit=commit_hash,
-                    observed_at=datetime.utcnow(),
+                    valid_to_commit=None,
+                    observed_at=datetime.now(UTC),
                     artifact_version=1,
-                    provenance={"violation_id": str(model.id)}
+                    provenance={"violation_id": str(model.id)},
                 )
-                self.uow.knowledge_artifacts.add(artifact)
-            self.uow.commit()
+                uow.knowledge_artifacts.save(artifact)
+            uow.commit()
 
-    def persist_snapshot(self, repository_id: uuid.UUID, commit_hash: str, snapshot_data: Dict[str, Any]) -> None:
+    def persist_snapshot(
+        self, repository_id: uuid.UUID, commit_hash: str, snapshot_data: dict[str, Any]
+    ) -> None:
         from src.infrastructure.persistence.models.architecture_models import ArchitectureSnapshotModel
-        with self.uow:
+
+        with self.uow_factory() as uow:
             model = ArchitectureSnapshotModel(
                 id=uuid.uuid4(),
                 repository_id=str(repository_id),
@@ -138,20 +165,21 @@ class ArchitectureArtifactService:
                 fitness_metrics=snapshot_data.get("fitness_metrics", {}),
                 violations=snapshot_data.get("violations", []),
                 ownership_profile=snapshot_data.get("ownership_profile", {}),
-                generated_at=datetime.utcnow()
+                generated_at=datetime.now(UTC),
             )
-            self.uow.architecture_snapshots.add(model)
-            
-            artifact = KnowledgeArtifactModel(
+            uow.architecture_snapshots.add(model)
+
+            artifact = KnowledgeArtifact(
                 id=uuid.uuid4(),
                 repository_id=repository_id,
                 artifact_type="architecture_snapshot",
                 source="ArchitectureSnapshotEngine",
                 confidence=1.0,
                 valid_from_commit=commit_hash,
-                observed_at=datetime.utcnow(),
+                valid_to_commit=None,
+                observed_at=datetime.now(UTC),
                 artifact_version=1,
-                provenance={"snapshot_id": str(model.id)}
+                provenance={"snapshot_id": str(model.id)},
             )
-            self.uow.knowledge_artifacts.add(artifact)
-            self.uow.commit()
+            uow.knowledge_artifacts.save(artifact)
+            uow.commit()

@@ -1,12 +1,14 @@
 """Domain model representing architectural benchmarking."""
 
 import uuid
-from datetime import datetime
 from dataclasses import dataclass, field
+from datetime import datetime
+
 
 @dataclass
 class ArchitectureBenchmark:
     """Benchmarking metrics comparing the architecture to a group."""
+
     id: uuid.UUID
     repository_id: str
     commit_hash: str

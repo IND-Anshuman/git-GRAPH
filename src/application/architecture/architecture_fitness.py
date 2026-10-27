@@ -2,9 +2,11 @@
 
 from dataclasses import dataclass, field
 
+
 @dataclass(frozen=True)
 class ArchitectureFitness:
     """Fitness metrics evaluating the health of the architecture. All scores are in [0.0, 1.0]."""
+
     coupling_score: float
     cohesion_score: float
     instability_score: float
