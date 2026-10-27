@@ -1,11 +1,14 @@
 """Boundary strength and leakage detection engine for capabilities."""
 
-from typing import Dict, Any
+from typing import Any
+
 
 class CapabilityBoundaryEngine:
     """Evaluates boundaries of a capability to detect leakage, coupling breaches, and define Bounded Context bounds."""
 
-    def compute_boundary(self, internal_entities_count: int, external_dependencies_count: int) -> Dict[str, Any]:
+    def compute_boundary(
+        self, internal_entities_count: int, external_dependencies_count: int
+    ) -> dict[str, Any]:
         """
         Calculates boundary strength and leakage metrics based on relative counts of internal entities vs external dependencies.
         """
@@ -19,5 +22,5 @@ class CapabilityBoundaryEngine:
             "internal_entities": internal_entities_count,
             "external_dependencies": external_dependencies_count,
             "boundary_strength": boundary_strength,
-            "leakage_detected": leakage
+            "leakage_detected": leakage,
         }

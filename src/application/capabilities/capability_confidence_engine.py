@@ -1,5 +1,6 @@
 """Confidence evaluation engine for capabilities."""
 
+
 class CapabilityConfidenceEngine:
     """Calculates unified confidence score for discovered capability candidates using evidence metrics."""
 
@@ -30,13 +31,17 @@ class CapabilityConfidenceEngine:
         behavior_agreement = 0.8 if len(evidence.behaviors) > 1 else 1.0
 
         # 5. Relationship Density: count of supporting relationships (max 5 -> 1.0)
-        relationship_density = min(1.0, len(evidence.supporting_relationships) / 5.0) if evidence.supporting_relationships else 0.5
+        relationship_density = (
+            min(1.0, len(evidence.supporting_relationships) / 5.0)
+            if evidence.supporting_relationships
+            else 0.5
+        )
 
         score = (
-            0.30 * evidence_strength +
-            0.25 * flow_cohesion +
-            0.20 * concept_agreement +
-            0.15 * behavior_agreement +
-            0.10 * relationship_density
+            0.30 * evidence_strength
+            + 0.25 * flow_cohesion
+            + 0.20 * concept_agreement
+            + 0.15 * behavior_agreement
+            + 0.10 * relationship_density
         )
         return round(min(1.0, max(0.0, score)), 3)
