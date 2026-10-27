@@ -1,12 +1,14 @@
 """Domain model representing similarity between architectures."""
 
 import uuid
-from datetime import datetime
 from dataclasses import dataclass
+from datetime import datetime
+
 
 @dataclass
 class ArchitectureSimilarity:
     """Similarity metrics between two repository architectures."""
+
     id: uuid.UUID
     source_repository_id: str
     target_repository_id: str

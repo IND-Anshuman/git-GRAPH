@@ -4,17 +4,12 @@ Phase 7B — Architecture Strategies
 Implements IReasoningStrategy for the new Phase 7B architectural question types.
 """
 
-import uuid
-from datetime import datetime
-
-from src.application.reasoning.reasoning_strategy import IReasoningStrategy
-from src.application.reasoning.reasoning_question_type import ReasoningQuestionType
 from src.application.reasoning.reasoning_context import ReasoningContext
+from src.application.reasoning.reasoning_question_type import ReasoningQuestionType
 from src.application.reasoning.reasoning_result import ReasoningResult
-from src.application.reasoning.reasoning_confidence import ReasoningConfidence
-from src.application.reasoning.evidence_weight_registry import EvidenceWeightRegistry
-from src.application.reasoning.reasoning_hypothesis import ReasoningHypothesis
+from src.application.reasoning.reasoning_strategy import IReasoningStrategy
 from src.application.reasoning.reasoning_strategy_registry import _make_result
+
 
 class ArchitectureStyleStrategy(IReasoningStrategy):
     def supports(self, question_type: ReasoningQuestionType) -> bool:
@@ -34,6 +29,7 @@ class ArchitectureStyleStrategy(IReasoningStrategy):
             supporting_ids=context.source_ids(),
         )
 
+
 class FitnessStrategy(IReasoningStrategy):
     def supports(self, question_type: ReasoningQuestionType) -> bool:
         return question_type == ReasoningQuestionType.FITNESS
@@ -51,6 +47,7 @@ class FitnessStrategy(IReasoningStrategy):
             hypothesis_statement="System architecture satisfies or violates fitness functions.",
             supporting_ids=context.source_ids(),
         )
+
 
 class InvariantStrategy(IReasoningStrategy):
     def supports(self, question_type: ReasoningQuestionType) -> bool:
@@ -70,6 +67,7 @@ class InvariantStrategy(IReasoningStrategy):
             supporting_ids=context.source_ids(),
         )
 
+
 class DriftArchStrategy(IReasoningStrategy):
     def supports(self, question_type: ReasoningQuestionType) -> bool:
         return question_type == ReasoningQuestionType.DRIFT_ARCH
@@ -87,6 +85,7 @@ class DriftArchStrategy(IReasoningStrategy):
             hypothesis_statement="Architecture has drifted from its original intended design.",
             supporting_ids=context.source_ids(),
         )
+
 
 class OwnershipArchStrategy(IReasoningStrategy):
     def supports(self, question_type: ReasoningQuestionType) -> bool:
@@ -106,6 +105,7 @@ class OwnershipArchStrategy(IReasoningStrategy):
             supporting_ids=context.source_ids(),
         )
 
+
 class RefactoringStrategy(IReasoningStrategy):
     def supports(self, question_type: ReasoningQuestionType) -> bool:
         return question_type == ReasoningQuestionType.REFACTORING
@@ -116,13 +116,16 @@ class RefactoringStrategy(IReasoningStrategy):
             description="RefactoringStrategy: identifying code smells and refactoring candidates.",
             inputs=context.source_ids(),
         )
-        answer = f"Refactoring reasoning surfaced code smells within {len(context.entities)} evaluated entities."
+        answer = (
+            f"Refactoring reasoning surfaced code smells within {len(context.entities)} evaluated entities."
+        )
         return _make_result(
             context,
             answer=answer,
             hypothesis_statement="Structural metrics indicate high-priority refactoring targets.",
             supporting_ids=context.source_ids(),
         )
+
 
 class RecommendationStrategy(IReasoningStrategy):
     def supports(self, question_type: ReasoningQuestionType) -> bool:
@@ -142,6 +145,7 @@ class RecommendationStrategy(IReasoningStrategy):
             supporting_ids=context.source_ids(),
         )
 
+
 class SimilarityStrategy(IReasoningStrategy):
     def supports(self, question_type: ReasoningQuestionType) -> bool:
         return question_type == ReasoningQuestionType.SIMILARITY
@@ -160,6 +164,7 @@ class SimilarityStrategy(IReasoningStrategy):
             supporting_ids=context.source_ids(),
         )
 
+
 class BenchmarkStrategy(IReasoningStrategy):
     def supports(self, question_type: ReasoningQuestionType) -> bool:
         return question_type == ReasoningQuestionType.BENCHMARK
@@ -177,6 +182,7 @@ class BenchmarkStrategy(IReasoningStrategy):
             hypothesis_statement="Architecture fitness scores fall within specific peer percentiles.",
             supporting_ids=context.source_ids(),
         )
+
 
 class TimelineStrategy(IReasoningStrategy):
     def supports(self, question_type: ReasoningQuestionType) -> bool:

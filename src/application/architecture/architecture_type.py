@@ -2,8 +2,10 @@
 
 from enum import Enum
 
+
 class ArchitectureType(str, Enum):
     """Enumeration representing different architectural styles and types."""
+
     LAYERED = "LAYERED"
     CLEAN = "CLEAN"
     HEXAGONAL = "HEXAGONAL"
