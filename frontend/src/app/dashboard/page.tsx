@@ -9,9 +9,9 @@ import RepositoryHealthWidget from '@/features/dashboard/RepositoryHealthWidget'
 import CapabilitySummaryWidget from '@/features/dashboard/CapabilitySummaryWidget';
 import DependencyOverviewWidget from '@/features/dashboard/DependencyOverviewWidget';
 import RecentChangesWidget from '@/features/dashboard/RecentChangesWidget';
+import RiskIntelligenceWidget from '@/features/dashboard/RiskIntelligenceWidget';
 import ErrorBoundary from '@/components/common/ErrorBoundary';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
-import { GlitchText } from '@/components/common/GlitchText';
 
 import type { Capability } from '@/types/platform';
 
@@ -88,11 +88,9 @@ export default function DashboardPage() {
             {/* ROW 3: Risk Intelligence (6 cols) + Timeline (6 cols) */}
             <div className="grid grid-cols-12 gap-8">
               <div className="col-span-6">
-                {/* Risk Intelligence - placeholder for now */}
-                <div className="professional-card" style={{ height: '400px' }}>
-                  <h3 className="text-section-header mb-4">Risk Intelligence</h3>
-                  <p className="text-metadata text-gray-400">Coming soon...</p>
-                </div>
+                <ErrorBoundary>
+                  <RiskIntelligenceWidget repositoryId={activeRepositoryId} />
+                </ErrorBoundary>
               </div>
               <div className="col-span-6">
                 <ErrorBoundary>

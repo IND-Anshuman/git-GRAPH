@@ -1,6 +1,10 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // `standalone` produces a self-contained server in .next/standalone so the
+  // Docker image can run with only the Node runtime, no npm/yarn.
+  output: "standalone",
+
   // Allow all external image domains (for avatars, etc.)
   images: {
     remotePatterns: [],

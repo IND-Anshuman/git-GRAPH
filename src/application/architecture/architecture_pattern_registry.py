@@ -1,8 +1,10 @@
 """Pattern registry for loading architecture signatures from YAML configuration."""
 
 import os
+from typing import Any
+
 import yaml
-from typing import Dict, Any, List
+
 
 class ArchitecturePatternRegistry:
     """
@@ -14,7 +16,7 @@ class ArchitecturePatternRegistry:
     def __init__(self, patterns_dir: str) -> None:
         """Initialize the registry and load patterns from the given directory."""
         self.patterns_dir = patterns_dir
-        self._patterns: Dict[str, Dict[str, Any]] = {}
+        self._patterns: dict[str, dict[str, Any]] = {}
         self._load_patterns()
 
     def _load_patterns(self) -> None:
@@ -26,19 +28,19 @@ class ArchitecturePatternRegistry:
             if filename.endswith((".yaml", ".yml")):
                 filepath = os.path.join(self.patterns_dir, filename)
                 try:
-                    with open(filepath, "r", encoding="utf-8") as f:
+                    with open(filepath, encoding="utf-8") as f:
                         data = yaml.safe_load(f)
                         if data and isinstance(data, dict):
                             for key, value in data.items():
                                 self._patterns[key] = value
-                except Exception as e:
+                except Exception:
                     # In a real app we'd log this, but we silently skip for now
                     pass
 
-    def get_pattern(self, pattern_name: str) -> Dict[str, Any]:
+    def get_pattern(self, pattern_name: str) -> dict[str, Any]:
         """Retrieve a specific pattern by name."""
         return self._patterns.get(pattern_name, {})
 
-    def get_all_patterns(self) -> Dict[str, Dict[str, Any]]:
+    def get_all_patterns(self) -> dict[str, dict[str, Any]]:
         """Retrieve all loaded patterns."""
         return self._patterns

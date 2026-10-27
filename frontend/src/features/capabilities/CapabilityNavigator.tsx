@@ -1,11 +1,10 @@
 "use client";
 
 import React, { useState, useMemo, useCallback, useRef } from "react";
-import { List } from "react-window";
+import { List, type RowComponentProps } from "react-window";
 import Fuse from "fuse.js";
-import { Search, X, SlidersHorizontal, ChevronDown, ChevronUp } from "lucide-react";
+import { Search, X, SlidersHorizontal } from "lucide-react";
 
-import { cn } from "@/lib/utils";
 import {
   CAPABILITY_TYPES,
   RISK_LEVELS,
@@ -46,6 +45,9 @@ const RISK_LEVEL_OPTIONS = RISK_LEVELS as unknown as string[];
 const CAPABILITY_TYPE_OPTIONS = CAPABILITY_TYPES as unknown as string[];
 
 // ─── Main component ───────────────────────────────────────────────────────────
+// Stable fallback so memoised filters do not recompute on every render.
+const NO_CAPABILITIES: Capability[] = [];
+
 export function CapabilityNavigator() {
   const repositoryId        = useUIStore((s) => s.activeRepositoryId);
   const selectedId          = useUIStore((s) => s.selectedCapabilityId);
@@ -64,7 +66,7 @@ export function CapabilityNavigator() {
 
   // ── Data ─────────────────────────────────────────────────────────────────────
   const { data, isLoading, isError } = useCapabilities(repositoryId);
-  const capabilities: Capability[] = data ?? [];
+  const capabilities: Capability[] = data ?? NO_CAPABILITIES;
 
   // ── Fuse.js instance ─────────────────────────────────────────────────────────
   const fuse = useMemo(
@@ -141,7 +143,7 @@ export function CapabilityNavigator() {
 
   // ── Virtualized row renderer ─────────────────────────────────────────────────
   const VirtualRow = useCallback(
-    ({ index, style }: { index: number; style: React.CSSProperties }) => {
+    ({ index, style }: RowComponentProps) => {
       const cap = filteredCapabilities[index];
       if (!cap) return null;
       return (
@@ -368,7 +370,7 @@ function AutoSizedList({
   items: Capability[];
   selectedId: string | null;
   setSelectedId: (id: string | null) => void;
-  VirtualRow: (props: { index: number; style: React.CSSProperties }) => React.ReactElement | null;
+  VirtualRow: (props: RowComponentProps) => React.ReactElement | null;
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [height, setHeight] = useState(600);
@@ -390,7 +392,7 @@ function AutoSizedList({
         style={{ height }}
         rowCount={items.length}
         rowHeight={72}
-        rowComponent={VirtualRow as any}
+        rowComponent={VirtualRow}
         rowProps={{}}
         overscanCount={5}
       />

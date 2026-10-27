@@ -1,12 +1,14 @@
 """Domain model representing ownership and knowledge distribution in the architecture."""
 
 import uuid
-from datetime import datetime
 from dataclasses import dataclass, field
+from datetime import datetime
+
 
 @dataclass
 class OwnershipProfile:
     """Ownership, silos, and bus factors for the architecture."""
+
     id: uuid.UUID
     repository_id: str
     commit_hash: str

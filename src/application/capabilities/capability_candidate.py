@@ -2,11 +2,14 @@
 
 import uuid
 from dataclasses import dataclass, field
+
 from src.application.capabilities.capability_evidence import CapabilityEvidence
+
 
 @dataclass
 class CapabilityCandidate:
     """A capability proposed by the discovery engine before formal governance approval."""
+
     id: uuid.UUID
     name: str
     description: str

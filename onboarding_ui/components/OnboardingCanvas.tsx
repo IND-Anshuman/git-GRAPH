@@ -22,7 +22,6 @@ import { DecisionRingScene } from "./scenes/DecisionRingScene";
 import { ReasoningNetworkScene } from "./scenes/ReasoningNetworkScene";
 import { UniverseScene } from "./scenes/UniverseScene";
 import { InteractionHandler } from "@/lib/InteractionHandler";
-import { InfoCardOverlay } from "./InfoCardOverlay";
 import { PostProcessingEffects } from "./PostProcessingEffects";
 
 /**
@@ -512,7 +511,6 @@ export function OnboardingCanvas() {
         <SceneContainer />
         <PerformanceMonitorHelper />
         <InteractionBridge />
-        <InfoCardOverlay />
         <PostProcessingEffects />
       </Canvas>
       <UniversalExplanationHUD />

@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Clock, ChevronRight, AlertTriangle, ShieldCheck, GitCommit, User } from 'lucide-react';
+import { Clock, ChevronRight } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useUIStore } from '@/stores';
 import { formatRelativeDate } from '@/lib/utils';
@@ -112,10 +112,6 @@ function RecentChangesInner({ capabilities = [], isLoading }: RecentChangesWidge
                   ? 'primary'
                   : 'success';
 
-              // Map static mock details for a rich timeline stream layout
-              const mockAuthor = 'SHREESHANTH99';
-              const mockSha = 'cfe1921';
-
               return (
                 <div key={cap.id} className="relative group select-none">
                   {/* Timeline Indicator Dot */}
@@ -162,22 +158,16 @@ function RecentChangesInner({ capabilities = [], isLoading }: RecentChangesWidge
 
                       {/* Sub-text activity description */}
                       <p className="text-[11px] text-[var(--color-text-secondary)] mt-1.5 line-clamp-1 leading-snug">
-                        {cap.description || 'Live code domain successfully mapped to semantic architecture models.'}
+                        {cap.description || `${cap.entities.length} entities, ${cap.behaviors.length} behaviors`}
                       </p>
 
-                      {/* Author / SHA / Time footer */}
+                      {/* Type / confidence / discovery time — all from the capability record */}
                       <div className="flex items-center gap-3 text-[9px] font-mono text-[var(--color-text-tertiary)] mt-2">
-                        <span className="flex items-center gap-1 shrink-0">
-                          <User size={10} />
-                          {mockAuthor}
-                        </span>
+                        <span className="shrink-0 uppercase">{cap.capability_type}</span>
                         <span>•</span>
-                        <span className="flex items-center gap-1 shrink-0">
-                          <GitCommit size={10} />
-                          {mockSha}
-                        </span>
+                        <span className="shrink-0">{Math.round(cap.confidence * 100)}% confidence</span>
                         <span>•</span>
-                        <span className="shrink-0">{formatRelativeDate(cap.created_at)}</span>
+                        <span className="shrink-0">discovered {formatRelativeDate(cap.created_at)}</span>
                       </div>
                     </div>
 

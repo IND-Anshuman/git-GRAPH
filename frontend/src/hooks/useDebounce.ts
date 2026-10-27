@@ -22,7 +22,10 @@ export function useDebouncedCallback<T extends (...args: unknown[]) => unknown>(
   delay: number
 ): (...args: Parameters<T>) => void {
   const callbackRef = useRef(callback);
-  callbackRef.current = callback;
+  // Keep the latest callback without re-subscribing; refs are written after render.
+  useEffect(() => {
+    callbackRef.current = callback;
+  });
   const timerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   return useCallback(

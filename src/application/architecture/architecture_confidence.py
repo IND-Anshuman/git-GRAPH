@@ -2,9 +2,11 @@
 
 from dataclasses import dataclass
 
+
 @dataclass(frozen=True)
 class ArchitectureConfidence:
     """Confidence scores across various architectural dimensions. All scores are in [0.0, 1.0]."""
+
     score: float
     topology_match: float
     dependency_match: float
@@ -24,8 +26,16 @@ class ArchitectureConfidence:
         ownership_match: float,
         historical_match: float,
         evidence_coverage: float,
+        available: set[str] | None = None,
     ) -> "ArchitectureConfidence":
-        """Compute the overall score using weighted averages of components."""
+        """Weighted average of the components that were actually measured.
+
+        ``available`` names the measured components (``topology``,
+        ``dependency``, ``flow``, ``capability``, ``ownership``,
+        ``historical``, ``evidence``). Unmeasured ones are excluded and the
+        remaining weights renormalised, so a missing signal neither inflates
+        nor deflates the score. ``None`` means every component was measured.
+        """
         weights = {
             "topology": 0.25,
             "dependency": 0.2,
@@ -35,16 +45,19 @@ class ArchitectureConfidence:
             "historical": 0.1,
             "evidence": 0.05,
         }
-        
-        score = (
-            topology_match * weights["topology"] +
-            dependency_match * weights["dependency"] +
-            flow_match * weights["flow"] +
-            capability_match * weights["capability"] +
-            ownership_match * weights["ownership"] +
-            historical_match * weights["historical"] +
-            evidence_coverage * weights["evidence"]
-        )
+
+        values = {
+            "topology": topology_match,
+            "dependency": dependency_match,
+            "flow": flow_match,
+            "capability": capability_match,
+            "ownership": ownership_match,
+            "historical": historical_match,
+            "evidence": evidence_coverage,
+        }
+        used = set(weights) if available is None else set(available) & set(weights)
+        total_weight = sum(weights[k] for k in used)
+        score = sum(values[k] * weights[k] for k in used) / total_weight if total_weight else 0.0
 
         return cls(
             score=max(0.0, min(1.0, score)),

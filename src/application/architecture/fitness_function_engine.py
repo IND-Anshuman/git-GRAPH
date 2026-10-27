@@ -1,8 +1,7 @@
 """Engine for computing architecture fitness metrics."""
 
-from typing import Dict, Any, List, Set
-from .architecture_graph import ArchitectureGraph
 from .architecture_fitness import ArchitectureFitness
+from .architecture_graph import ArchitectureGraph
 
 
 class FitnessFunctionEngine:
@@ -11,14 +10,14 @@ class FitnessFunctionEngine:
     def compute_fitness(self, graph: ArchitectureGraph) -> ArchitectureFitness:
         """
         Calculate fitness metrics for a given architecture graph.
-        
+
         All metrics return a float between 0.0 and 1.0.
         """
         nodes = graph.nodes
         edges = graph.edges
         total_nodes = len(nodes)
         total_edges = len(edges)
-        
+
         if total_nodes == 0:
             return ArchitectureFitness(
                 coupling_score=1.0,
@@ -29,7 +28,7 @@ class FitnessFunctionEngine:
                 cyclicity_score=0.0,
                 layer_violation_score=0.0,
                 overall_score=1.0,
-                formulas={"info": "Empty graph"}
+                formulas={"info": "Empty graph"},
             )
 
         # Coupling: 1.0 = highly decoupled, 0.0 = highly coupled
@@ -56,13 +55,13 @@ class FitnessFunctionEngine:
             instability_score = 0.0
 
         # Abstractness: abstract / total types
-        abstractness_score = 0.0 # Placeholder for now
+        abstractness_score = 0.0  # Placeholder for now
 
         # Distance from main sequence: |A + I - 1|
         # Ideally, Distance from Main Sequence = |Abstractness + Instability - 1|
         # In range [0, 1]. D=0 is best (on the line), D=1 is worst.
         distance_from_main_sequence = abs(abstractness_score + instability_score - 1.0)
-        
+
         # We typically want distance_score where 1.0 is best and 0.0 is worst?
         # But ArchitectureFitness definition implies it's just the value |A + I - 1|.
         # Actually, |A+I-1| is usually [0,1], 0 is good, 1 is bad.
@@ -71,7 +70,7 @@ class FitnessFunctionEngine:
 
         # Cyclicity: fraction of nodes in cycles
         cycles = graph.detect_cycles()
-        nodes_in_cycles: Set[str] = set()
+        nodes_in_cycles: set[str] = set()
         for cycle in cycles:
             nodes_in_cycles.update(cycle)
         cyclicity_score = len(nodes_in_cycles) / total_nodes
@@ -79,14 +78,16 @@ class FitnessFunctionEngine:
         # Layer violation score: violations / total edges
         # Just passing an empty layer order for now, or maybe not computable without one.
         layer_violation_score = 0.0
-        
+
         # Overall score
         # Let's say we want higher to be better.
         # coupling_score (higher better), cohesion (higher better)
         # instability (depends, let's say average)
         # cyclicity (lower better) -> 1 - cyclicity
         # layer_violation (lower better) -> 1 - layer_violation
-        overall = (coupling_score + cohesion_score + (1.0 - cyclicity_score) + (1.0 - layer_violation_score)) / 4.0
+        overall = (
+            coupling_score + cohesion_score + (1.0 - cyclicity_score) + (1.0 - layer_violation_score)
+        ) / 4.0
 
         formulas = {
             "coupling": "1.0 - (E / (N * (N - 1)))",
@@ -96,7 +97,7 @@ class FitnessFunctionEngine:
             "distance_from_main_sequence": "|A + I - 1|",
             "cyclicity": "Nodes in cycles / Total nodes",
             "layer_violation": "Violations / E",
-            "overall": "Average of normalized scores"
+            "overall": "Average of normalized scores",
         }
 
         return ArchitectureFitness(
@@ -108,5 +109,5 @@ class FitnessFunctionEngine:
             cyclicity_score=cyclicity_score,
             layer_violation_score=layer_violation_score,
             overall_score=overall,
-            formulas=formulas
+            formulas=formulas,
         )

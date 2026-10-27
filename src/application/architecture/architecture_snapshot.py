@@ -1,12 +1,14 @@
 """Domain model representing an architecture snapshot in time."""
 
 import uuid
-from datetime import datetime
 from dataclasses import dataclass, field
+from datetime import datetime
+
 
 @dataclass
 class ArchitectureSnapshot:
     """Architectural equivalent of CapabilitySnapshot to avoid recomputing old states."""
+
     snapshot_id: uuid.UUID
     repository_id: str
     commit_hash: str

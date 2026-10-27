@@ -27,7 +27,6 @@ export function TypeWriter({
   const [displayedLines, setDisplayedLines] = useState<string[]>([]);
   const [currentLine, setCurrentLine] = useState(0);
   const [currentChar, setCurrentChar] = useState(0);
-  const [isWaiting, setIsWaiting] = useState(false);
   const [showCursor, setShowCursor] = useState(true);
   const rafRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -57,12 +56,10 @@ export function TypeWriter({
         setCurrentChar((c) => c + 1);
       }, speed);
     } else {
-      setIsWaiting(true);
       rafRef.current = setTimeout(() => {
         setDisplayedLines((prev) => [...prev, target]);
         setCurrentLine((l) => l + 1);
         setCurrentChar(0);
-        setIsWaiting(false);
       }, pauseBetween);
     }
 

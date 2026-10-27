@@ -1,19 +1,23 @@
 """Domain model representing architectural violations."""
 
 import uuid
-from enum import Enum
 from dataclasses import dataclass, field
+from enum import Enum
+
 
 class ViolationSeverity(str, Enum):
     """Severity levels for architectural violations."""
+
     INFO = "INFO"
     WARNING = "WARNING"
     ERROR = "ERROR"
     CRITICAL = "CRITICAL"
 
+
 @dataclass
 class ArchitectureViolation:
     """A violation of an architectural rule or invariant."""
+
     id: uuid.UUID
     rule_name: str
     severity: ViolationSeverity

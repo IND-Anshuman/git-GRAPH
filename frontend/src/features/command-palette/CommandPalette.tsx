@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Command } from 'cmdk';
 import { useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
@@ -30,6 +30,8 @@ export default function CommandPalette() {
   const toggleSidebar = useUIStore((s) => s.toggleSidebar);
 
   const [search, setSearch] = useState('');
+  // Recency window anchor, fixed per mount (7-day granularity makes drift irrelevant).
+  const [now] = useState(() => Date.now());
 
   // Setup Ctrl+K toggle shortcut
   useKeyboardShortcut({ key: 'k', ctrlKey: true }, (e) => {
@@ -89,7 +91,6 @@ export default function CommandPalette() {
 
       // Check recency (within 7 days)
       const sevenDays = 7 * 24 * 60 * 60 * 1000;
-      const now = Date.now();
       const isRecentA = recA && now - recA.lastExecuted < sevenDays;
       const isRecentB = recB && now - recB.lastExecuted < sevenDays;
 
@@ -109,7 +110,7 @@ export default function CommandPalette() {
       }
       return a.label.localeCompare(b.label);
     });
-  }, [allCommands, recentCommands]);
+  }, [allCommands, recentCommands, now]);
 
   const handleSelectCommand = (id: string, label: string, action: () => void) => {
     recordExecution(id, label);

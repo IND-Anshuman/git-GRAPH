@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Network, Blocks, Share2, Cpu, Activity, Server } from 'lucide-react';
+import { Blocks, Cpu, Activity, Server } from 'lucide-react';
 import type { Capability } from '@/types/platform';
 import SpotlightCard from '@/components/common/SpotlightCard';
 import ErrorBoundary from '@/components/common/ErrorBoundary';
@@ -14,6 +14,10 @@ interface DependencyOverviewWidgetProps {
 }
 
 function DependencyOverviewInner({ capabilities = [], isLoading }: DependencyOverviewWidgetProps) {
+  if (isLoading) {
+    return <div className="glass-card h-[320px] skeleton" aria-busy="true" aria-label="Loading dependency overview" />;
+  }
+
   // Last analysis time (most recent capability created_at)
   const lastUpdated = capabilities.reduce((latest, c) => {
     const cur = new Date(c.created_at).getTime();

@@ -55,7 +55,7 @@ export const CapabilityCard = memo(function CapabilityCard({
   return (
     <div
       role="listitem"
-      aria-selected={isSelected}
+      aria-current={isSelected ? "true" : undefined}
       tabIndex={0}
       onClick={onClick}
       onKeyDown={(e) => {

@@ -1,7 +1,8 @@
 'use client';
 
 import React from 'react';
-import { GitBranch, ShieldAlert, Cpu, Share2, HelpCircle, Network } from 'lucide-react';
+import { GitBranch, Cpu, Share2, Network } from 'lucide-react';
+import { useHydrated } from '@/hooks/useHydrated';
 import { useCapability, useCapabilityBlastRadius, useCapabilities } from '@/hooks/useCapabilities';
 import { useUIStore } from '@/stores';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
@@ -13,7 +14,8 @@ import ReactFlow, {
   useNodesState,
   useEdgesState,
   BackgroundVariant,
-  MarkerType
+  MarkerType,
+  type EdgeMarker,
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 
@@ -36,7 +38,7 @@ export interface FlowGraphEdge {
   target: string;
   animated?: boolean;
   style?: React.CSSProperties;
-  markerEnd?: any;
+  markerEnd?: EdgeMarker | string;
 }
 
 export default function DependenciesTab({ capabilityId }: DependenciesTabProps) {
@@ -47,13 +49,10 @@ export default function DependenciesTab({ capabilityId }: DependenciesTabProps) 
   const { data: blastRadius, isLoading: isBlastLoading } = useCapabilityBlastRadius(capabilityId);
   const { data: allCapsData } = useCapabilities(repositoryId);
 
-  const [isMounted, setIsMounted] = React.useState(false);
+  const isMounted = useHydrated();
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
 
-  React.useEffect(() => {
-    setIsMounted(true);
-  }, []);
 
   const allCapabilities = React.useMemo(() => {
     return allCapsData ?? [];
@@ -137,7 +136,8 @@ export default function DependenciesTab({ capabilityId }: DependenciesTabProps) 
         markerEnd: {
           type: MarkerType.ArrowClosed,
           color: 'rgba(79, 124, 255, 0.45)',
-          size: 14
+          width: 14,
+          height: 14
         }
       });
     });
@@ -178,7 +178,8 @@ export default function DependenciesTab({ capabilityId }: DependenciesTabProps) 
         markerEnd: {
           type: MarkerType.ArrowClosed,
           color: 'rgba(239, 68, 68, 0.45)',
-          size: 14
+          width: 14,
+          height: 14
         }
       });
     });
@@ -216,7 +217,8 @@ export default function DependenciesTab({ capabilityId }: DependenciesTabProps) 
         markerEnd: {
           type: MarkerType.ArrowClosed,
           color: 'rgba(6, 182, 212, 0.4)',
-          size: 12
+          width: 12,
+          height: 12
         }
       });
     });
@@ -226,7 +228,7 @@ export default function DependenciesTab({ capabilityId }: DependenciesTabProps) 
   }, [capability, impactedCaps, isMounted, setNodes, setEdges]);
 
   // Navigate to selecting the clicked node if it's an impacted capability
-  const onNodeClick = React.useCallback((event: React.MouseEvent, node: any) => {
+  const onNodeClick = React.useCallback((event: React.MouseEvent, node: { id: string }) => {
     if (node.id.startsWith('impacted-')) {
       const targetId = node.id.replace('impacted-', '');
       setSelectedCapabilityId(targetId);

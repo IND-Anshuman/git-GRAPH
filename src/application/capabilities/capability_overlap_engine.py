@@ -1,11 +1,12 @@
 """Overlap detection engine for capabilities."""
 
-from typing import List, Dict, Any
+from typing import Any
+
 
 class CapabilityOverlapEngine:
     """Detects duplicate and near-duplicate capabilities based on concept/behavior overlap."""
 
-    def detect_overlaps(self, capabilities: List[Any]) -> List[Dict[str, Any]]:
+    def detect_overlaps(self, capabilities: list[Any]) -> list[dict[str, Any]]:
         """
         Scans a list of capabilities and reports overlaps using Jaccard index on their concepts.
         Recommends 'MERGE' for overlap score >= 0.80, and 'REVIEW' for scores between 0.50 and 0.80.
@@ -24,12 +25,14 @@ class CapabilityOverlapEngine:
                 overlap_score = len(intersection) / len(union) if union else 0.0
 
                 if overlap_score >= 0.5:
-                    overlaps.append({
-                        "capability_a_id": str(cap1.id),
-                        "capability_a_name": cap1.name,
-                        "capability_b_id": str(cap2.id),
-                        "capability_b_name": cap2.name,
-                        "overlap_score": round(overlap_score, 3),
-                        "recommendation": "MERGE" if overlap_score >= 0.8 else "REVIEW"
-                    })
+                    overlaps.append(
+                        {
+                            "capability_a_id": str(cap1.id),
+                            "capability_a_name": cap1.name,
+                            "capability_b_id": str(cap2.id),
+                            "capability_b_name": cap2.name,
+                            "overlap_score": round(overlap_score, 3),
+                            "recommendation": "MERGE" if overlap_score >= 0.8 else "REVIEW",
+                        }
+                    )
         return overlaps

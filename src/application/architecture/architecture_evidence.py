@@ -2,9 +2,11 @@
 
 from dataclasses import dataclass, field
 
+
 @dataclass
 class ArchitectureEvidence:
     """Aggregated evidence that justifies the detection of an architectural style."""
+
     capabilities: list[dict] = field(default_factory=list)
     flows: list[dict] = field(default_factory=list)
     entities: list[dict] = field(default_factory=list)

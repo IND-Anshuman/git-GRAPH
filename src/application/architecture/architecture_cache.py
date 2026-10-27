@@ -1,6 +1,7 @@
 """Cache for expensive architectural calculations."""
 
-from typing import Any, Dict, Optional, Tuple
+from typing import Any
+
 
 class ArchitectureCache:
     """
@@ -11,9 +12,9 @@ class ArchitectureCache:
 
     def __init__(self) -> None:
         """Initialize the architecture cache."""
-        self._cache: Dict[Tuple[str, str, str], Any] = {}
+        self._cache: dict[tuple[str, str, str], Any] = {}
 
-    def get(self, repository_id: str, commit_hash: str, analysis_type: str) -> Optional[Any]:
+    def get(self, repository_id: str, commit_hash: str, analysis_type: str) -> Any | None:
         """Retrieve a cached value."""
         key = (repository_id, commit_hash, analysis_type)
         return self._cache.get(key)

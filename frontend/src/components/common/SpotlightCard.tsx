@@ -45,7 +45,7 @@ export default function SpotlightCard({
         className
       )}
       style={{
-        ['--_glow-color' as any]: glowColor,
+        ['--_glow-color' as string]: glowColor,
       }}
       {...props}
     >

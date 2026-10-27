@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { PieChart as PieIcon, ShieldAlert } from 'lucide-react';
+import { PieChart as PieIcon } from 'lucide-react';
 import {
   ResponsiveContainer,
   PieChart,
@@ -29,7 +29,14 @@ const TYPE_LABELS: Record<string, string> = {
   INTEGRATION: 'Integration',
 };
 
-const CustomTooltip = ({ active, payload }: any) => {
+interface TooltipEntry {
+  name?: string;
+  value?: number;
+  color?: string;
+  payload: { color?: string };
+}
+
+const CustomTooltip = ({ active, payload }: { active?: boolean; payload?: TooltipEntry[] }) => {
   if (active && payload && payload.length) {
     const data = payload[0];
     return (
