@@ -2,7 +2,6 @@
 
 import React, { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { cn } from '@/lib/utils';
 import { useUIStore } from '@/stores';
 import { useRepositories } from '@/hooks/useRepositories';
 import Sidebar from './Sidebar';
@@ -20,6 +19,15 @@ export default function AppShell({ children }: AppShellProps) {
   const activeRepositoryId = useUIStore((s) => s.activeRepositoryId);
   const setActiveRepositoryId = useUIStore((s) => s.setActiveRepositoryId);
   const reducedMotion = useUIStore((s) => s.reducedMotion);
+  const setReducedMotion = useUIStore((s) => s.setReducedMotion);
+
+  // Sync OS-level prefers-reduced-motion into the store on first mount
+  useEffect(() => {
+    if (typeof window === "undefined" || !window.matchMedia) return;
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    if (mq.matches) setReducedMotion(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const { data: repositories = [], isLoading, isError } = useRepositories();
 
@@ -73,7 +81,7 @@ export default function AppShell({ children }: AppShellProps) {
         style={{
           paddingLeft: `${currentSidebarWidth}px`,
           // Set dynamic custom variable for topbar left offset
-          ['--_sidebar-current-width' as any]: `${currentSidebarWidth}px`,
+          ['--_sidebar-current-width' as string]: `${currentSidebarWidth}px`,
         }}
       >
         {/* TopBar Component */}

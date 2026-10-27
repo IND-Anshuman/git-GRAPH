@@ -13,6 +13,9 @@ import {
   GitFork,
   Brain,
   Clock,
+  Share2,
+  Clapperboard,
+  Settings as SettingsIcon,
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
@@ -30,6 +33,9 @@ const ICON_MAP = {
   GitFork,
   Brain,
   Clock,
+  Share2,
+  Clapperboard,
+  Settings: SettingsIcon,
 } as const;
 
 type IconName = keyof typeof ICON_MAP;

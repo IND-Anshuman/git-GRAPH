@@ -2,8 +2,9 @@
  * Vitest test setup file
  * Configures global test environment
  */
-import { expect, afterEach, vi } from 'vitest';
-import { cleanup } from '@testing-library/react';
+import "@testing-library/jest-dom/vitest";
+import { afterEach, vi } from "vitest";
+import { cleanup } from "@testing-library/react";
 
 // Cleanup after each test
 afterEach(() => {
@@ -25,8 +26,8 @@ const sessionStorageMock = {
   clear: vi.fn(),
 };
 
-global.localStorage = localStorageMock as any;
-global.sessionStorage = sessionStorageMock as any;
+global.localStorage = localStorageMock as unknown as Storage;
+global.sessionStorage = sessionStorageMock as unknown as Storage;
 
 // Mock window.matchMedia
 Object.defineProperty(window, 'matchMedia', {

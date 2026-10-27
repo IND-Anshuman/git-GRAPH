@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Compass, Cpu, HelpCircle, Network, Clock, Brain } from 'lucide-react';
+import { ArrowLeft, Compass, Network, Clock, Brain } from 'lucide-react';
 
 export default function NotFound() {
   return (

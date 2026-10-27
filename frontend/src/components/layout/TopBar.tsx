@@ -2,6 +2,7 @@
 
 import React, { memo } from "react";
 import { Bell, Search } from "lucide-react";
+import { UserButton } from "@clerk/nextjs";
 
 import { cn } from "@/lib/utils";
 import { useUIStore } from "@/stores";
@@ -93,28 +94,45 @@ const NotificationBell = memo(function NotificationBell() {
 // ─── UserAvatar ───────────────────────────────────────────────────────────────
 
 const UserAvatar = memo(function UserAvatar() {
+  const clerkKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
+
+  // No Clerk key → keep the placeholder avatar (local dev mode).
+  if (!clerkKey) {
+    return (
+      <button
+        type="button"
+        aria-label="User menu"
+        aria-haspopup="menu"
+        className={cn(
+          "flex items-center justify-center shrink-0",
+          "w-9 h-9 rounded-full",
+          "bg-[var(--color-primary-muted)]",
+          "border border-[var(--color-border)]",
+          "text-[var(--color-primary)] text-xs font-bold",
+          "hover:border-[var(--color-primary)]",
+          "transition-colors duration-150",
+          "focus-visible:outline-none focus-visible:ring-2",
+          "focus-visible:ring-[var(--color-primary)]",
+          "focus-visible:ring-offset-1",
+          "focus-visible:ring-offset-[var(--color-bg-surface)]",
+        )}
+      >
+        <span aria-hidden="true">U</span>
+      </button>
+    );
+  }
+
   return (
-    <button
-      type="button"
-      aria-label="User menu"
-      aria-haspopup="menu"
-      className={cn(
-        "flex items-center justify-center shrink-0",
-        "w-9 h-9 rounded-full",
-        "bg-[var(--color-primary-muted)]",
-        "border border-[var(--color-border)]",
-        "text-[var(--color-primary)] text-xs font-bold",
-        "hover:border-[var(--color-primary)]",
-        "transition-colors duration-150",
-        "focus-visible:outline-none focus-visible:ring-2",
-        "focus-visible:ring-[var(--color-primary)]",
-        "focus-visible:ring-offset-1",
-        "focus-visible:ring-offset-[var(--color-bg-surface)]",
-      )}
-    >
-      {/* Placeholder initials — replace with actual user data */}
-      <span aria-hidden="true">U</span>
-    </button>
+    <div className="shrink-0" aria-label="User menu">
+      <UserButton
+        appearance={{
+          elements: {
+            rootBox: "w-9 h-9",
+            avatarBox: "w-9 h-9 rounded-full border border-[var(--color-border)]",
+          },
+        }}
+      />
+    </div>
   );
 });
 
