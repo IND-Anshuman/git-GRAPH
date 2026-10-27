@@ -1,14 +1,45 @@
-import React from 'react';
-import Link from 'next/link';
-import { Clock, ArrowLeft, History, CalendarDays } from 'lucide-react';
-import AppShell from '@/components/layout/AppShell';
+"use client";
 
-export default function TimelinePlaceholder() {
+/**
+ * /timeline — Evolution Time Machine.
+ * Scrub or play through commits; the graph diffs frame-to-frame with
+ * added (green) / removed (red) coloring.
+ */
+import dynamic from "next/dynamic";
+import { Clock } from "lucide-react";
+import AppShell from "@/components/layout/AppShell";
+import EmptyState from "@/components/common/EmptyState";
+import { useUIStore } from "@/stores";
+import { useQuery } from "@tanstack/react-query";
+import { temporalApi } from "@/lib/api";
+import { queryKeys } from "@/lib/query-keys";
+import { CACHE } from "@/lib/constants";
+
+// ReactFlow inside TimeMachine — no SSR
+const TimeMachine = dynamic(
+  () =>
+    import("@/features/time-machine/TimeMachine").then((m) => m.TimeMachine),
+  { ssr: false }
+);
+
+export default function TimelinePage() {
+  const activeRepositoryId = useUIStore((s) => s.activeRepositoryId);
+
+  // Commit count gate: need >= 2 commits for a meaningful evolution
+  const commitsQuery = useQuery({
+    queryKey: queryKeys.temporal.commits(activeRepositoryId ?? ""),
+    queryFn: () => temporalApi.listCommits(activeRepositoryId!),
+    enabled: !!activeRepositoryId,
+    staleTime: CACHE.COMMITS,
+  });
+
+  const commitCount = commitsQuery.data?.length ?? 0;
+
   return (
     <AppShell>
-      <div className="p-6 max-w-[800px] mx-auto flex flex-col gap-6 my-12 animate-fade-in">
-        {/* Page Header */}
-        <div className="flex items-center gap-3 border-b border-[var(--color-border)] pb-4 shrink-0">
+      <div className="flex h-full flex-col">
+        {/* Page header */}
+        <div className="flex items-center gap-3 border-b border-[var(--color-border)] px-6 py-4 shrink-0">
           <div className="p-2 bg-[var(--color-primary-muted)] text-[var(--color-primary)] rounded">
             <Clock className="w-5 h-5" />
           </div>
@@ -17,40 +48,36 @@ export default function TimelinePlaceholder() {
               Evolution Time Machine
             </h1>
             <span className="text-[10px] uppercase tracking-wider font-bold text-[var(--color-primary)]">
-              Reserved for Stage 3
+              Temporal Reconstruction
             </span>
           </div>
         </div>
 
-        {/* Info box */}
-        <div className="bg-sip-surface border border-[var(--color-border)] rounded-lg p-6 flex flex-col gap-4">
-          <h2 className="text-sm font-bold text-sip-text-primary uppercase tracking-wider">
-            Repository Evolution & Delta History
-          </h2>
-          <p className="text-xs text-sip-text-secondary leading-relaxed">
-            The Evolution Time Machine indexes codebase structural snapshots chronologically. Users will be able to review capability changes across multiple commits, playback development speed, and analyze design system health drift over time.
-          </p>
-
-          <div className="grid grid-cols-2 gap-4 my-2">
-            <div className="p-4 bg-[#161A22]/50 border border-[var(--color-border)] rounded flex flex-col gap-1.5">
-              <History className="w-4 h-4 text-sip-text-tertiary" />
-              <span className="text-xs font-semibold text-sip-text-primary">Commit Snapshot Playback</span>
-              <span className="text-[10px] text-sip-text-muted">Animate structural changes sequentially from init commit.</span>
+        {/* Body */}
+        <div className="flex-1 min-h-0">
+          {!activeRepositoryId ? (
+            <div className="flex h-full items-center justify-center">
+              <EmptyState
+                title="No repository selected"
+                description="Select a repository from the top bar to replay its evolution."
+              />
             </div>
-            <div className="p-4 bg-[#161A22]/50 border border-[var(--color-border)] rounded flex flex-col gap-1.5">
-              <CalendarDays className="w-4 h-4 text-sip-text-tertiary" />
-              <span className="text-xs font-semibold text-sip-text-primary">Diff Heatmaps</span>
-              <span className="text-[10px] text-sip-text-muted">Graphically highlight churned areas of complexity.</span>
+          ) : commitsQuery.isLoading ? (
+            <div className="flex h-full items-center justify-center">
+              <span className="font-mono text-[10px] uppercase tracking-widest text-[var(--color-text-muted)]">
+                indexing commits…
+              </span>
             </div>
-          </div>
-
-          <Link
-            href="/dashboard"
-            className="self-start inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold rounded bg-[#111318] border border-[#222938] text-[#8B95B0] hover:text-[#F0F2F8] hover:bg-[#161A22] transition-colors"
-          >
-            <ArrowLeft size={13} />
-            Back to Dashboard
-          </Link>
+          ) : commitCount < 2 ? (
+            <div className="flex h-full items-center justify-center">
+              <EmptyState
+                title="Not enough history"
+                description={`This repository has ${commitCount} commit${commitCount === 1 ? "" : "s"}. At least 2 are needed to replay evolution.`}
+              />
+            </div>
+          ) : (
+            <TimeMachine repositoryId={activeRepositoryId} />
+          )}
         </div>
       </div>
     </AppShell>

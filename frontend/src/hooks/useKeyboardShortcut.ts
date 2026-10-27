@@ -18,7 +18,10 @@ export function useKeyboardShortcut(
   enabled = true
 ): void {
   const handlerRef = useRef(handler);
-  handlerRef.current = handler;
+  // Keep the latest handler without re-subscribing; refs are written after render.
+  useEffect(() => {
+    handlerRef.current = handler;
+  });
 
   useEffect(() => {
     if (!enabled) return;
@@ -32,7 +35,8 @@ export function useKeyboardShortcut(
 
       if (
         matchKey &&
-        (combo.ctrlKey || combo.metaKey ? matchCtrl : true) &&
+        (combo.ctrlKey ? matchCtrl : true) &&
+        (combo.metaKey ? matchMeta : true) &&
         matchShift &&
         matchAlt
       ) {

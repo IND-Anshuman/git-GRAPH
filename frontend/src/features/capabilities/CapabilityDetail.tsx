@@ -2,7 +2,7 @@
 
 import React from 'react';
 import dynamic from 'next/dynamic';
-import { Boxes, Sparkles, HelpCircle } from 'lucide-react';
+import { Boxes } from 'lucide-react';
 import { useUIStore } from '@/stores';
 import { useCapability } from '@/hooks/useCapabilities';
 import { DETAIL_TABS, type DetailTabId } from '@/lib/constants';

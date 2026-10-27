@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient, type UseQueryResult } from "@tanstack/react-query";
 import { queryKeys } from "@/lib/query-keys";
 import { CACHE } from "@/lib/constants";
-import { capabilitiesApi } from "@/services/api/endpoints";
+import { capabilitiesApi } from "@/lib/api";
 import type { CapabilityFilters, Capability, CapabilityHealthRisk, CapabilityBlastRadius, CapabilityTimeline, CapabilityCandidate } from "@/types/platform";
 
 export function useCapabilities(
@@ -69,7 +69,7 @@ export function useApproveCapability() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (candidateId: string) => capabilitiesApi.approve(candidateId),
-    onSuccess: (_, candidateId) => {
+    onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: queryKeys.capabilities.all() });
     },
   });

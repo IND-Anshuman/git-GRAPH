@@ -43,9 +43,6 @@ export default function OverviewTab({ capabilityId }: OverviewTabProps) {
     );
   }
 
-  const calculatedHealth = capability.health_score ?? 
-    Math.round(((capability.maturity_score + capability.coverage_score + (1 - capability.risk_score)) / 3) * 100);
-
   return (
     <div className="flex flex-col gap-6 p-1 animate-fade-in">
       {/* Description Card */}

@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { ShieldAlert, Activity, CheckCircle2 } from 'lucide-react';
+import { ShieldAlert, CheckCircle2 } from 'lucide-react';
 import {
   ResponsiveContainer,
   RadarChart,
@@ -18,8 +18,6 @@ import {
 } from 'recharts';
 import { useCapabilityHealth } from '@/hooks/useCapabilities';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
-import ScoreRing from '@/components/common/ScoreRing';
-import { scoreToInt } from '@/lib/utils';
 
 interface HealthTabProps {
   capabilityId: string;

@@ -4,11 +4,10 @@ import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Box, ChevronDown, ChevronUp, Cpu, Award } from 'lucide-react';
 import { useCapability } from '@/hooks/useCapabilities';
-import { conceptsApi } from '@/services/api/endpoints';
+import { conceptsApi } from '@/lib/api';
 import { queryKeys } from '@/lib/query-keys';
 import { useUIStore } from '@/stores';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
-import ScoreRing from '@/components/common/ScoreRing';
 import { scoreToInt } from '@/lib/utils';
 
 interface ConceptsTabProps {

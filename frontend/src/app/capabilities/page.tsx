@@ -12,7 +12,7 @@ export default function CapabilitiesPage() {
       <div
         className="max-w-[1600px] mx-auto w-full h-[calc(100vh-var(--topbar-height))] px-6 sm:px-8 py-6 flex gap-6 overflow-hidden"
         style={{
-          ['--navigator-width' as any]: '320px', // set navigator width variable consumed by CapabilityNavigator
+          ['--navigator-width' as string]: '320px', // set navigator width variable consumed by CapabilityNavigator
         }}
       >
         {/* Left Panel: Capability Navigator */}
