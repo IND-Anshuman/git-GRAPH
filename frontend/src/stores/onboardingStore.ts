@@ -246,7 +246,8 @@ const detectQualityTier = (): QualityTier => {
   const cores = navigator.hardwareConcurrency || 2;
   
   // Check device memory (if available)
-  const memory = (navigator as any).deviceMemory || 4;
+  // deviceMemory is a Chromium-only extension of Navigator.
+  const memory = (navigator as Navigator & { deviceMemory?: number }).deviceMemory || 4;
   
   // Check screen size
   const width = window.innerWidth;

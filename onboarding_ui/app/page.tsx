@@ -378,7 +378,7 @@ export default function Home() {
         </aside>
 
         {/* Right Scroll Panel */}
-        <main ref={scrollContainerRef} className="ml-[380px] w-[calc(100%-380px)] min-h-screen relative z-10 flex flex-col items-center">
+        <main ref={scrollContainerRef} className="ml-[380px] w-[calc(100%-380px)] min-h-screen relative z-10 flex flex-col items-center pointer-events-none">
           
           {/* Spacer to push first card down */}
           <div className="h-[100vh]" />

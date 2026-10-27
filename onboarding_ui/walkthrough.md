@@ -170,6 +170,18 @@ We have refactored and optimized Scene 2 ("Stardust of Code") to feature 6 bundl
 - **Reduced Size (`1.9` Scale)**: Reduced the final scale of the clusters to `1.9` (down from `2.6`) and pulse bounds to `1.9 + 0.04` to prevent visual clipping and match the new compact layout.
 - **Perfect Connection**: Terminated the lines exactly at `cluster.position` so they connect to the cluster cores with mathematical precision.
 
+### 6. Interactive Clusters & Enlarged HUD Badges
+- **Enlarged HUD Badges**: Increased the size of the HTML description overlay labels (Classes, Functions, APIs, Databases, Queues, Dependencies) by enlarging padding, icons (`w-3 h-3` -> `w-4.5 h-4.5`), and increasing title/count typography to improve readability and clickability.
+- **Mouse Interactivity (R3F & HTML)**: Added `pointerEvents: "auto"` to the HTML overlays and registered the clusters with the central `InteractionHandler` raycaster so that hovering over either the 3D geometry or the HTML badge highlights them (scaling up by 1.1x and causing a volumetric glow pulse in the local nebula halo).
+- **Irregular Hover Rotations & Revolutions**: When a cluster is hovered, it begins spinning faster in a chaotic, multi-axis irregular pattern (using time-modulated trigonometric noise along X, Y, and Z axes). When the mouse leaves, the rotation smoothly lerps back to align with the slow background spin without any visual snaps.
+- **Sci-Fi Hover Gradients**: Transited the HUD badge backgrounds from their default solid black (`bg-[#05040a]/95`) to customized, glowing color-themed sci-fi gradients (e.g., deep blue-slate for Classes, violet-pink for Functions, orange-amber for APIs) on hover.
+- **Click to Expand**: Clicking any of the 6 clusters opens the glassmorphic detail overlay card, pausing scroll-guided progress and showing custom code-cluster metadata.
+- **Raycast & Bounding Volume Refinements**:
+  - Recomputed `InstancedMesh` bounding boxes and bounding spheres dynamically in the frame loop so that R3F raycasting accurately detects pointer events on all 6 cluster meshes.
+  - Manually expanded the underlying cluster geometries' bounding sphere (radius `4.5`) and bounding box (size `9.0`) to cover the entire volume of distributed nodes, ensuring Three.js raycasting does not reject pointer inputs far from the cluster local origin.
+  - Swapped R3F pointer events on HTML overlay containers for native DOM `onMouseEnter` / `onMouseLeave` mouse events and added `pointer-events-auto` Tailwind class directly to inner containers to guarantee DOM-level pointer events.
+  - Excluded the `Software Cluster` items from background octree raycast updates in `InteractionHandler` to let standard R3F and DOM mouse hover events retain 100% authority without flickering.
+
 
 
 

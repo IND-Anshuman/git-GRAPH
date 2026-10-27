@@ -13,8 +13,7 @@ import {
   useParticleCount,
   useShouldUsePostProcessing,
   type QualityTier,
-  type SceneNumber,
-} from './onboardingStore';
+  } from './onboardingStore';
 
 describe('OnboardingStore', () => {
   beforeEach(() => {
@@ -448,7 +447,7 @@ describe('OnboardingStore', () => {
 
     describe('useShouldAnimateCamera', () => {
       it('should return true when camera is active', () => {
-        const { result: storeResult } = renderHook(() => useOnboardingStore());
+        renderHook(() => useOnboardingStore());
         const { result: selectorResult } = renderHook(() => useShouldAnimateCamera());
         
         expect(selectorResult.current).toBe(true);

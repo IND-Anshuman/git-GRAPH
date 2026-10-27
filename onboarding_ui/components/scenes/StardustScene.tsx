@@ -7,6 +7,7 @@ import { CodeSnippetRenderer } from "@/lib/CodeSnippetRenderer";
 import { SceneConfig } from "@/types";
 import * as THREE from "three";
 import { Html } from "@react-three/drei";
+import { InteractionHandler } from "@/lib/InteractionHandler";
 
 interface StardustSceneProps {
   active: boolean;
@@ -85,11 +86,11 @@ function getPointOnCurve(
 
 // Icon mapper for HTML badges
 const getClusterIcon = (type: string, color: string) => {
-  const iconClass = "w-3 h-3";
+  const iconClass = "w-4.5 h-4.5";
   switch (type) {
     case "CLASSES":
       return (
-        <span className="p-1 bg-slate-950/80 rounded border border-white/5 flex items-center justify-center" style={{ color }}>
+        <span className="p-1.5 bg-slate-950/80 rounded-md border border-white/5 flex items-center justify-center" style={{ color }}>
           <svg className={iconClass} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3.5}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M21 7.5l-9-5.25L3 7.5m18 0l-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9" />
           </svg>
@@ -97,13 +98,13 @@ const getClusterIcon = (type: string, color: string) => {
       );
     case "FUNCTIONS":
       return (
-        <span className="px-1.5 py-0.5 bg-slate-950/80 rounded border border-white/5 text-[9px] font-black italic tracking-tighter flex items-center justify-center leading-none" style={{ color }}>
+        <span className="px-2 py-1 bg-slate-950/80 rounded-md border border-white/5 text-[11px] font-black italic tracking-tighter flex items-center justify-center leading-none" style={{ color }}>
           fx
         </span>
       );
     case "APIs":
       return (
-        <span className="p-1 bg-slate-950/80 rounded border border-white/5 flex items-center justify-center" style={{ color }}>
+        <span className="p-1.5 bg-slate-950/80 rounded-md border border-white/5 flex items-center justify-center" style={{ color }}>
           <svg className={iconClass} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3.5}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 3v1.5M4.5 8.25H3m18 0h-1.5M4.5 12H3m18 0h-1.5m-15 3.75H3m18 0h-1.5M8.25 19.5V21M12 3v1.5m0 15V21m3.75-18v1.5m0 15V21m-9-1.5h10.5a2.25 2.25 0 002.25-2.25V6.75a2.25 2.25 0 00-2.25-2.25H6.75A2.25 2.25 0 004.5 6.75v10.5a2.25 2.25 0 002.25 2.25z" />
           </svg>
@@ -111,7 +112,7 @@ const getClusterIcon = (type: string, color: string) => {
       );
     case "DATABASES":
       return (
-        <span className="p-1 bg-slate-950/80 rounded border border-white/5 flex items-center justify-center" style={{ color }}>
+        <span className="p-1.5 bg-slate-950/80 rounded-md border border-white/5 flex items-center justify-center" style={{ color }}>
           <svg className={iconClass} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3.5}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M20.25 6.375c0 2.278-3.694 4.125-8.25 4.125S3.75 8.653 3.75 6.375m16.5 0c0-2.278-3.694-4.125-8.25-4.125S3.75 4.097 3.75 6.375m16.5 0v11.25c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125V6.375m16.5 0v3.75m-16.5-3.75v3.75m16.5 0v3.75C20.25 16.153 16.556 18 12 18s-8.25-1.847-8.25-4.125v-3.75m16.5 0v3.75m-16.5-3.75v3.75" />
           </svg>
@@ -119,7 +120,7 @@ const getClusterIcon = (type: string, color: string) => {
       );
     case "QUEUES":
       return (
-        <span className="p-1 bg-slate-950/80 rounded border border-white/5 flex items-center justify-center" style={{ color }}>
+        <span className="p-1.5 bg-slate-950/80 rounded-md border border-white/5 flex items-center justify-center" style={{ color }}>
           <svg className={iconClass} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3.5}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 0 1 0 3.75H5.625a1.875 1.875 0 0 1 0-3.75Z" />
           </svg>
@@ -127,7 +128,7 @@ const getClusterIcon = (type: string, color: string) => {
       );
     case "DEPENDENCIES":
       return (
-        <span className="p-1 bg-slate-950/80 rounded border border-white/5 flex items-center justify-center" style={{ color }}>
+        <span className="p-1.5 bg-slate-950/80 rounded-md border border-white/5 flex items-center justify-center" style={{ color }}>
           <svg className={iconClass} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3.5}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m13.35-.622 1.757-1.757a4.5 4.5 0 0 0-6.364-6.364l-4.5 4.5a4.5 4.5 0 0 0 1.242 7.244" />
           </svg>
@@ -138,11 +139,32 @@ const getClusterIcon = (type: string, color: string) => {
   }
 };
 
+const getClusterGradient = (type: string, isHovered: boolean) => {
+  if (!isHovered) return "bg-[#05040a]/95";
+  switch (type) {
+    case "CLASSES":
+      return "bg-gradient-to-br from-[#0c1e40]/95 via-[#060a12]/98 to-[#131235]/95";
+    case "FUNCTIONS":
+      return "bg-gradient-to-br from-[#240a3e]/95 via-[#06040c]/98 to-[#2a0833]/95";
+    case "APIs":
+      return "bg-gradient-to-br from-[#2e1405]/95 via-[#090604]/98 to-[#231505]/95";
+    case "DATABASES":
+      return "bg-gradient-to-br from-[#0c1e40]/95 via-[#060a12]/98 to-[#131235]/95";
+    case "QUEUES":
+      return "bg-gradient-to-br from-[#2f0525]/95 via-[#0c040e]/98 to-[#22071d]/95";
+    case "DEPENDENCIES":
+      return "bg-gradient-to-br from-[#022533]/95 via-[#030910]/98 to-[#06202c]/95";
+    default:
+      return "bg-[#05040a]/95";
+  }
+};
+
 export function StardustScene({ active, config: _config }: StardustSceneProps) {
   const groupRef = useRef<THREE.Group>(null);
   const snippetGroupsRef = useRef<(THREE.Group | null)[]>([]);
   const spritesRef = useRef<(THREE.Sprite | null)[]>([]);
   const clusterGroupsRef = useRef<(THREE.Group | null)[]>([]);
+  const clusterRotationsRef = useRef<THREE.Vector3[]>([]);
   
   // References for structured nodes and dynamic lines
   const nodeMeshesRef = useRef<Record<string, THREE.InstancedMesh | null>>({});
@@ -151,6 +173,11 @@ export function StardustScene({ active, config: _config }: StardustSceneProps) {
 
   const shouldAnimate = useShouldAnimateCamera();
   const scrollProgress = useOnboardingStore((s) => s.scrollProgress);
+
+  const hoveredObjectId = useOnboardingStore((s) => s.hoveredObjectId);
+  const setHoveredObject = useOnboardingStore((s) => s.setHoveredObject);
+  const expandCard = useOnboardingStore((s) => s.expandCard);
+  const focusedObjectId = useOnboardingStore((s) => s.focusedObjectId);
 
   // Map Scene 2 scroll boundaries [0.17, 0.33] to local progress [0.0, 1.0]
   const localProgress = useMemo(() => {
@@ -338,6 +365,31 @@ export function StardustScene({ active, config: _config }: StardustSceneProps) {
     });
   }, [clusters]);
 
+  // Register interactive clusters with InteractionHandler
+  useEffect(() => {
+    if (active) {
+      const handler = InteractionHandler.getInstance();
+      clusterData.forEach((c) => {
+        handler.registerObject(c.type, c.position, 2.8, {
+          type: "Software Cluster",
+          title: c.type,
+          description: `An extracted software architecture cluster containing ${c.count.toLocaleString()} code elements dynamically indexed.`,
+          details: {
+            "Total Node Elements": c.count.toLocaleString(),
+            "Lattice Connectors": c.nodesCount,
+            "Structure Mesh": c.geomType.toUpperCase()
+          }
+        });
+      });
+
+      return () => {
+        clusterData.forEach((c) => {
+          handler.unregisterObject(c.type);
+        });
+      };
+    }
+  }, [active, clusterData]);
+
   // ── Allocate Vertex Colors for the LineSegments ──
   const lineColorsAttribute = useMemo(() => {
     // 6 clusters, 12 curves per cluster, 24 segments per curve, 2 points per segment, 3 floats (r, g, b)
@@ -438,9 +490,26 @@ export function StardustScene({ active, config: _config }: StardustSceneProps) {
       const group = clusterGroupsRef.current[clusterIdx];
       if (!group) return;
 
-      // Slow self-spin
-      group.rotation.y = time * 0.06 + clusterIdx;
-      group.rotation.z = Math.sin(time * 0.2 + clusterIdx) * 0.03;
+      // Slow self-spin or Hover Irregular Spin
+      const isHovered = hoveredObjectId === cluster.type;
+      
+      if (!clusterRotationsRef.current[clusterIdx]) {
+        clusterRotationsRef.current[clusterIdx] = new THREE.Vector3(0, time * 0.06 + clusterIdx, Math.sin(time * 0.2 + clusterIdx) * 0.03);
+      }
+      
+      const rot = clusterRotationsRef.current[clusterIdx];
+      if (isHovered) {
+        // Irregular, chaotic multi-axis spinning on hover using trig offsets
+        rot.x += 0.02 + Math.sin(time * 2.8) * 0.012;
+        rot.y += 0.03 + Math.cos(time * 2.2) * 0.015;
+        rot.z += 0.018 + Math.sin(time * 1.6) * 0.008;
+      } else {
+        // Smoothly lerp back X to 0 and follow normal slow Y/Z spin
+        rot.x = THREE.MathUtils.lerp(rot.x, 0, 0.06);
+        rot.y = THREE.MathUtils.lerp(rot.y, time * 0.06 + clusterIdx, 0.06);
+        rot.z = THREE.MathUtils.lerp(rot.z, Math.sin(time * 0.2 + clusterIdx) * 0.03, 0.06);
+      }
+      group.rotation.set(rot.x, rot.y, rot.z);
 
       // Enlarge final scale to 2
       let baseScale = 0.0;
@@ -479,6 +548,8 @@ export function StardustScene({ active, config: _config }: StardustSceneProps) {
           nodeMesh.setMatrixAt(idx, tempMat);
         });
         nodeMesh.instanceMatrix.needsUpdate = true;
+        nodeMesh.computeBoundingBox();
+        nodeMesh.computeBoundingSphere();
       }
     });
   });
@@ -584,6 +655,14 @@ export function StardustScene({ active, config: _config }: StardustSceneProps) {
             geom = new THREE.TetrahedronGeometry(0.5, 0);
         }
 
+        // Expand bounding box and bounding sphere manually so that InstancedMesh raycasting
+        // will correctly intersect all nodes distributed inside the cluster (up to 4.5 units away)
+        geom.boundingSphere = new THREE.Sphere(new THREE.Vector3(0, 0, 0), 4.5);
+        geom.boundingBox = new THREE.Box3(
+          new THREE.Vector3(-4.5, -4.5, -4.5),
+          new THREE.Vector3(4.5, 4.5, 4.5)
+        );
+
         return (
           <group
             key={cluster.type}
@@ -592,13 +671,13 @@ export function StardustScene({ active, config: _config }: StardustSceneProps) {
           >
             {/* Volumetric Localized Nebula Glow (Halos centered at each cluster) */}
             {glowTexture && (
-              <sprite scale={[18, 18, 1]}>
+              <sprite scale={hoveredObjectId === cluster.type ? [22, 22, 1] : [18, 18, 1]}>
                 <spriteMaterial
                   attach="material"
                   map={glowTexture}
                   color={cluster.color}
                   transparent
-                  opacity={0.36 * Math.min(1.0, phase4Val)} // Fades in with final structure
+                  opacity={(hoveredObjectId === cluster.type ? 0.60 : 0.36) * Math.min(1.0, phase4Val)} // Fades in and glows brighter on hover
                   blending={THREE.AdditiveBlending}
                   depthWrite={false}
                 />
@@ -609,11 +688,25 @@ export function StardustScene({ active, config: _config }: StardustSceneProps) {
             <instancedMesh
               ref={(el) => { nodeMeshesRef.current[cluster.type] = el; }}
               args={[geom, null as any, cluster.nodesCount]}
+              onClick={(e) => {
+                e.stopPropagation();
+                expandCard(cluster.type);
+              }}
+              onPointerOver={(e) => {
+                e.stopPropagation();
+                document.body.style.cursor = "pointer";
+                setHoveredObject(cluster.type);
+              }}
+              onPointerOut={(e) => {
+                e.stopPropagation();
+                document.body.style.cursor = "auto";
+                setHoveredObject(null);
+              }}
             >
               <meshStandardMaterial
                 color={cluster.color}
                 emissive={cluster.color}
-                emissiveIntensity={0.88}
+                emissiveIntensity={hoveredObjectId === cluster.type ? 1.6 : 0.88}
                 roughness={0.2}
                 metalness={0.1}
               />
@@ -630,23 +723,40 @@ export function StardustScene({ active, config: _config }: StardustSceneProps) {
               <lineBasicMaterial
                 color={cluster.color}
                 transparent
-                opacity={0.35}
+                opacity={hoveredObjectId === cluster.type ? 0.65 : 0.35}
                 blending={THREE.AdditiveBlending}
               />
             </lineSegments>
 
             {/* Custom Interactive HUD badges overlay */}
-            <Html center distanceFactor={45} style={{ pointerEvents: "none" }}>
+            <Html center distanceFactor={45} style={{ pointerEvents: "auto" }}>
               <div 
-                className="flex items-center gap-2 bg-[#05040a]/95 backdrop-blur px-3 py-1.5 rounded-lg border shadow-xl shadow-black/60 whitespace-nowrap select-none"
-                style={{ borderColor: `${cluster.color}35` }}
+                className={`flex items-center gap-3 backdrop-blur px-5 py-3.5 rounded-xl border shadow-2xl transition-all duration-300 select-none cursor-pointer whitespace-nowrap pointer-events-auto ${
+                  hoveredObjectId === cluster.type || focusedObjectId === cluster.type
+                    ? `${getClusterGradient(cluster.type, true)} border-white/40 scale-110 shadow-purple-500/20`
+                    : `${getClusterGradient(cluster.type, false)} border-white/10 hover:scale-105`
+                }`}
+                style={{ 
+                  borderColor: hoveredObjectId === cluster.type || focusedObjectId === cluster.type ? cluster.color : `${cluster.color}40`,
+                  boxShadow: hoveredObjectId === cluster.type || focusedObjectId === cluster.type ? `0 0 25px ${cluster.color}25` : undefined
+                }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  expandCard(cluster.type);
+                }}
+                onMouseEnter={() => {
+                  setHoveredObject(cluster.type);
+                }}
+                onMouseLeave={() => {
+                  setHoveredObject(null);
+                }}
               >
                 {getClusterIcon(cluster.type, cluster.color)}
                 <div>
-                  <div className="text-[9px] font-black uppercase tracking-wider text-white font-sans leading-none">
+                  <div className="text-[12px] font-black uppercase tracking-widest text-white font-sans leading-none">
                     {cluster.type}
                   </div>
-                  <div className="text-[8px] font-bold text-slate-400 font-mono mt-0.5 leading-none">
+                  <div className="text-[10px] font-bold text-slate-400 font-mono mt-1.5 leading-none">
                     {cluster.count.toLocaleString()}
                   </div>
                 </div>

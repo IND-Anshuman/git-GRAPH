@@ -1,7 +1,7 @@
 import { useQuery, type UseQueryResult } from "@tanstack/react-query";
 import { queryKeys } from "@/lib/query-keys";
 import { CACHE } from "@/lib/constants";
-import { repositoriesApi } from "@/services/api/endpoints";
+import { repositoriesApi } from "@/lib/api";
 import type { Repository } from "@/types/platform";
 
 export function useRepositories() {
