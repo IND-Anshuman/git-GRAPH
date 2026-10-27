@@ -1,29 +1,32 @@
 """Discovery engine for automated capability intelligence extraction."""
 
 import uuid
-from typing import List, Dict, Set, Tuple, Any
-from src.application.ports.unit_of_work import IUnitOfWork
+from typing import Any
+
 from src.application.capabilities.capability_candidate import CapabilityCandidate
 from src.application.capabilities.capability_evidence import CapabilityEvidence
+from src.application.ports.unit_of_work import IUnitOfWork
+
 
 class CapabilityDiscoveryEngine:
     """The core engine that discovers capabilities using clustering, heuristics, and framework rules."""
 
-    def discover_capabilities(self, uow: IUnitOfWork, repository_id: uuid.UUID) -> List[CapabilityCandidate]:
+    def discover_capabilities(self, uow: IUnitOfWork, repository_id: uuid.UUID) -> list[CapabilityCandidate]:
         """
         Main discovery entrypoint. Groups concepts, behaviors, flows, and entities
         into high-level system capabilities.
         """
         # 1. Fetch concept nodes from UOW
         from src.domain.value_objects.repository_id import RepositoryId
+
         repo_id_vo = RepositoryId(repository_id) if isinstance(repository_id, uuid.UUID) else repository_id
         concepts = uow.concept_nodes.list_by_repository(repo_id_vo) if hasattr(uow, "concept_nodes") else []
         candidates = []
 
         if concepts:
             # Cluster based on shared files/behaviors (Jaccard Similarity)
-            concept_features: Dict[uuid.UUID, Set[str]] = {}
-            concept_map: Dict[uuid.UUID, Any] = {}
+            concept_features: dict[uuid.UUID, set[str]] = {}
+            concept_map: dict[uuid.UUID, Any] = {}
 
             for c in concepts:
                 concept_map[c.id] = c
@@ -42,7 +45,7 @@ class CapabilityDiscoveryEngine:
                 concept_features[c.id] = features
 
             # Build similarity edges
-            edges: Dict[uuid.UUID, List[uuid.UUID]] = {c.id: [] for c in concepts}
+            edges: dict[uuid.UUID, list[uuid.UUID]] = {c.id: [] for c in concepts}
             for i in range(len(concepts)):
                 for j in range(i + 1, len(concepts)):
                     c1 = concepts[i]
@@ -64,20 +67,29 @@ class CapabilityDiscoveryEngine:
             for idx, comp in enumerate(components):
                 comp_concepts = [concept_map[cid] for cid in comp]
                 primary_concept = comp_concepts[0]
-                
+
                 # Dynamic naming based on primary concept's domain
                 parts = primary_concept.ontology_node_id.split(".")
                 name = parts[1].title() if len(parts) > 1 else primary_concept.name
-                
+
                 # Check for specific AI/Security/Business mappings
                 cap_type = "TECHNICAL"
-                if any("auth" in c.ontology_node_id.lower() or "security" in c.ontology_node_id.lower() for c in comp_concepts):
+                if any(
+                    "auth" in c.ontology_node_id.lower() or "security" in c.ontology_node_id.lower()
+                    for c in comp_concepts
+                ):
                     cap_type = "SECURITY"
                     name = "Authentication & Security"
-                elif any("pay" in c.ontology_node_id.lower() or "checkout" in c.ontology_node_id.lower() for c in comp_concepts):
+                elif any(
+                    "pay" in c.ontology_node_id.lower() or "checkout" in c.ontology_node_id.lower()
+                    for c in comp_concepts
+                ):
                     cap_type = "BUSINESS"
                     name = "Payment Processing"
-                elif any("agent" in c.ontology_node_id.lower() or "retrieval" in c.ontology_node_id.lower() for c in comp_concepts):
+                elif any(
+                    "agent" in c.ontology_node_id.lower() or "retrieval" in c.ontology_node_id.lower()
+                    for c in comp_concepts
+                ):
                     cap_type = "AI"
                     name = "AI Agent Workloads"
 
@@ -88,25 +100,31 @@ class CapabilityDiscoveryEngine:
                     flows=[],
                     entities=[],
                     supporting_relationships=[],
-                    confidence_breakdown={"jaccard_cohesion": 0.85}
+                    confidence_breakdown={"jaccard_cohesion": 0.85},
                 )
 
-                candidate_id = uuid.uuid5(uuid.UUID("a7b3c291-5f2e-4d8a-b6c4-e1f0a9d2b5c8"), f"discovered_{idx}_{name}")
-                candidates.append(CapabilityCandidate(
-                    id=candidate_id,
-                    name=name,
-                    description=f"Automated capability discovered from concept cohort: {[c.name for c in comp_concepts]}",
-                    confidence=0.90,
-                    status="CANDIDATE",
-                    evidence=evidence,
-                    capability_type=cap_type
-                ))
+                candidate_id = uuid.uuid5(
+                    uuid.UUID("a7b3c291-5f2e-4d8a-b6c4-e1f0a9d2b5c8"), f"discovered_{idx}_{name}"
+                )
+                candidates.append(
+                    CapabilityCandidate(
+                        id=candidate_id,
+                        name=name,
+                        description=f"Automated capability discovered from concept cohort: {[c.name for c in comp_concepts]}",
+                        confidence=0.90,
+                        status="CANDIDATE",
+                        evidence=evidence,
+                        capability_type=cap_type,
+                    )
+                )
         else:
             # Robust fallback: check code entities and files to infer capabilities
-            entities = uow.code_entities.get_by_repository(repo_id_vo) if hasattr(uow, "code_entities") else []
+            entities = (
+                uow.code_entities.get_by_repository(repo_id_vo) if hasattr(uow, "code_entities") else []
+            )
             if entities:
                 # Group by namespace/module prefix (e.g. utils.auth -> Authentication, services.payment -> Payments)
-                groups: Dict[str, List[Any]] = {}
+                groups: dict[str, list[Any]] = {}
                 for ent in entities:
                     # Check module prefix
                     prefix = "core"
@@ -136,22 +154,28 @@ class CapabilityDiscoveryEngine:
                         behaviors=[],
                         flows=[],
                         entities=[ent.qualified_name for ent in group_ents],
-                        supporting_relationships=[]
+                        supporting_relationships=[],
                     )
-                    candidate_id = uuid.uuid5(uuid.UUID("a7b3c291-5f2e-4d8a-b6c4-e1f0a9d2b5c8"), f"fallback_{prefix}")
-                    candidates.append(CapabilityCandidate(
-                        id=candidate_id,
-                        name=name,
-                        description=f"Discovered by grouping namespace prefix: {prefix}",
-                        confidence=0.75,
-                        status="CANDIDATE",
-                        evidence=evidence,
-                        capability_type=cap_type
-                    ))
+                    candidate_id = uuid.uuid5(
+                        uuid.UUID("a7b3c291-5f2e-4d8a-b6c4-e1f0a9d2b5c8"), f"fallback_{prefix}"
+                    )
+                    candidates.append(
+                        CapabilityCandidate(
+                            id=candidate_id,
+                            name=name,
+                            description=f"Discovered by grouping namespace prefix: {prefix}",
+                            confidence=0.75,
+                            status="CANDIDATE",
+                            evidence=evidence,
+                            capability_type=cap_type,
+                        )
+                    )
 
         return candidates
 
-    def _find_connected_components(self, nodes: List[uuid.UUID], edges: Dict[uuid.UUID, List[uuid.UUID]]) -> List[List[uuid.UUID]]:
+    def _find_connected_components(
+        self, nodes: list[uuid.UUID], edges: dict[uuid.UUID, list[uuid.UUID]]
+    ) -> list[list[uuid.UUID]]:
         """Finds connected components in the graph."""
         visited = set()
         components = []

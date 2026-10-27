@@ -1,8 +1,9 @@
 """Dependency graph representation and projections for capabilities."""
 
 import uuid
-from typing import Dict, List, Any
+
 from src.application.ports.unit_of_work import IUnitOfWork
+
 
 class CapabilityDependencyGraph:
     """Builds and projects capability-to-capability dependency trees using resolved call pathways."""
@@ -13,7 +14,4 @@ class CapabilityDependencyGraph:
         Ensures O(capabilities) traversal paths.
         """
         # Retrieve all active capabilities and relationships for a repository
-        return {
-            "nodes": [],
-            "edges": []
-        }
+        return {"nodes": [], "edges": []}

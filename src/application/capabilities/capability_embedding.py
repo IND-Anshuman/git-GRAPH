@@ -1,12 +1,13 @@
 """Embedding generator for capabilities."""
 
 import hashlib
-from typing import List, Any
+from typing import Any
+
 
 class CapabilityEmbedding:
     """Generates stable vector embeddings from capability metadata to support semantic GraphRAG search."""
 
-    def generate_embedding(self, capability: Any) -> List[float]:
+    def generate_embedding(self, capability: Any) -> list[float]:
         """
         Generates a 16-dimensional deterministic floating-point vector using SHA256 hashes of capability text.
         This provides a lightweight, pure-Python mock representation of embeddings.
